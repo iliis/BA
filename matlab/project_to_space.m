@@ -11,14 +11,15 @@ focal = 0.035; % 35mm
 U = UVD(:,1);
 V = UVD(:,2);
 D = UVD(:,3);
-pointsx = U.*D;
-pointsy = -V.*D;
-pointsz = -focal.*D;
 
-XYZ = [pointsx'; pointsy'; pointsz'];
+pointsx =  U.*D./focal;
+pointsy =  V.*D./focal;
+pointsz =  D;
+
+XYZ = [pointsx pointsy pointsz];
 
 % apply camera transformation
-XYZ = (quat2dcm(camera_rot)' * XYZ)'; % + repmat(camera_pos, size(XYZ,1), 1)';
+%XYZ = (quat2dcm(camera_rot)' * XYZ)'; % + repmat(camera_pos, size(XYZ,1), 1)';
 
 %size(camera_pos)
 

@@ -19,6 +19,9 @@ scatter3(XYZ(:,1), XYZ(:,2), XYZ(:,3), 1, colors, 'Marker', '.');
 xlabel('X'); ylabel('Y'); zlabel('Z');
 pbaspect([1 1 1]); % keep aspect ratio fixed
 % ensure uniform scaling of all axes
-xlim([-1 0]);
-ylim([ 0 1]);
-zlim([-0.5 0.5]);
+%xlim([-1 0]);
+%ylim([ 0 1]);
+%zlim([-0.5 0.5]);
+
+% lochkamera nachlesen
+% erstmal Euler Winkel
