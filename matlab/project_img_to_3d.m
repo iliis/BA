@@ -14,7 +14,14 @@ XYZ = project_to_space(UVD, camera_pos, camera_rot);
 
 colors = read_color_image(imgnr);
 
-plot_pointcloud(XYZ, colors);
+XYZ = apply_camera_transformation(XYZ, camera_pos, camera_rot);
+
+XYZ = apply_camera_transformation(XYZ, [2 0 0], [1 0 0 0]);
+
+XYZ = reverse_camera_transformation(XYZ, camera_pos, camera_rot);
+
+%plot_pointcloud(XYZ, colors);
+project_to_camera(XYZ, colors);
 
 % lochkamera nachlesen
 % erstmal Euler Winkel
