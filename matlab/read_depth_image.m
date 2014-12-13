@@ -6,10 +6,13 @@ function [UVD] = read_depth_image(nr)
 clipping = [0.1 100];
 width = 0.032; % sensor size = 32mm
 
-D = double(imread(sprintf('depth%04u.png', nr))); % BW, 16bit
+D = imread(sprintf('depth%04u.png', nr)); % BW, 16bit
+
+% reverse gamma correction
+%D = imadjust(D,[],[],2.2);
 
 % scale depth
-D = D / 65535 * (clipping(2)-clipping(1)) + clipping(1);
+D = double(D) / 65535 * (clipping(2)-clipping(1)) + clipping(1);
 
 center = size(D)/2;
 [U,V] = meshgrid((1:size(D,2)) - center(2), (1:size(D,1)) - center(1));

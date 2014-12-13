@@ -19,7 +19,7 @@ pointsz =  D;
 XYZ = [pointsx pointsy pointsz];
 
 % apply camera transformation
-%XYZ = (quat2dcm(camera_rot)' * XYZ)'; % + repmat(camera_pos, size(XYZ,1), 1)';
+%XYZ = (quat2dcm(camera_rot) * XYZ')' + repmat(camera_pos, size(XYZ,1), 1);
 
 %size(camera_pos)
 
