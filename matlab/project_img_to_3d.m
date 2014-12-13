@@ -14,14 +14,7 @@ XYZ = project_to_space(UVD, camera_pos, camera_rot);
 
 colors = read_color_image(imgnr);
 
-whitebg('black'); % improve contrast
-scatter3(XYZ(:,1), XYZ(:,2), -XYZ(:,3), 1, colors, 'Marker', '.');
-xlabel('X'); ylabel('Y'); zlabel('Z');
-pbaspect([1 1 1]); % keep aspect ratio fixed
-% ensure uniform scaling of all axes
-xlim([-10 20]);
-ylim([-20 10]);
-zlim([-20 10]);
+plot_pointcloud(XYZ, colors);
 
 % lochkamera nachlesen
 % erstmal Euler Winkel
