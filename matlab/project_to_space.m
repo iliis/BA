@@ -1,26 +1,24 @@
-function XYZ = project_to_space(UVD, camera_pos, camera_rot)
-% input:  N x 3 list of points in the camera plane
-%         3D coordinates of camera and 4D quaternion of camera orientation
-% output: N x 3 list of points in real space
+function XYZ = project_to_space(D)
+% input:  H x W image with depth values
+% output: H x W x 3 list of points in real space
 
-% properties of camera (in Blender Units / meter)
+% properties of camera (in Blender Units / meters)
 focal = 0.035; % 35mm
+width = 0.032; % sensor size = 32mm
 
-% Blender's camera has Y as 'up' and -Z as 'into the scene'
-%XYZ =  [UVD(:,1) -UVD(:,2) -focal*ones(size(UVD,1),1)] .* repmat(UVD(:,3), 1, 3);
-U = UVD(:,1);
-V = UVD(:,2);
-D = UVD(:,3);
+H = size(D, 1);
+W = size(D, 2);
 
-pointsx =  U.*D./focal;
-pointsy =  V.*D./focal;
-pointsz =  D;
+% calculate pixel positions on camera sensor
+[U,V] = meshgrid((1:W) - W/2, (1:H) - H/2);
+U = U * (width / W); % correct for sensor size
+V = V * (width / W);
 
-XYZ = [pointsx pointsy pointsz];
+% actually project points into 3D space
+X = U .* D / focal;
+Y = V .* D / focal;
+Z = D;
 
-% apply camera transformation
-%XYZ = (quat2dcm(camera_rot) * XYZ')' - repmat(camera_pos, size(XYZ,1), 1);
-
-%size(camera_pos)
+XYZ = cat(3, X, Y, Z);
 
 end
