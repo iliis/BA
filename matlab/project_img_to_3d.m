@@ -14,11 +14,10 @@ colors = read_color_image(imgnr);
 
 XYZ = project_to_space(depth);
 
+write_to_ply(XYZ, colors, 'test.ply');
 
 XYZ = apply_camera_transformation(XYZ, camera_pos, camera_rot);
-
 XYZ = apply_camera_transformation(XYZ, [2 1 0], [1 0.1 0 0]);
-
 XYZ = reverse_camera_transformation(XYZ, camera_pos, camera_rot);
 
 %plot_pointcloud(XYZ, colors);

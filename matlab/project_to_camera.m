@@ -15,7 +15,7 @@ D = XYZ(:,:,3);
 %plot_pointcloud(cat(3,U,V,ones(H,W)), colors);
 %scatter(reshape(U,[],1), reshape(V,[],1), 'Marker', '.');
 
-image_c = zeros(size(colors));
+image_c = nan(size(colors));
 image_d = inf(size(XYZ, 1), size(XYZ, 2));
 
 % TODO: don't use for loop
@@ -42,5 +42,5 @@ for i = 1:H
     end
 end
 
-image(image_c);
+%image(image_c);
 end

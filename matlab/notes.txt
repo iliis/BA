@@ -1,0 +1,13 @@
+%% NOTES
+
+IDEAS
+
+> 'direct' least squares solution?
+
+> least squares in 3D space instead of rendering onto images
+  + no odd artefacts from projecting onto image
+  + no loss of points that fall outside image
+    - they don't matter/help in 3D case either...
+  - minimize what exactly? color difference between closest points?
+  - need depth images for all frames
+    + we should get them anyway from the FPGA
