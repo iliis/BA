@@ -8,6 +8,8 @@ function [DCM] = quat2dcm(q_in)
 % TODO: normalize this
 % TODO: even simpler: use Euler angles
 
+q_in = q_in ./ norm(q_in);
+
 % permute into [w x y z]
 q_in =[q_in(2) q_in(3) q_in(4) q_in(1)];
 
