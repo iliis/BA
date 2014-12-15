@@ -10,7 +10,7 @@ H = size(XYZ,1);
 points = image_to_list(XYZ);
 
 % actualy do the transformation
-points = (quat2dcm(rotation) * points')' + repmat(translation, W*H, 1);
+points = (angle2dcm(rotation) * points')' + repmat(translation, W*H, 1);
 
 % repackage points into 2D array of 3D points (i.e. 3 dimensional matrix)
 XYZ = list_to_image(points, [H,W]);
