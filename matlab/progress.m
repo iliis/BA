@@ -33,7 +33,13 @@ if (isempty(progress_handle) || isempty(ish) || ~ish(1))
     set(progress_handle, 'units', 'normalized');
     % center on screen
     set(progress_handle, 'position',[.25 .425 .5 .15]);
+    % title of window
+    set(progress_handle, 'Name', 'Progress', 'NumberTitle', 'off');
 end
+
+% use plot handle
+%figure(progress_handle);
+set(0, 'CurrentFigure', progress_handle); % prevent window from popping to the top
 
 hold on;
 
@@ -42,13 +48,14 @@ percent = (percent-minmax(1))/(minmax(2)-minmax(1))*100;
 fill([0 percent percent 0], [0 0 1 1],'g');
 fill([percent 100 100 percent], [0 0 1 1],'r'); 
 title(['\fontsize{20}\bf',num2str(percent),'%']);
+set(progress_handle, 'Name', ['Progress ' num2str(percent) '%']);
 
 set(gca, 'ytick', []); % disable y axis
 
 hold off;
 
 % close progress bar plot window if we're done (i.e. progress == 100%)
-if(percent == minmax(2))
+if(percent >= minmax(2))
     close(progress_handle);
     clear progress_handle;
 end

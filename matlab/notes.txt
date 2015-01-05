@@ -11,3 +11,13 @@ IDEAS
   - minimize what exactly? color difference between closest points?
   - need depth images for all frames
     + we should get them anyway from the FPGA
+  --> Turns out this doesn't work as well, as error terms get a lot more complicated (can't just assume simple gaussians)
+
+
+
+OBSERVATIONS
+
+> F*ck gamma correction
+  - there might be a bug in Blender
+
+> lsqnonlin needs quite big DiffMinChange but still gets stuck in local minima (at least without Jacobian)
