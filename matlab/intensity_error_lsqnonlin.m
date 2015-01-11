@@ -20,7 +20,9 @@ errs(isnan(warped)) = NONMATCHED_PIXEL_PENALTY; % not yet tested, penalty for un
 
 err = image_to_list(errs)';
 
-disp(['intensity error: ', num2str(T_translation), ' --> ', num2str(sum(err.^2))]);
+disp(['intensity error:  --> ', num2str(sum(err.^2))]);
+disp(['translation: ' num2str(T_translation)]);
+disp(['rotation:    ' num2str(T_rotation)]);
 
 if nargout > 1
     
