@@ -7,7 +7,13 @@ global_parameters
 warped = warp_image(D1, I1, T_translation, T_rotation);
 
 errs = (I2-warped).^2;
+
+% keep a copy for plotting later on
+errs_plot = errs;
+errs_plot(isnan(warped)) = 0;
+
 %errs(isnan(warped)) = 0; % ignore empty pixels
+%errs(isnan(warped)) = []; 
 errs(isnan(warped)) = NONMATCHED_PIXEL_PENALTY; % empiric penalty for empty pixels
 
 err = sum(sum(errs));
@@ -25,7 +31,7 @@ if nargin >= 7
     imagesc(warped);
 
     axes(plot(3));
-    imagesc(abs(errs));
+    imagesc(abs(errs_plot));
     
     title(err);
 end

@@ -11,6 +11,11 @@ U = XYZ(:,:,1).*CAMERA_FOCAL./XYZ(:,:,3);
 V = XYZ(:,:,2).*CAMERA_FOCAL./XYZ(:,:,3);
 D = XYZ(:,:,3);
 
+% convert points on camera sensor into pixel coordinates
+% int32 already rounds correctly
+U = int32(U / CAMERA_WIDTH * W + 0.5 * W);
+V = int32(V / CAMERA_WIDTH * W + 0.5 * H);
+
 %plot_pointcloud(cat(3,U,V,ones(H,W)), colors);
 %scatter(reshape(U,[],1), reshape(V,[],1), 'Marker', '.');
 
@@ -20,8 +25,8 @@ image_d = inf(size(XYZ, 1), size(XYZ, 2));
 % TODO: don't use for loop
 for i = 1:H
     for j = 1:W
-        u = int32(U(i,j) / CAMERA_WIDTH * W + 0.5 * W);
-        v = int32(V(i,j) / CAMERA_WIDTH * W + 0.5 * H);
+        u = U(i,j);
+        v = V(i,j);
 
         %disp([num2str(U(i,j)) ' ' num2str(V(i,j)) ' --> ' num2str(u) ' ' num2str(v)]);
         

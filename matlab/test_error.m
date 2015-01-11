@@ -13,6 +13,16 @@ I1 = read_intensity_image(1);
 D2 = read_depth_image(2);
 I2 = read_intensity_image(2);
 
+scale = 2;
+if scale > 1
+    D1 = imresize(D1, 1/2^scale);
+    I1 = imresize(I1, 1/2^scale);
+    D2 = imresize(D2, 1/2^scale);
+    I2 = imresize(I2, 1/2^scale);
+end
+
+
+
 %imagesc(I2-I1);
 %colormap(gray);
 
@@ -21,9 +31,9 @@ I2 = read_intensity_image(2);
 % find transformation by global optimization
 %addpath('bayesopt/matlab');
 
-minfun     = @(x) intensity_error(D1,I1,D2,I2, x(1:3), x(4:6));
-minfunpos  = @(x) intensity_error(D1,I1,D2,I2, x(1:3), [0 0 0], false);
-minfunposl = @(x) intensity_error_lsqnonlin(D1,I1,D2,I2, x(1:3), [0 0 0]);
+minfun    = @(x) intensity_error(D1,I1,D2,I2, x(1:3), x(4:6));
+minfunpos = @(x) intensity_error(D1,I1,D2,I2, x(1:3), [0 0 0], false);
+minfunl   = @(x) intensity_error_lsqnonlin(D1,I1,I2, x(1:3), x(4:6));
 
 % initial values for solvers:
 %guess_translation = [-1 0 0];
@@ -45,9 +55,8 @@ options = optimset(options, 'DiffMinChange', 0.01);
 options = optimset(options, 'DiffMaxChange', 1);
 options = optimset(options, 'Display', 'iter-detailed', 'FunValCheck', 'on');
 options = optimset(options, 'UseParallel', true);
-[xmin, ymin] = lsqnonlin(minfunposl, guess_translation, [-3 -2 -2], [2 2 2], options)
-xmin = [xmin 0 0 0];
-
+%options = optimset(options, 'Jacobian', 'on');
+[xmin, ymin] = lsqnonlin(minfunl, [guess_translation guess_rotation], [-3 -2 -2 -2 -2 -2], [2 2 2 2 2 2], options)
 
 
 intensity_error(D1,I1,D2,I2, xmin(1:3), xmin(4:6), true); % plot result

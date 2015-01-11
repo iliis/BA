@@ -1,7 +1,7 @@
 clear all;
 global_parameters;
 
-MAX_ITERS = 4; % how often to divide images by 2
+MAX_ITERS = 5; % how often to divide images by 2
 
 % initial estimation
 T_translation = [ 0 0 0 ]; % actual solution = 2.1411    0.3076   -0.5665
@@ -15,9 +15,11 @@ I2 = read_intensity_image(2);
 options = optimset();
 %options = optimset(options, 'TolX', 1e-10, 'TolFun', 1e-10, 'TolCon', 1e-10);
 options = optimset(options, 'TolX', 0.0001, 'TolFun', 1);
-options = optimset(options, 'DiffMinChange', 0.1);
+options = optimset(options, 'DiffMinChange', 0.01);
 options = optimset(options, 'DiffMaxChange', 1);
 options = optimset(options, 'Display', 'iter-detailed', 'FunValCheck', 'on');
+options = optimset(options, 'UseParallel', true);
+%options = optimset(options, 'Jacobian', 'on');
 
 
 for i = MAX_ITERS:-1:1
@@ -27,11 +29,15 @@ for i = MAX_ITERS:-1:1
     D2_scaled = imresize(D2, 1/2^i);
     I2_scaled = imresize(I2, 1/2^i);
     
-    minfunposl = @(x) intensity_error_lsqnonlin(D1_scaled,I1_scaled,D2_scaled,I2_scaled, x(1:3), [0 0 0]);
-    minfunpos  = @(x) intensity_error(D1_scaled,I1_scaled,D2_scaled,I2_scaled, x(1:3), [0 0 0]);
+    minfunl    = @(x) intensity_error_lsqnonlin(D1_scaled,I1_scaled,I2_scaled, x(1:3), x(4:6));
+    minfun     = @(x) intensity_error(D1_scaled,I1_scaled,D2_scaled,I2_scaled, x(1:3), x(4:6));
 
     %[T_translation, ymin] = lsqnonlin(minfunposl, T_translation, [-3 -2 -2], [2 2 2], options)
-    [T_translation, ymin] = patternsearch(minfunpos, T_translation)
+    %[T_translation, ymin] = patternsearch(minfunpos, T_translation)
+    %xmin = patternsearch(minfun, [T_translation T_rotation])
+    xmin = lsqnonlin(minfunl, [T_translation T_rotation], [-3 -2 -2 -2 -2 -2], [2 2 2 2 2 2], options);
+    T_translation = xmin(1:3);
+    T_rotation    = xmin(4:6);
 
     %intensity_error(D1,I1,D2,I2, T_translation, T_rotation, true); % plot result
     

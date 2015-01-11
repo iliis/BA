@@ -21,3 +21,23 @@ OBSERVATIONS
   - there might be a bug in Blender
 
 > lsqnonlin needs quite big DiffMinChange but still gets stuck in local minima (at least without Jacobian)
+
+
+QUESTIONS
+
+> How to delete element in matrix? I.e. mark it as invalid/non-existing?
+
+
+TODO
+
+> implement full Jacobi
+  - derive differentials for functions seperately and manually combine them using chain rule
+  - use gauss-newton instead of lsqnonlin
+
+> optimize away some for loops
+
+> generate more test footage
+  - with more geometry
+  - try to use real camera
+
+> exact deadline date
