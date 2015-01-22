@@ -1,5 +1,9 @@
 %% NOTES
 
+DEADLINE
+
+15.6.2015
+
 IDEAS
 
 > 'direct' least squares solution?
@@ -23,16 +27,11 @@ OBSERVATIONS
 > lsqnonlin needs quite big DiffMinChange but still gets stuck in local minima (at least without Jacobian)
 
 
-QUESTIONS
-
-> How to delete element in matrix? I.e. mark it as invalid/non-existing?
-
-
 TODO
 
 > implement full Jacobi
-  - derive differentials for functions seperately and manually combine them using chain rule
-  - use gauss-newton instead of lsqnonlin
+ - unit test with finite differences
+ - plot derivation of sum(errs.^2)
 
 > optimize away some for loops
 
@@ -40,4 +39,5 @@ TODO
   - with more geometry
   - try to use real camera
 
-> exact deadline date
+> organize code somewhat
+  - tests, plots, actual_math, ...

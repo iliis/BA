@@ -55,9 +55,10 @@ set(gca, 'ytick', []); % disable y axis
 hold off;
 
 % close progress bar plot window if we're done (i.e. progress == 100%)
-if(percent >= minmax(2))
+if(percent >= 100) % minmax(2))
     close(progress_handle);
     clear progress_handle;
+    disp('progress: done, closing progress bar');
 end
 
 % force update of plot window (and the entire rest of the MATLAB GUI)
