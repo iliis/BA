@@ -4,7 +4,7 @@ classdef basic_projection_tests < matlab.unittest.TestCase
     properties
         image_scale = 1;
         image_path  = 'unit_tests/linear_translation';
-        show_plots  = true;
+        show_plots  = false;
         
         I, D;
     end
@@ -17,7 +17,6 @@ classdef basic_projection_tests < matlab.unittest.TestCase
     
     methods (Test)
         function test_proj_to_space(tc)
-            persistent fig;
             
             Imin = min(min(tc.I));
             Imax = max(max(tc.I));
@@ -28,7 +27,6 @@ classdef basic_projection_tests < matlab.unittest.TestCase
             warped = project_to_camera(XYZ, tc.I);
             
             if tc.show_plots
-                if isempty(fig) fig = figure; else figure(fig); end
                 
                 subplot(1, 2, 1);
                 imagesc(tc.I);

@@ -1,9 +1,9 @@
-classdef linear_translation_tests < matlab.unittest.TestCase
+classdef rotation_and_translation_tests < matlab.unittest.TestCase
     % test on a simple linear transformation [-1 2 0]
     
     properties
         image_scale = 1;
-        image_path  = 'unit_tests/linear_translation';
+        image_path  = 'unit_tests/rotation_and_translation';
         show_plots  = true;
         
         I1, I2, D1, D2;
@@ -25,10 +25,13 @@ classdef linear_translation_tests < matlab.unittest.TestCase
         
         function test_image_warping_translation(tc)
             
-            correct_translation = [1 0 0];
+            %correct_translation = [1 0 0];
+            correct_translation = [0.94 0 0.34];
+            %correct_rotation    = [0 degtorad(-20) 0];
+            correct_rotation    = [0 degtorad(-20) 0];
             
-            I1_w = warp_image(tc.D1, tc.I1,  correct_translation, [0 0 0]);
-            I2_w = warp_image(tc.D2, tc.I2, -correct_translation, [0 0 0]);
+            I1_w = warp_image(tc.D1, tc.I1,  correct_translation,  correct_rotation);
+            I2_w = warp_image(tc.D2, tc.I2, -correct_translation, -correct_rotation);
             
             e1 = difference_error(tc.I1, I2_w);
             e2 = difference_error(tc.I2, I1_w);
@@ -66,35 +69,18 @@ classdef linear_translation_tests < matlab.unittest.TestCase
                 title(['diff (err = ', num2str(e2), ')']);
             end
             
-            % ASSERTIONS
-            % (after plotting, so plots are shown even when assertions fail)
-            % //////////////////////////////////////////////////////////////
-            
-            tc.assertLessThan(e1, 150);
-            tc.assertLessThan(e2, 150);
+            %tc.assertLessThan(e1, 150);
+            %tc.assertLessThan(e2, 150);
             
             % ensure this is really the local minimum by perturbing a bit
-            perturbations = [-0.1, -0.01, 0.01, 0.1];
-            for px = perturbations
-                for py = perturbations
-                    for pz = perturbations
-                        I1_w = warp_image(tc.D1, tc.I1,  correct_translation + [px py pz], [0 0 0]);
-                        I2_w = warp_image(tc.D2, tc.I2, -correct_translation - [px py pz], [0 0 0]);
-
-                        e1_perturbed = difference_error(tc.I1, I2_w);
-                        e2_perturbed = difference_error(tc.I2, I1_w);
-
-                        tc.assertLessThan(e1, e1_perturbed, ['translation by ' num2str(correct_translation) ' + ' num2str([px py pz]) ' results in error of ' num2str(e1_perturbed) ' instead of ' num2str(e1)]);
-                        tc.assertLessThan(e2, e2_perturbed);
-                    end
-                end
-            end
+            
             
             % also do random perturbations
             for i = 1:20
-                perturbation = rand(1,3)-0.5; % +/-0.5
-                I1_w = warp_image(tc.D1, tc.I1,  correct_translation + perturbation, [0 0 0]);
-                I2_w = warp_image(tc.D2, tc.I2, -correct_translation - perturbation, [0 0 0]);
+                perturbation_pos = rand(1,3)*0.2-0.1; % +/-0.1
+                perturbation_rot = rand(1,3)*2*pi/10-pi/10; % +/-pi/10
+                I1_w = warp_image(tc.D1, tc.I1,  correct_translation + perturbation_pos, correct_translation + perturbation_rot);
+                I2_w = warp_image(tc.D2, tc.I2, -correct_translation - perturbation_pos, correct_translation - perturbation_rot);
 
                 e1_perturbed = difference_error(tc.I1, I2_w);
                 e2_perturbed = difference_error(tc.I2, I1_w);
