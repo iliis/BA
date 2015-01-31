@@ -34,7 +34,8 @@ classdef linear_translation_tests < matlab.unittest.TestCase
             e1 = difference_error(tc.I1, I2_w);
             e2 = difference_error(tc.I2, I1_w);
             
-            %tc.assertLessThan(
+            tc.assertLessThan(e1, 150);
+            tc.assertLessThan(e2, 150);
             
             % plot
             if tc.show_plots
@@ -69,6 +70,23 @@ classdef linear_translation_tests < matlab.unittest.TestCase
                 diff(isnan(I2_w)) = 0;
                 imagesc(diff);
                 title(['diff (err = ', num2str(e2), ')']);
+            end
+            
+            % ensure this is really the local minimum by perturbing a bit
+            perturbations = [-0.1, -0.01, 0.01, 0.1];
+            for px = perturbations
+                for py = perturbations
+                    for pz = perturbations
+                        I1_w = warp_image(tc.D1, tc.I1,  correct_translation + [px py pz], [0 0 0]);
+                        I2_w = warp_image(tc.D2, tc.I2, -correct_translation - [px py pz], [0 0 0]);
+
+                        e1_perturbed = difference_error(tc.I1, I2_w);
+                        e2_perturbed = difference_error(tc.I2, I1_w);
+
+                        tc.assertLessThan(e1, e1_perturbed, ['translation by ' num2str(correct_translation) ' + ' num2str([px py pz]) ' results in error of ' num2str(e1_perturbed) ' instead of ' num2str(e1)]);
+                        tc.assertLessThan(e2, e2_perturbed);
+                    end
+                end
             end
             
         end

@@ -4,7 +4,7 @@ classdef basic_projection_tests < matlab.unittest.TestCase
     properties
         image_scale = 1;
         image_path  = 'unit_tests/linear_translation';
-        show_plots  = false;
+        show_plots  = true;
         
         I, D;
     end
