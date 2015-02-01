@@ -26,6 +26,12 @@ OBSERVATIONS
 
 > lsqnonlin needs quite big DiffMinChange but still gets stuck in local minima (at least without Jacobian)
 
+> Global minima can sometimes be a litte of of 'true' solution!
+
+> Warping can lead to holes between pixels, resulting in background 'shining trough'
+  -> this increases error for true solution
+  -> add some sort of filtering when rendering warped image?
+
 
 TODO
 
