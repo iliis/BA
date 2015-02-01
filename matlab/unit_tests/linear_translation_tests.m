@@ -4,7 +4,7 @@ classdef linear_translation_tests < matlab.unittest.TestCase
     properties
         image_scale = 1;
         image_path  = 'unit_tests/linear_translation';
-        show_plots  = true;
+        show_plots  = false;
         
         I1, I2, D1, D2;
     end
@@ -61,7 +61,7 @@ classdef linear_translation_tests < matlab.unittest.TestCase
                 
                 subplot(2, 3, 6);
                 diff = abs(I1_w - tc.I2);
-                diff(isnan(I2_w)) = 0;
+                diff(isnan(I1_w)) = 0;
                 imagesc(diff);
                 title(['diff (err = ', num2str(e2), ')']);
             end

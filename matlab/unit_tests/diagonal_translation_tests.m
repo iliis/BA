@@ -64,7 +64,7 @@ classdef diagonal_translation_tests < matlab.unittest.TestCase
                 
                 subplot(2, 3, 6);
                 diff = abs(I1_w - tc.I2);
-                diff(isnan(I2_w)) = 0;
+                diff(isnan(I1_w)) = 0;
                 imagesc(diff);
                 title(['diff (err = ', num2str(e2), ')']);
             end
@@ -79,7 +79,7 @@ classdef diagonal_translation_tests < matlab.unittest.TestCase
             % ensure this is really the local minimum by perturbing a bit
             % don't perturb by 0.01, this actually gives a slightly better
             % solution...
-            perturbations = [-0.1, -0.02, 0.02, 0.1];
+            perturbations = [-0.1, -0.01, 0.01, 0.1];
             for px = perturbations
                 for py = perturbations
                     for pz = perturbations
