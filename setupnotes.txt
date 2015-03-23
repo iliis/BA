@@ -1,0 +1,72 @@
+Eclim for Xilinx SDK:
+=====================
+
+Download Version 1.7.19 from http://sourceforge.net/projects/eclim/files/eclim/1.7.19/ (Version 2.x requires Eclipse 4.4.x)
+Make sure installer has write permissions to ~/.vim and to SDK eclipse directory
+In installer, choose Xilinx/14.7/ISE_DS/EDK/eclipse/lin64/eclipse as Eclipse Home directory
+
+$ java -jar eclim_1.7.19.jar
+
+If plugin installation fails, delete all eclim files in eclipse/features/, eclipse/plugins/, ~/.vim, ~/.eclipse and also all entries in eclipse/artifacts.xml
+
+/media/DATA2/visensor/Xilinx/14.7/ISE_DS/EDK/eclipse/lin64/eclipse
+
+Start eclim server at:
+/media/DATA2/visensor/Xilinx/14.7/ISE_DS/EDK/eclipse/lin64/eclipse/eclimd
+
+
+
+visensor-srv project (Xilinx SDK)
+=================================
+
+- Uncomment everything with CAM4-7 and DENSE_MATCHER1-3
+
+
+
+ROS on Fedora 21
+================
+
+Install repo from csc.mcs.sdsmt.edu (smd-ros-staging-release, smd-ros-shadow-fixed-release).
+
+$ sudo yum install ros-indigo-desktop-full python-rosinstall
+$ sudo rosdep init
+$ rosdep update
+# add /opt/ros/indigo/setub.[bash|zsh] to ~/.[bashrc|zshrc]
+
+Now, create a ROS workspace:
+$ {mkdir -p,cd} ~/ros/src
+$ catkin_init_workspace
+
+Copy ros treiber stuff into ~/ros/src (libvisensor, visensor_node)
+
+Build it:
+$ cd ~/ros
+$ catkin_make
+$ source ~/ros/devel/setup.[bash|zsh]
+
+
+Make sure UDP ports 13775 and 51243 are open (sudo firewall-config), otherwise autodiscovery of sensor will fail during 'rosrun visensor_node visensor_node'.
+
+If you still can't autodiscover sensor trough ROS, make sure the sensor is actually running libvisensor!
+
+
+
+Run roscore:
+$ roscore
+
+Run driver:
+$ rosrun visensor_node visensor_node
+
+Show dense stereo data:
+$ rosrun dynamic_reconfigure dynparam set /visensor_node "{'cam1_agc_enable': 0, 'cam1_aec_enable': 0, 'cam1_coarse_shutter_width': 300}"
+$ rosrun image_view image_view image:=/dense/image_raw
+
+
+
+$ rosrun rqt_reconfigure rqt_reconfigure 
+
+
+visensor-srv: runs on sensor, sends out data trough custom boost pipes
+libvisensor: runs on pc, receives data from sensor
+visensor-node: runs on pc, gets data from libvisensor, forwards it to ROS
+

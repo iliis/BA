@@ -1,4 +1,4 @@
-function [err, J] = intensity_error_lsqnonlin( D1, I1, I2, T_translation, T_rotation )
+function [err, J, invalid_terms] = intensity_error_lsqnonlin( D1, I1, I2, T_translation, T_rotation )
 % input:  2 intensitiy and 1 depth images, T transformation that maps I2/D2 to I1/D1
 % output: linear error vector (not summed and not squared)
 %         Jacobian of error term for T_translation
@@ -15,10 +15,13 @@ Tc = T_rotation(3);
 warped = warp_image(D1, I1, T_translation, T_rotation);
 
 errs = (I2-warped);
-%errs(isnan(warped)) = 0; % ignore empty pixels
-errs(isnan(warped)) = NONMATCHED_PIXEL_PENALTY; % not yet tested, penalty for unmatched pixels
+errs(isnan(warped)) = 0; % ignore empty pixels
+%errs(isnan(warped)) = NONMATCHED_PIXEL_PENALTY; % not yet tested, penalty for unmatched pixels
 
 err = image_to_list(errs)';
+
+invalid_terms = logical(zeros(size(err)));
+invalid_terms(isnan(warped)) = true;
 
 %disp(['intensity error:  --> ', num2str(sum(err.^2))]);
 %disp(['translation: ' num2str(T_translation)]);
@@ -76,6 +79,7 @@ if nargout > 1
                 % pixel is out of range of our image (or the differential of it)
                 
                 J(J_idx, :) = [0 0 0 0 0 0];
+                invalid_terms(J_idx) = true;
                 
                 continue;
             end
@@ -87,20 +91,10 @@ if nargout > 1
             % final Jacobian
             J(J_idx, :) = J_I * J_pi * J_T;
             
-            
-            
-            %iu = (focal*(Tx + (u*D1(u, v))/focal))/(Tz + D1(u, v));
-            %iv = (focal*(Ty + (v*D1(u, v))/focal))/(Tz + D1(u, v));
-            
-            % TODO: calculate actual differentials here
-    
-            % dx = -(focal*D([1], I1)((focal*(Tx + (u*D1(u, v))/focal))/(Tz + D1(u, v)), (focal*(Ty + (v*D1(u, v))/focal))/(Tz + D1(u, v))))/(Tz + D1(u, v))
-            % dy = -(focal*D([2], I1) (px, py)  ) /(Tz + D1(u, v))
-            % dz = (focal*(Tx + (u*D1(u, v))/focal)*D([1], I1)((focal*(Tx + (u*D1(u, v))/focal))/(Tz + D1(u, v)), (focal*(Ty + (v*D1(u, v))/focal))/(Tz + D1(u, v))))/(Tz + D1(u, v))^2 + (focal*(Ty + (v*D1(u, v))/focal)*D([2], I1)((focal*(Tx + (u*D1(u, v))/focal))/(Tz + D1(u, v)), (focal*(Ty + (v*D1(u, v))/focal))/(Tz + D1(u, v))))/(Tz + D1(u, v))^2
         end
     end
     
-end
+end % nargout > 1
 
 end
 

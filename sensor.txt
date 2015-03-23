@@ -1,0 +1,31 @@
+http://wiki.ros.org/vi_sensor
+rosrun visensor_node visensor_node
+
+visensor_node config -> disable auto sensor exposure (aec_enable off, coarse_shutter_with auf etwas sinnvolles (100 oderso indoor))
+
+manually copy needed opencv libs to /usr/lib (space constraints)
+
+ssh root@10.0.0.1
+# remount / rw to write stuff
+mount -o remount,rw /
+
+kill visensor before starting own code (as everything in ~/bin (without .elf) is autostarted and server is alreaddy running and hogs sensor)
+
+use sensor data on pc: convert ros -> opencv
+
+linalg: eigen
+
+
+installing ROS...
+
+
+allow UDP ports 13775 and 51243
+
+egomotion project:
+- add a lot of opencv/modules/*/include folders to include path
+- missing sources in include/: fpga, sensors, visensor (links to aslam_driver/embedded/visensor-srv/include/*)
+
+
+libvisensor
+visensor_node
+visensor_msgs

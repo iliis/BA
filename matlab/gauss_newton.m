@@ -7,7 +7,7 @@ for i = 1:10
     
     x = x - inv(J'*J) * J' * err';
     
-    disp(['step ' num2str(i) ': error = ' num2str(sum(err.^2))]);
+    disp(['step ' num2str(i) ': error = ' num2str(sum(err.^2)) '  T = ' num2str([T_translation T_rotation])]);
 end
 
 T_translation = x(1:3)';

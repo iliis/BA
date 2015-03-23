@@ -4,6 +4,7 @@ classdef rotation_and_translation_tests < matlab.unittest.TestCase
     properties
         image_scale = 1;
         image_path  = 'unit_tests/rotation_and_translation';
+        %image_path  = 'unit_tests/rot_trans_verysmall';
         show_plots  = false;
         
         I1, I2, D1, D2;
@@ -25,12 +26,12 @@ classdef rotation_and_translation_tests < matlab.unittest.TestCase
         
         function test_image_warping_translation(tc)
             
-            %correct_translation = [1 0 0];
-            %correct_translation = [1 0 2];
-            
             correct_translation = [1.6237 0 -1.5374];
-            %correct_rotation    = [0 degtorad(-20) 0];
             correct_rotation    = [0 degtorad(-20) 0];
+            
+            % for verysmall
+            %correct_translation = [0.04 0 -0.03];
+            %correct_rotation    = [0 degtorad(-5) 0];
             
             %[correct_translation_rev, correct_rotation_rev] = reverse_transformation(correct_translation, correct_rotation)
             correct_translation_rev = [-1 0 2];

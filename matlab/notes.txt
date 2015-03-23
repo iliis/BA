@@ -47,3 +47,12 @@ TODO
 
 > organize code somewhat
   - tests, plots, actual_math, ...
+
+
+
+
+max. movement: 10cm for now
+
+alles dokumentieren! alle zwischenschritte!
+
+jacobi berechnen: nicht null, rausnehmen! halt auch ausm error term
