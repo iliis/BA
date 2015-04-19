@@ -36,7 +36,7 @@ for i = 1:H
         end
 
         if (image_d(v, u) <= D(i, j))
-            % current pixel is behind an already existing one
+            % current pixel is behind an existing one
             continue;
         end
 

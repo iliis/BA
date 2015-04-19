@@ -1,10 +1,10 @@
-function J_T = jacobi_transformation( u, v, depth_uv, T )
-% jacobian for transformation operator
+function J_T = jacobi_transformation( x, depth_uv, T )
+% jacobian for transformation operator T*pi^-1(x, D(x))
 
 global_parameters;
 
-H = size(D1, 1);
-W = size(D1, 2);
+u = x(1);
+v = x(2);
 
 % get points on camera sensor from pixel coordinates
 pu = (u - W/2) * CAMERA_WIDTH / W;

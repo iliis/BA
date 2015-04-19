@@ -1,4 +1,5 @@
 function J_I = jacobi_image(I,u,v)
+% Jacobian for Image intensitiy itself
 
 % TODO: filter/convolute image?
 diff_x = diff(I,1,1);

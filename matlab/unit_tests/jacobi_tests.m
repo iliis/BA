@@ -163,7 +163,7 @@ classdef jacobi_tests < matlab.unittest.TestCase
 
                 tc.assertEqualTolerance(reshape(XYZ(pu,pv,:), [3 1]), eval(subs(proj_inv, [T u v Depth focal], [0 0 0 0 0 0 px_real py_real tc.D1(pu, pv) CAMERA_FOCAL])), 1e-6);
 
-                T_numerical = @(t) reshape(apply_camera_transformation(cat(3,XYZ(pu,pv,1),XYZ(pu,pv,2),XYZ(pu,pv,3)), t(1:3), t(4:6)), [3, 1]);
+                T_numerical = @(t) reshape(apply_camera_transformation(cat(3,XYZ(pu,pv,1),XYZ(pu,pv,2),XYZ(pu,pv,3)), t), [3, 1]);
 
                 tc.numeric_diff(J_T_analytical([0 0 0 0 0 0], px_real, py_real, tc.D1(pu, pv)), T_numerical);
             end
