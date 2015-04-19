@@ -1,3 +1,7 @@
+% use lsqnonline with Jacobi to find minimum of some fancy function
+% attempts to plot convergence regions
+% just to test lsqnonlin and Jacobis
+
 z = @(x, y) 3*(1-x).^2.*exp(-(x.^2) - (y+1).^2) ... 
    - 10*(x/5 - x.^3 - y.^5).*exp(-x.^2-y.^2) ... 
    - 1/3*exp(-(x+1).^2 - y.^2) + 8;

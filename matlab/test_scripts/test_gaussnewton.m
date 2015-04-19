@@ -1,23 +1,11 @@
+% tries to find minimum using Gauss Newton
+
 clear all;
 
 global_parameters
 
-path = 'unit_tests/rot_trans_verysmall';
-
-D1 = read_depth_image(path, 1);
-I1 = read_intensity_image(path, 1);
-D2 = read_depth_image(path, 2);
-I2 = read_intensity_image(path, 2);
-
-scale = 1;
-if scale > 1
-    D1 = imresize(D1, 1/2^scale);
-    I1 = imresize(I1, 1/2^scale);
-    D2 = imresize(D2, 1/2^scale);
-    I2 = imresize(I2, 1/2^scale);
-end
-
-
+image_path = 'unit_tests/rot_trans_verysmall';
+test_init;
 
 % initial values for solvers:
 %guess_translation = [-1 0 0];
@@ -42,4 +30,4 @@ intensity_error(D1,I1,D2,I2, T_translation, T_rotation, true); % plot result
 points1 = apply_camera_transformation(project_to_space(D1), T_translation, T_rotation);
 points2 = project_to_space(D2);
 
-write_to_ply([points1 points2], [read_color_image(1) read_color_image(2)], 'test.ply');
+write_to_ply([points1 points2], [C1 C2], 'test.ply');

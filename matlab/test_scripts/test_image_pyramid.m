@@ -1,3 +1,5 @@
+% matches and plots image pairs in increasing scales
+
 clear all;
 
 test_init;
