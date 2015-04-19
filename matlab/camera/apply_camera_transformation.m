@@ -1,4 +1,4 @@
-function XYZ = apply_camera_transformation(XYZ, translation, rotation)
+function XYZ = apply_camera_transformation(XYZ, T)
 % input: XYZ = H x W x 3 array of points in 3D space
 %        translation: 3 dimensional row vector
 %        rotation: [W X Y Z] quaternion
@@ -6,11 +6,14 @@ function XYZ = apply_camera_transformation(XYZ, translation, rotation)
 W = size(XYZ,2);
 H = size(XYZ,1);
 
+T_translation = T(1:3);
+T_rotation    = T(4:6);
+
 % repackage points from 2D-array into list
 points = image_to_list(XYZ);
 
 % actualy do the transformation
-points = (angle2dcm(rotation) * points')' + repmat(translation, W*H, 1);
+points = (angle2dcm(T_rotation) * points')' + repmat(T_translation, W*H, 1);
 
 % repackage points into 2D array of 3D points (i.e. 3 dimensional matrix)
 XYZ = list_to_image(points, [H,W]);

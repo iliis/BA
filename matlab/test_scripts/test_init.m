@@ -4,7 +4,7 @@ if ~exist('image_path', 'var') || isempty(image_path)
     image_path  = 'input';
 end
 
-if ~exists('image_scale', 'var') || isempty(image_scale) || image_scale < 1
+if ~exist('image_scale', 'var') || isempty(image_scale) || image_scale < 1
     image_scale = 1;
 end
 

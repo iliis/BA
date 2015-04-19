@@ -1,20 +1,15 @@
-function [T_translation, T_rotation] = gauss_newton(D1,I1,I2, T_translation, T_rotation)
-
-x = [T_translation, T_rotation]';
+function T = gauss_newton(D1,I1,I2, T)
 
 for i = 1:10
     % TODO: remove invalid_terms!
-    [err, J] = intensity_error_lsqnonlin(D1,I1,I2, x(1:3)', x(4:6)');
+    [err, J] = intensity_error_lsqnonlin(D1,I1,I2,T);
     
     %step = inv(J'*J) * J' * err';
     step = (J'*J) \ J' * err';
     
-    x = x - step;
+    T = T - step';
     
-    disp(['step ' num2str(i) ': error = ' num2str(sum(err.^2)) '  T = ' num2str(x')]);
+    disp(['step ' num2str(i) ': error = ' num2str(sum(err.^2)) '  T = ' num2str(T)]);
 end
-
-T_translation = x(1:3)';
-T_rotation = x(4:6)';
 
 end
