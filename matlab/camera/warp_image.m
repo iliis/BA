@@ -4,7 +4,7 @@ function warped = warp_image(depth, colors, T)
 
 global_parameters
 
-warped_color = zeros(size(colors));
+warped_color = nan(size(colors));
 warped_depth = inf(size(colors));
 
 for v=1:H
@@ -17,7 +17,7 @@ for v=1:H
             continue;
         end
         
-        if D >= warped_depth(v,u)
+        if D >= warped_depth(uint32(x(2)), uint32(x(1)))
             % pixel is behind existing one
             continue;
         end

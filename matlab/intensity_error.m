@@ -16,7 +16,7 @@ err = image_to_list(errs)';
 % keep a copy for plotting later on
 errs_plot = errs.^2;
 errs_plot(isnan(warped)) = 0;
-err_total = sum(err);
+err_total = sum(err.^2);
 
 invalid_terms = false(size(err));
 invalid_terms(isnan(warped)) = true;
