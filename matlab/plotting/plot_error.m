@@ -1,12 +1,13 @@
 dim1 = 1;
 dim2 = 2;
+dim_names = {'X', 'Y', 'Z', 'alpha', 'beta', 'gamma'};
 
 scale = 4;
 
-D1 = read_depth_image(1);
-I1 = read_intensity_image(1);
-D2 = read_depth_image(2);
-I2 = read_intensity_image(2);
+D1 = read_depth_image('input/', 1);
+I1 = read_intensity_image('input/', 1);
+D2 = read_depth_image('input/', 2);
+I2 = read_intensity_image('input/', 2);
 
 if scale > 1
     D1 = imresize(D1, 1/2^scale);
@@ -45,8 +46,11 @@ for y = 1:Ny
     progress(y, [0, numel(yrange)]);
 end
 
-subplot(1,2,1);
-imagesc(errs);
+%subplot(1,2,1);
+title('Error');
+xaxis(dim_names(dim1));
+yaxis(dim_names(dim2));
+imagesc(minmax(xrange),minmax(yrange),errs);
 
-subplot(1,2,2);
-quiver(diff1, diff2);
+%subplot(1,2,2);
+%quiver(diff1, diff2);

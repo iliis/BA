@@ -12,6 +12,14 @@ syms u v I1(u, v) I2(u, v) D1(u, v) real
 syms Tx Ty Tz Ta Tb Tc real
 T = [Tx Ty Tz Ta Tb Tc];
 
+% camera orientation:
+% TODO: use classical definition of Euler angles (see Wikipedia)
+% X: move left
+% Y: move up
+% Z: move back
+% alpha: rotate down
+% beta:  
+
 % inverse projection operator (image to 3D space)
 proj_inv = D1(u, v) * [ u / focal; v / focal; 1 ];
 

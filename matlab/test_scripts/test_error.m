@@ -1,25 +1,14 @@
+%
+
 clear all;
 
-global_parameters
+test_init;
 
 % initial position of camera
 camera_pos = -[ 7.5 -6.5 5.3 ];
 %camera_rot = [ 0.782 0.482 0.213 0.334 ];
 camera_rot = [0.7816000580787659, 0.48170700669288635, 0.21292176842689514, 0.3342514932155609];
 
-
-D1 = read_depth_image(1);
-I1 = read_intensity_image(1);
-D2 = read_depth_image(2);
-I2 = read_intensity_image(2);
-
-scale = 2;
-if scale > 1
-    D1 = imresize(D1, 1/2^scale);
-    I1 = imresize(I1, 1/2^scale);
-    D2 = imresize(D2, 1/2^scale);
-    I2 = imresize(I2, 1/2^scale);
-end
 
 
 
@@ -66,7 +55,7 @@ intensity_error(D1,I1,D2,I2, xmin(1:3), xmin(4:6), true); % plot result
 points1 = apply_camera_transformation(project_to_space(D1), xmin(1:3), xmin(4:6));
 points2 = project_to_space(D2);
 
-write_to_ply([points1 points2], [read_color_image(1) read_color_image(2)], 'test.ply');
+write_to_ply([points1 points2], [C1 C2], 'test.ply');
 
 
 

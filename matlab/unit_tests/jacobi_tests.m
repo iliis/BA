@@ -13,7 +13,7 @@ classdef jacobi_tests < matlab.unittest.TestCase
         I1, I2, D1, D2;
     end
     
-    methods (TestClassSetup)        
+    methods (TestClassSetup)
         function load_images(tc)
             [tc.I1, tc.D1] = read_image(tc.image_path, 1, tc.image_scale);
             [tc.I2, tc.D2] = read_image(tc.image_path, 2, tc.image_scale);
@@ -29,11 +29,15 @@ classdef jacobi_tests < matlab.unittest.TestCase
         function numeric_diff(tc, correct_solution, test_function)
             % input:
             % correct_solution: float, value of d/dx of test_function
-            % test_function: f(x), numeric derivation at x=0+delta
-            % output_dim: size of y = f(x)
+            % test_function:    f(x), numeric derivation at x=0+delta
+            %
+            % output_dim:       size of y = f(x)
             % (with numel(x) == size(x,2) == size(correct_solution,2)
             %   and numel(y) == size(y,1) == size(correct_solution,1))
+            %
             % perturbation_range: set of delta's to test
+            
+            
             
             [output_dim, input_dim] = size(correct_solution);
             
@@ -103,6 +107,9 @@ classdef jacobi_tests < matlab.unittest.TestCase
 
             % camera transformation
             T_translation = [ Tx ; Ty ; Tz ];
+            
+            % TODO: use jacobian from intensity_error_lsqnonlin here
+            % i.e. refactor all the things!
 
             Rx = [ ...
                 1 0 0; ...

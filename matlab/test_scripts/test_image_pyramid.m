@@ -1,16 +1,11 @@
 clear all;
-global_parameters;
+
+test_init;
+
+T_translation = ground_truth_translation; %[0 0 0];
+T_rotation    = ground_truth_rotation; % [0 0 0];
 
 MAX_ITERS = 5; % how often to divide images by 2
-
-% initial estimation
-T_translation = [ 0 0 0 ]; % actual solution = 2.1411    0.3076   -0.5665
-T_rotation    = [ 0 0 0 ]; % not yet used!
-
-D1 = read_depth_image(1);
-I1 = read_intensity_image(1);
-D2 = read_depth_image(2);
-I2 = read_intensity_image(2);
 
 options = optimset();
 %options = optimset(options, 'TolX', 1e-10, 'TolFun', 1e-10, 'TolCon', 1e-10);
@@ -49,7 +44,7 @@ end
 points1 = apply_camera_transformation(project_to_space(D1), T_translation, T_rotation);
 points2 = project_to_space(D2);
 
-write_to_ply([points1 points2], [read_color_image(1) read_color_image(2)], 'test.ply');
+write_to_ply([points1 points2], [C1 C2], 'test.ply');
 
 % result:  -2.1794    0.2944   -0.4411
 % true:     2.1411    0.3076   -0.5665

@@ -56,3 +56,11 @@ max. movement: 10cm for now
 alles dokumentieren! alle zwischenschritte!
 
 jacobi berechnen: nicht null, rausnehmen! halt auch ausm error term
+
+refactor jacobi berechnung so dass es einfach testbar ist
+
+Gauss Newton: Kann divergieren wenn nicht positiv semi-definit -> Schrittgrösse limitieren (Levenberg-Marquart)
+(J'WJ+l*I)*deltaT = -J*W*e(T)
+-> l grösser machen wenn aktueller Schritt Fehler nicht verkleinert
+
+Kostenfunktion: Hubart (maybe try others)

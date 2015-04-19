@@ -14,7 +14,7 @@ Tc = T_rotation(3);
 
 warped = warp_image(D1, I1, T_translation, T_rotation);
 
-errs = (I2-warped);
+errs = (warped-I2);
 errs(isnan(warped)) = 0; % ignore empty pixels
 %errs(isnan(warped)) = NONMATCHED_PIXEL_PENALTY; % not yet tested, penalty for unmatched pixels
 
@@ -33,6 +33,7 @@ if nargout > 1
     
     % calculate derivatives at current 'position' (T)
     
+    % TODO: filter/convolute image
     diff_I1x = diff(I1,1,1);
     diff_I1y = diff(I1,1,2);
     
@@ -40,6 +41,11 @@ if nargout > 1
     
     for v = 1:H
         for u = 1:W
+            
+            % TODO: rename variables to standard names (cu/cv instead of
+            % pu/pv)
+            % TODO: use standard math (i.e. focal length in pixel units
+            % etc.)
             
             % index into J (resulting Jacobian)
             J_idx = (u-1)*H + v;
@@ -75,7 +81,7 @@ if nargout > 1
             pu = int32(x * CAMERA_FOCAL/z * W/CAMERA_WIDTH + W/2);
             pv = int32(y * CAMERA_FOCAL/z * W/CAMERA_WIDTH + H/2);
             
-            if (pu < 1 || pv < 1 || pu > W-1 || pv > H-1)
+            if (pu < 1 || pv < 1 || pu > W-1 || pv > H-1 || invalid_terms(J_idx) == true)
                 % pixel is out of range of our image (or the differential of it)
                 
                 J(J_idx, :) = [0 0 0 0 0 0];
@@ -93,6 +99,8 @@ if nargout > 1
             
         end
     end
+    
+    %J(invalid_terms, :) = [0 0 0 0 0 0];
     
 end % nargout > 1
 
