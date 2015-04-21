@@ -5,7 +5,7 @@ function [err, J, invalid_terms] = intensity_error( D1, I1, I2, T, plot)
 
 global_parameters
 
-warped = warp_image(D1, I1, T);
+warped = warp_image(D1, I1, T, false);
 
 errs = (warped-I2);
 errs(isnan(warped)) = 0; % ignore empty pixels

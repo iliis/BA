@@ -3,7 +3,15 @@ function inside = is_in_img_range( x )
 
 global_parameters;
 
-inside = floor(x(1)) >= 1 && ceil(x(1)) <= W && floor(x(2)) >= 1 && ceil(x(2)) <= H;
+if size(x,2) == 1
+    U = x(1);
+    V = x(2);
+else
+    U = x(:,1);
+    V = x(:,2);
+end
+
+inside = (floor(U) >= 1) & (ceil(U) <= W) & (floor(V) >= 1) & (ceil(V) <= H);
 
 end
 
