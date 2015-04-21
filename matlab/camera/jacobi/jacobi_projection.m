@@ -3,13 +3,17 @@ function [ J_pi ] = jacobi_projection( point )
 
 global_parameters;
 
-x = point(1);
-y = point(2);
-z = point(3);
+x = point(:, 1);
+y = point(:, 2);
+z = point(:, 3);
 
+N = zeros(size(point,1),1);
 J_pi = ...
-   [ CAMERA_FOCAL/z,       0, -(CAMERA_FOCAL*x)/z^2; ...
-           0, CAMERA_FOCAL/z, -(CAMERA_FOCAL*y)/z^2];
+cat(3, ...
+   [ CAMERA_FOCAL./z,       N, -(CAMERA_FOCAL*x)./z.^2], ...
+   [       N, CAMERA_FOCAL./z, -(CAMERA_FOCAL*y)./z.^2]);
+
+J_pi = permute(J_pi, [3 2 1]);
 
 % and back onto pixel coordinates
 J_pi = J_pi * W / CAMERA_WIDTH;

@@ -6,6 +6,7 @@ disp(ground_truth);
 tic;
 %intensity_error(D1,I1,I2, ground_truth, true); % plot result
 [err, J] = intensity_error(D1,I1,I2, ground_truth, true); % plot result
+%[warped, J] = warp_image(D1, I1, ground_truth);
 toc;
 
 
@@ -23,3 +24,7 @@ toc;
 
 % 2.406980
 % 25.045037
+
+% after optimizing jacobians (in warp_image)
+% 
+% 3.628479 with Jacobi

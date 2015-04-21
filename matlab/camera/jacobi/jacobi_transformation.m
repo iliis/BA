@@ -3,8 +3,8 @@ function J_T = jacobi_transformation( x, depth_uv, T )
 
 global_parameters;
 
-u = x(1);
-v = x(2);
+u = x(:, 1);
+v = x(:, 2);
 
 % get points on camera sensor from pixel coordinates
 pu = (u - W/2) * CAMERA_WIDTH / W;

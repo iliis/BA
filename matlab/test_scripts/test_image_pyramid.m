@@ -2,6 +2,7 @@
 
 clear all;
 
+global image_scale;
 test_init;
 
 T = ground_truth; % [0 0 0 0 0 0]
@@ -15,7 +16,7 @@ options = optimset(options, 'DiffMinChange', 0.01);
 options = optimset(options, 'DiffMaxChange', 1);
 options = optimset(options, 'Display', 'iter-detailed', 'FunValCheck', 'on');
 options = optimset(options, 'UseParallel', true);
-%options = optimset(options, 'Jacobian', 'on');
+options = optimset(options, 'Jacobian', 'on');
 
 
 for i = MAX_ITERS:-1:1
@@ -24,19 +25,21 @@ for i = MAX_ITERS:-1:1
     I1_scaled = imresize(I1, 1/2^i);
     D2_scaled = imresize(D2, 1/2^i);
     I2_scaled = imresize(I2, 1/2^i);
+    image_scale = i;
+    test_init;
     
-    minfunl    = @(x) intensity_error_lsqnonlin(D1_scaled,I1_scaled,I2_scaled, x);
-    minfun     = @(x) intensity_error(D1_scaled,I1_scaled,D2_scaled,I2_scaled, x);
+    minfun    = @(x) intensity_error(D1_scaled,I1_scaled,I2_scaled, x);
 
     %[T_translation, ymin] = lsqnonlin(minfunposl, T_translation, [-3 -2 -2], [2 2 2], options)
     %[T_translation, ymin] = patternsearch(minfunpos, T_translation)
     %xmin = patternsearch(minfun, [T_translation T_rotation])
-    T = lsqnonlin(minfunl, T, [-3 -2 -2 -2 -2 -2], [2 2 2 2 2 2], options);
+    %T = lsqnonlin(minfun, T, [-3 -2 -2 -2 -2 -2], [2 2 2 2 2 2], options);
+    T = gauss_newton(D1_scaled,I1_scaled,I2_scaled, T);
 
     %intensity_error(D1,I1,D2,I2, T_translation, T_rotation, true); % plot result
     
     subplots = [subplot(MAX_ITERS,3,i*3-2) subplot(MAX_ITERS,3,i*3-1) subplot(MAX_ITERS,3,i*3)];
-    intensity_error(D1_scaled,I1_scaled,D2_scaled,I2_scaled, T, subplots ); % plot result
+    intensity_error(D1_scaled,I1_scaled,I2_scaled, T, subplots ); % plot result
     drawnow; % force update of plot
 end
 

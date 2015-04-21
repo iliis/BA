@@ -2,6 +2,7 @@
 
 clear all;
 
+image_scale = 5;
 test_init;
 
 % initial position of camera
@@ -20,9 +21,7 @@ camera_rot = [0.7816000580787659, 0.48170700669288635, 0.21292176842689514, 0.33
 % find transformation by global optimization
 %addpath('bayesopt/matlab');
 
-minfun    = @(x) intensity_error(D1,I1,D2,I2, x(1:3), x(4:6));
-minfunpos = @(x) intensity_error(D1,I1,D2,I2, x(1:3), [0 0 0], false);
-minfunl   = @(x) intensity_error_lsqnonlin(D1,I1,I2, x(1:3), x(4:6));
+minfunl = @(x) intensity_error(D1,I1,I2, x);
 
 % initial values for solvers:
 %guess_translation = [-1 0 0];
@@ -44,15 +43,15 @@ options = optimset(options, 'DiffMinChange', 0.01);
 options = optimset(options, 'DiffMaxChange', 1);
 options = optimset(options, 'Display', 'iter-detailed', 'FunValCheck', 'on');
 options = optimset(options, 'UseParallel', true);
-%options = optimset(options, 'Jacobian', 'on');
+options = optimset(options, 'Jacobian', 'on');
 [xmin, ymin] = lsqnonlin(minfunl, [guess_translation guess_rotation], [-3 -2 -2 -2 -2 -2], [2 2 2 2 2 2], options)
 
 
-intensity_error(D1,I1,D2,I2, xmin(1:3), xmin(4:6), true); % plot result
+intensity_error(D1,I1,I2,xmin, true); % plot result
 
 
 
-points1 = apply_camera_transformation(project_to_space(D1), xmin(1:3), xmin(4:6));
+points1 = apply_camera_transformation(project_to_space(D1), xmin);
 points2 = project_to_space(D2);
 
 write_to_ply([points1 points2], [C1 C2], 'test.ply');

@@ -8,9 +8,19 @@ DEPTH_IMAGE_MAXVAL = 65535;
 COLOR_IMAGE_MAXVAL = 255;
 
 % TODO: find a clean way to implement this variable at run-time for the image pyramid
-IMAGE_WIDTH  = 256; W = IMAGE_WIDTH;
-IMAGE_HEIGHT = 128; H = IMAGE_HEIGHT;
 
+global image_scale;
+if isempty(image_scale)
+    image_scale = 1;
+end
+
+%disp(['using global image scale ' num2str(image_scale)]);
+
+    IMAGE_WIDTH  = 256/(2^(image_scale-1));
+W = IMAGE_WIDTH;
+
+    IMAGE_HEIGHT = 128/(2^(image_scale-1));
+H = IMAGE_HEIGHT;
 
 %% properties of camera
 % in Blender Units / meters

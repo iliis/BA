@@ -52,6 +52,24 @@ end
 
 warped = warped_color;
 
+
+if calc_jacobi
+    J_T  = jacobi_transformation_from_points(points, T);
+    J_pi = jacobi_projection(points);
+    J_I  = jacobi_image(colors, int32(xs));
+    
+    N = size(points,1);
+    assert(N == size(J_T,3));
+    assert(N == size(J_pi,3));
+    assert(N == size(J_I,3));
+    J = zeros(N,numel(T));
+    % this seems to be one of the fastest way of doing N matrix multiplications:
+    for i = 1:N
+        J(i,:) = J_I(:,:,i) * J_pi(:,:,i) * J_T(:,:,i);
+    end
+end
+
+
 %XYZ = project_to_space(depth);
 %XYZ = apply_camera_transformation(XYZ, T);
 %warped = project_to_camera(XYZ, colors);

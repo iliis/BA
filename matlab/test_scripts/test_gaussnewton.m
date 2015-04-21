@@ -2,8 +2,8 @@
 
 clear all;
 
-global_parameters
-
+global image_scale;
+image_scale = 5;
 image_path = 'unit_tests/rot_trans_verysmall';
 test_init;
 
@@ -24,8 +24,13 @@ guess_rotation    = [0 0 0];
 T = gauss_newton(D1,I1,I2,[0 0 0 0 0 0]);
 
 
+intensity_error(D1,I1,I2,T, [subplot(2,3,1) subplot(2,3,2) subplot(2,3,3)]); % plot result
 
-intensity_error(D1,I1,I2,T, true); % plot result
+% plot in full resolution
+image_scale = 1;
+test_init;
+
+intensity_error(D1,I1,I2,T, [subplot(2,3,4) subplot(2,3,5) subplot(2,3,6)]); % plot result
 
 points1 = apply_camera_transformation(project_to_space(D1), T);
 points2 = project_to_space(D2);

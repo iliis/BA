@@ -5,7 +5,11 @@ function [err, J, invalid_terms] = intensity_error( D1, I1, I2, T, plot)
 
 global_parameters
 
-warped = warp_image(D1, I1, T, false);
+if nargout > 1
+    [warped, J] = warp_image(D1, I1, T, false);
+else
+    warped = warp_image(D1, I1, T, false);
+end
 
 errs = (warped-I2);
 errs(isnan(warped)) = 0; % ignore empty pixels
@@ -17,7 +21,7 @@ err = image_to_list(errs)';
 errs_plot = errs.^2;
 errs_plot(isnan(warped)) = 0;
 err_total = sum(err.^2);
-disp(['err_total = ' num2str(err_total) ' T = ' num2str(T)]);
+%disp(['err_total = ' num2str(err_total) ' T = ' num2str(T)]);
 
 invalid_terms = false(size(err));
 invalid_terms(isnan(warped)) = true;
@@ -25,53 +29,6 @@ invalid_terms(isnan(warped)) = true;
 %disp(['intensity error:  --> ', num2str(sum(err.^2))]);
 %disp(['translation: ' num2str(T_translation)]);
 %disp(['rotation:    ' num2str(T_rotation)]);
-
-if nargout > 1
-    
-    % calculate derivatives at current 'position' (T)
-    
-    J = zeros(numel(err), 6);
-    
-    for v = 1:H
-        for u = 1:W
-            
-            % TODO: rename variables to standard names (cu/cv instead of pu/pv)
-            % TODO: use standard math (i.e. focal length in pixel units etc.)
-            
-            % apply transformation to 3D points
-%             Tpoint = angle2dcm(T_rotation) * [x y z]' + T_translation';
-%             x = Tpoint(1); y = Tpoint(2); z = Tpoint(3);
-%             
-             % index into J (resulting Jacobian)
-             J_idx = (u-1)*H + v;
-%             
-%             pu = int32(x * CAMERA_FOCAL/z * W/CAMERA_WIDTH + W/2);
-%             pv = int32(y * CAMERA_FOCAL/z * W/CAMERA_WIDTH + H/2);
-            point = camera_transformation([u,v],D1(v,u),T);
-            x = camera_projection(point);
-            
-            if (~is_in_img_range(x) || invalid_terms(J_idx) == true)
-                % pixel is out of range of our image (or the differential of it)
-                
-                J(J_idx, :) = [0 0 0 0 0 0];
-                invalid_terms(J_idx) = true;
-                
-                continue;
-            end
-            
-            J_T  = jacobi_transformation([u,v],D1(v,u),T);
-            J_pi = jacobi_projection(point);
-            J_I  = jacobi_image(I1, int32(x));
-            
-            % final Jacobian
-            J(J_idx, :) = J_I * J_pi * J_T;
-            
-        end
-    end
-    
-    %J(invalid_terms, :) = [0 0 0 0 0 0];
-    
-end % nargout > 1
 
 if nargin >= 5
     if numel(plot) ~= 3
