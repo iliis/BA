@@ -12,8 +12,8 @@ else
 end
 
 errs = (warped-I2);
-errs(isnan(warped)) = 0; % ignore empty pixels
-%errs(isnan(warped)) = NONMATCHED_PIXEL_PENALTY; % not yet tested, penalty for unmatched pixels
+%errs(isnan(warped)) = 0; % ignore empty pixels
+errs(isnan(warped)) = NONMATCHED_PIXEL_PENALTY; % not yet tested, penalty for unmatched pixels
 
 err = image_to_list(errs)';
 

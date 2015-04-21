@@ -36,4 +36,4 @@ CAMERA_CLIPPING = [0.1 100];
 %% error term parameters
 
 % empiric penalty for empty pixels
-NONMATCHED_PIXEL_PENALTY = 0.03;
+NONMATCHED_PIXEL_PENALTY = 0; %0.2; % 0.03;

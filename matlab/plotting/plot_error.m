@@ -2,24 +2,15 @@ dim1 = 1;
 dim2 = 2;
 dim_names = {'X', 'Y', 'Z', 'alpha', 'beta', 'gamma'};
 
-scale = 4;
-
-D1 = read_depth_image('input/', 1);
-I1 = read_intensity_image('input/', 1);
-D2 = read_depth_image('input/', 2);
-I2 = read_intensity_image('input/', 2);
-
-if scale > 1
-    D1 = imresize(D1, 1/2^scale);
-    I1 = imresize(I1, 1/2^scale);
-    D2 = imresize(D2, 1/2^scale);
-    I2 = imresize(I2, 1/2^scale);
-end
-
-% [-2.1650    0.3075   -0.4952]; % actual solution
 
 
-minfun = @(x) intensity_error_lsqnonlin(D1,I1,I2, x(1:3), x(4:6));
+global image_scale;
+image_scale = 4;
+image_path = 'input';
+%image_path = 'unit_tests/rot_trans_verysmall';
+test_init;
+
+minfun = @(x) intensity_error(D1,I1,I2, x);
 
 xrange = -10:0.5:10;
 yrange = -10:0.5:10;
@@ -47,10 +38,11 @@ for y = 1:Ny
 end
 
 %subplot(1,2,1);
-title('Error');
-xaxis(dim_names(dim1));
-yaxis(dim_names(dim2));
 imagesc(minmax(xrange),minmax(yrange),errs);
+title('Error');
+xlabel(dim_names(dim1));
+ylabel(dim_names(dim2));
+colorbar;
 
 %subplot(1,2,2);
 %quiver(diff1, diff2);
