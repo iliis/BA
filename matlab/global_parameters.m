@@ -15,6 +15,7 @@ IMAGE_HEIGHT = 128; H = IMAGE_HEIGHT;
 %% properties of camera
 % in Blender Units / meters
 
+% TODO: convert to pixels and rename
 CAMERA_FOCAL = 0.035; % 35mm
 CAMERA_WIDTH = 0.032; % sensor size = 32mm
 

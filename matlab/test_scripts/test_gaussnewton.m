@@ -21,11 +21,11 @@ guess_rotation    = [0 0 0];
 % - inv(J*J') badly conditioned -> \, cholesky, ...
 % - may not converge globally
 
-[T_translation, T_rotation] = gauss_newton(D1,I1,I2,T);
+T = gauss_newton(D1,I1,I2,[0 0 0 0 0 0]);
 
 
 
-intensity_error(D1,I1,D2,I2,T, true); % plot result
+intensity_error(D1,I1,I2,T, true); % plot result
 
 points1 = apply_camera_transformation(project_to_space(D1), T);
 points2 = project_to_space(D2);

@@ -17,6 +17,7 @@ err = image_to_list(errs)';
 errs_plot = errs.^2;
 errs_plot(isnan(warped)) = 0;
 err_total = sum(err.^2);
+disp(['err_total = ' num2str(err_total) ' T = ' num2str(T)]);
 
 invalid_terms = false(size(err));
 invalid_terms(isnan(warped)) = true;
@@ -38,16 +39,18 @@ if nargout > 1
             % TODO: use standard math (i.e. focal length in pixel units etc.)
             
             % apply transformation to 3D points
-            Tpoint = angle2dcm(T_rotation) * [x y z]' + T_translation';
-            x = Tpoint(1); y = Tpoint(2); z = Tpoint(3);
+%             Tpoint = angle2dcm(T_rotation) * [x y z]' + T_translation';
+%             x = Tpoint(1); y = Tpoint(2); z = Tpoint(3);
+%             
+             % index into J (resulting Jacobian)
+             J_idx = (u-1)*H + v;
+%             
+%             pu = int32(x * CAMERA_FOCAL/z * W/CAMERA_WIDTH + W/2);
+%             pv = int32(y * CAMERA_FOCAL/z * W/CAMERA_WIDTH + H/2);
+            point = camera_transformation([u,v],D1(v,u),T);
+            x = camera_projection(point);
             
-            % index into J (resulting Jacobian)
-            J_idx = (u-1)*H + v;
-            
-            pu = int32(x * CAMERA_FOCAL/z * W/CAMERA_WIDTH + W/2);
-            pv = int32(y * CAMERA_FOCAL/z * W/CAMERA_WIDTH + H/2);
-            
-            if (pu < 1 || pv < 1 || pu > W-1 || pv > H-1 || invalid_terms(J_idx) == true)
+            if (~is_in_img_range(x) || invalid_terms(J_idx) == true)
                 % pixel is out of range of our image (or the differential of it)
                 
                 J(J_idx, :) = [0 0 0 0 0 0];
@@ -56,9 +59,9 @@ if nargout > 1
                 continue;
             end
             
-            J_T  = jacobi_transformation(u,v,D1(v,u),T);
-            J_pi = jacobi_projection(Tpoint);
-            J_I  = jacobi_image(I1,pu,pv);
+            J_T  = jacobi_transformation([u,v],D1(v,u),T);
+            J_pi = jacobi_projection(point);
+            J_I  = jacobi_image(I1, int32(x));
             
             % final Jacobian
             J(J_idx, :) = J_I * J_pi * J_T;

@@ -1,3 +1,5 @@
+% analytical definitions of all transformations
+
 % camera parameters
 %focal = sym(0.035);
 focal = sym('FOCAL');
@@ -42,7 +44,7 @@ Rz = [ ...
     0 0 1];
 
 % TODO: check order (shouldn't matter, as long as we keep it consistent)
-T_rotation = Rz * Ry * Rx;
+T_rotation = angle2dcm([Ta Tb Tc]);
 
 % apply transformation
 transformed = T_rotation * proj_inv + T_translation;

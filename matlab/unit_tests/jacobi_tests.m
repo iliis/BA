@@ -55,19 +55,28 @@ classdef jacobi_tests < matlab.unittest.TestCase
             error = 0;
             for odim = 1:output_dim
                 for idim = 1:input_dim
-                    p = polyfit(tc.perturbation_range, permute(yval(idim,odim,:), [2 3 1]), 1);
-                    diff(idim, odim) = p(1);
+                    %p = polyfit(tc.perturbation_range, permute(yval(idim,odim,:), [2 3 1]), 1);
+                    %diff(idim, odim) = p(1);
                     
-                    error = error + (p(1) - correct_solution(odim,idim))^2;
+                    % fit quadratic polynomial and use that to measure df/dx
+                    p = polyfit(tc.perturbation_range, permute(yval(idim,odim,:), [2 3 1]), 2);
+                    p = polyder(p);
+                    diff(idim, odim) = polyval(p,0);
+                    
+                    % absolute error
+                    %error = error + (diff(idim,odim) - correct_solution(odim,idim))^2;
+                    
+                    % relative error
+                    error = error + (diff(idim,odim) - correct_solution(odim,idim))^2 / (abs(diff(idim,odim))+1)^2;
                 end
             end
             
             if (error >= tc.diff_max_error)
                 % plot all slopes
-                figure('Name', ['Comparison numerical to analytical Jacobi (total error = ' num2str(error) ')'], 'NumberTitle', 'Off');
+                f = figure('Name', ['Comparison numerical to analytical Jacobi (total error = ' num2str(error) ')'], 'NumberTitle', 'Off');
                 for odim = 1:output_dim
                     for idim = 1:input_dim
-                        subplot(output_dim,input_dim,idim + (odim-1)*input_dim);
+                        ax = subplot(output_dim,input_dim,idim + (odim-1)*input_dim);
                         f0 = test_function(zeros(1,input_dim))';
                         % plot 'correct' slope
                         plot(minmax(tc.perturbation_range), minmax(tc.perturbation_range)*correct_solution(odim, idim)+f0(odim), 'g-');
@@ -76,7 +85,15 @@ classdef jacobi_tests < matlab.unittest.TestCase
                         plot(minmax(tc.perturbation_range), minmax(tc.perturbation_range)*diff(idim, odim)+f0(odim), 'b:');
                         % plot function values
                         plot(tc.perturbation_range, reshape(yval(idim, odim, :), [1 numel(tc.perturbation_range)]), 'r.');
-                        title({['analytical = ' num2str(correct_solution(odim,idim))], ['numerical = ' num2str(diff(idim,odim))]});
+                        title({['analytical = ' num2str(correct_solution(odim,idim))], ...
+                            ['numerical = ' num2str(diff(idim,odim))], ...
+                            ['error = ' num2str((correct_solution(odim,idim)-diff(idim,odim))^2)]});
+                        
+                        % color the subplot background proportional to error
+                        %f = (correct_solution(odim,idim)-diff(idim,odim))^2/tc.diff_max_error;
+                        %f = min([max([f 0]) 1]);
+                        %set(ax, 'Color', [1 0 0] * f + [1 1 1] * (1-f));
+                        
                         hold off;
                     end
                 end
@@ -88,7 +105,44 @@ classdef jacobi_tests < matlab.unittest.TestCase
     
     methods (Test)
         
+        function test_numerical_true_jacobi_transformation(tc)
+            
+            % TODO: test different transformations
+            T_test = [0 0 0 0.1 0.2 0.3];
+            
+            % exhaustivly test all pixels
+            %for v = 1:size(tc.I1,1)
+            %    for u = 1:size(tc.I1,2)
+            
+            for i=1:100
+                u = randi(size(tc.I1,2));
+                v = randi(size(tc.I1,1));
+                %T_test = rand(1,6)-0.5;
+                tc.numeric_diff(jacobi_transformation([u v],tc.D1(v,u),T_test), @(T) camera_transformation([u v],tc.D1(v,u),T_test+T)')
+            end
+        end
+        
+        function test_numerical_true_jacobi_projection(tc)
+            for i=1:100
+                point = rand(1,3)*200-100;
+                tc.numeric_diff(jacobi_projection(point), @(pd) camera_projection(point+pd));
+            end
+        end
+        
+        function test_numerical_true_jacobi_image(tc)
+            for i = 1:100
+                % choose a point at random, but not at the border (where
+                % the numerical differentation might run out of the image bounds)
+                u = randi(size(tc.I1,2)-10)+5;
+                v = randi(size(tc.I1,1)-10)+5;
+                disp(['testing ' num2str([u v])]);
+                tc.numeric_diff(jacobi_image(tc.I1, [u v]), @(pd) camera_image(tc.I1, [u v]+pd));
+            end
+        end
+        
         function test_numerical_jacobi_transformation(tc)
+            
+            return; % disabled for now, use test_numerical_true_jacobi_transformation
             
             % load global parameters
             global_parameters
