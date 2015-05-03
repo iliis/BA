@@ -2,7 +2,7 @@
 
 clear all;
 
-image_scale = 5;
+image_scale = 4;
 test_init;
 
 % initial position of camera

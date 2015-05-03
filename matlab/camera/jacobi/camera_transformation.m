@@ -19,7 +19,11 @@ z = depth_uv;
 T_translation = T(1:3);
 T_rotation    = T(4:6);
 
-point = (angle2dcm(T_rotation) * [x y z]')' + repmat(T_translation,size(x,1),1);
+% translate
+point = [x y z] + repmat(T_translation,size(x,1),1);
+
+% and rotate
+point = (angle2dcm(T_rotation) * point')';
 
 end
 

@@ -4,14 +4,24 @@ for i = 1:1000
     % invalid terms are zero in Jacobi
     [err, J] = intensity_error(D1,I1,I2,T);
     
-    disp(['step ' num2str(i) ': error = ' num2str(sum(err.^2)) '  T = [ ' num2str(T) ' ]']);
+    disp(['[GN] step ' num2str(i) ': error = ' num2str(sum(err.^2)) '  T = [ ' num2str(T) ' ]']);
+    
+    %J(:,3:end) = [];
     
     %step = inv(J'*J) * J' * err';
-    step = (J'*J) \ J' * err';
+    step = (J'*J) \ J' * err;
+    
+    %step(3:end) = 0;
+    %step = [step'  0 0 0 0]; 
+    
+    hold on;
+    plot(T(1), T(2), '.g');
+    drawnow;
+    hold off;
     
     T = T - step';
 end
 
-disp(['final step : error = ' num2str(sum(err.^2)) '  T = [ ' num2str(T) ' ]']);
+disp(['[GN] final step : error = ' num2str(sum(err.^2)) '  T = [ ' num2str(T) ' ]']);
 
 end

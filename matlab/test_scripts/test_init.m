@@ -27,8 +27,8 @@ if image_scale > 1
     C2 = imresize(C2, 1/2^(image_scale-1));
 end
 
-ground_truth_trajectory = normalize_trajectory(read_camera_trajectory(image_path));
+ground_truth_trajectory = read_camera_trajectory(image_path);
 
-ground_truth = ground_truth_trajectory(2,:)-ground_truth_trajectory(1,:);
+ground_truth = ground_truth_trajectory(2,:);
 ground_truth_translation = ground_truth(1:3);
 ground_truth_rotation    = ground_truth(4:6);

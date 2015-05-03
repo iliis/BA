@@ -15,7 +15,7 @@ errs = (warped-I2);
 %errs(isnan(warped)) = 0; % ignore empty pixels
 errs(isnan(warped)) = NONMATCHED_PIXEL_PENALTY; % not yet tested, penalty for unmatched pixels
 
-err = image_to_list(errs)';
+err = image_to_list(errs);
 
 % keep a copy for plotting later on
 errs_plot = errs.^2;
@@ -36,12 +36,12 @@ if nargin >= 5
     end
     
     axes(plot(1));
-    imagesc(I2);
-    title('I2');
-
-    axes(plot(2));
     imagesc(warped);
     title('I1 warped');
+
+    axes(plot(2));
+    imagesc(I2);
+    title('I2');
 
     axes(plot(3));
     imagesc(abs(errs_plot));

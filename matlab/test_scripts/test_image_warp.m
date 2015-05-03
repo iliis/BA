@@ -1,6 +1,13 @@
 % simply warp image according to ground truth
 clear all;
+image_scale = 1;
+%image_path = 'unit_tests/rot_trans_verysmall';
+image_path = 'unit_tests/linear_translation';
+
 test_init;
+
+ground_truth = [1 0 0 0 0 0];
+%ground_truth = [0.82121 -0.038462 0 0 0 0];
 
 disp(ground_truth);
 tic;

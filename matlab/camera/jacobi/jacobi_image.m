@@ -11,6 +11,7 @@ V = x(:,2);
 
 diff_x = conv2(I, [-1 0 1]/2, 'same');
 diff_y = conv2(I, [-1 0 1]'/2, 'same');
+%[diff_x, diff_y] = imgradientxy(I);
 
 % approximate Jacobian for intensity image
 
