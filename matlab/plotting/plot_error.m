@@ -5,7 +5,7 @@ dim_names = {'X', 'Y', 'Z', 'alpha', 'beta', 'gamma'};
 
 
 global image_scale;
-image_scale = 1;
+image_scale = 4;
 %image_path = 'input';
 %image_path = 'unit_tests/rot_trans_verysmall';
 image_path = 'unit_tests/linear_translation';
@@ -25,15 +25,18 @@ yrange = linspace(-0.3,0.3,40);
 Nx = numel(xrange);
 Ny = numel(yrange);
 
-errs = zeros(Ny, Nx);
+errs  = zeros(Ny, Nx);
+steps = zeros(Ny, Nx, 6);
 for y = 1:Ny
     for x = 1:Nx
         v = [0 0 0 0 0 0];
         v(dim1) = xrange(x);
         v(dim2) = yrange(y);
-        %[e, J] = minfun(v);
-        e = minfun(v);
+        [e, J] = minfun(v);
+        %e = minfun(v);
         errs(y,x) = sum(e.^2);
+        
+        steps(y,x,:) = - J' * e;
     end
     
     % progress() isn't thread-safe :(
@@ -60,6 +63,10 @@ title({['Error (min = ' num2str(min(min(errs))) ')'], ...
 xlabel(dim_names{dim1});
 ylabel(dim_names{dim2});
 colorbar;
+
+%figure;
+hold on;
+quiver(xrange, yrange, steps(:,:,dim1), steps(:,:,dim2), 'r');
 
 %subplot(1,2,2);
 %quiver(diff1, diff2);

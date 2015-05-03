@@ -14,7 +14,7 @@ for i = 1:1000
         T_path = [T_path; T];
     end
     
-    %J(:,3:end) = 0;
+    % J(:,3:end) = 0;
     
     step = step_size * J' * err;
     
