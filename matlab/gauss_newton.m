@@ -1,4 +1,10 @@
-function T = gauss_newton(D1,I1,I2, T)
+function T = gauss_newton(D1,I1,I2,T,restrict)
+
+global minimization_running;
+
+if nargin == 4
+    restrict = false;
+end
 
 for i = 1:1000
     % invalid terms are zero in Jacobi
@@ -6,7 +12,9 @@ for i = 1:1000
     
     disp(['[GN] step ' num2str(i) ': error = ' num2str(sum(err.^2)) '  T = [ ' num2str(T) ' ]']);
     
-    %J(:,3:end) = [];
+    if restrict
+        J(:,3:end) = 0;
+    end
     
     %step = inv(J'*J) * J' * err';
     step = (J'*J) \ J' * err;
@@ -20,6 +28,10 @@ for i = 1:1000
     hold off;
     
     T = T - step';
+    
+    if (~minimization_running)
+        break;
+    end
 end
 
 disp(['[GN] final step : error = ' num2str(sum(err.^2)) '  T = [ ' num2str(T) ' ]']);

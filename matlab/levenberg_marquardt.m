@@ -1,4 +1,10 @@
-function T = levenberg_marquardt(D1,I1,I2, T)
+function T = levenberg_marquardt(D1,I1,I2,T,restrict)
+
+global minimization_running;
+
+if nargin == 4
+    restrict = false;
+end
 
 lambda = 0.01;
 lambda_inc_factor = 2;
@@ -16,7 +22,9 @@ for i = 1:1000
     
     while true
         
-        J(:,3:end) = 0;
+        if restrict
+            J(:,3:end) = 0;
+        end
 
         JTJ = J'*J;
         %step = -(JTJ + lambda * diag(diag(JTJ))) \ J' * err;
@@ -50,6 +58,10 @@ for i = 1:1000
     
     plot(T(1), T(2), 'xg');
     drawnow;
+    
+    if (~minimization_running)
+        break;
+    end
 end
 hold off;
 disp(['[GN] final step : error = ' num2str(sum(err.^2)) '  T = [ ' num2str(T) ' ]']);

@@ -1,4 +1,6 @@
-function [T, T_path] = gradient_descent(D1,I1,I2, T, step_size)
+function [T, T_path] = gradient_descent(D1,I1,I2,T,restrict,step_size)
+
+global minimization_running;
 
 if nargout > 1
     T_path = [];
@@ -14,7 +16,9 @@ for i = 1:1000
         T_path = [T_path; T];
     end
     
-    % J(:,3:end) = 0;
+    if restrict
+        J(:,3:end) = 0;
+    end
     
     step = step_size * J' * err;
     
@@ -24,6 +28,10 @@ for i = 1:1000
     plot(T(1), T(2), '.g');
     drawnow;
     hold off;
+    
+    if (~minimization_running)
+        break;
+    end
 end
 
 disp(['[GD] final step : error = ' num2str(sum(err.^2)) '  T = [ ' num2str(T) ' ]']);
