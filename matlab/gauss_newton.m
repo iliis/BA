@@ -6,6 +6,7 @@ if nargin == 4
     restrict = false;
 end
 
+hold on;
 for i = 1:1000
     % invalid terms are zero in Jacobi
     [err, J] = intensity_error(D1,I1,I2,T);
@@ -13,19 +14,18 @@ for i = 1:1000
     disp(['[GN] step ' num2str(i) ': error = ' num2str(sum(err.^2)) '  T = [ ' num2str(T) ' ]']);
     
     if restrict
-        J(:,3:end) = 0;
+        J(:,3:end) = [];
     end
     
     %step = inv(J'*J) * J' * err';
     step = (J'*J) \ J' * err;
     
-    %step(3:end) = 0;
-    %step = [step'  0 0 0 0]; 
+    if restrict
+        step = [step'  0 0 0 0]';
+    end
     
-    hold on;
     plot(T(1), T(2), '.g');
     drawnow;
-    hold off;
     
     T = T - step';
     
@@ -33,6 +33,7 @@ for i = 1:1000
         break;
     end
 end
+hold off;
 
 disp(['[GN] final step : error = ' num2str(sum(err.^2)) '  T = [ ' num2str(T) ' ]']);
 
