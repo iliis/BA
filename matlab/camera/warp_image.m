@@ -54,7 +54,8 @@ warped = warped_color;
 
 
 if calc_jacobi
-    J_T  = jacobi_transformation_from_points(points, T);
+    %J_T  = jacobi_transformation_from_points(points, T);
+    J_T  = jacobi_transformation(UV, image_to_list(depth), T);
     J_pi = jacobi_projection(points);
     J_I  = jacobi_image(colors, int32(xs));
     

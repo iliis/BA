@@ -20,10 +20,10 @@ T_translation = T(1:3);
 T_rotation    = T(4:6);
 
 % translate
-point = [x y z] + repmat(T_translation,size(x,1),1);
+point = [x y z] ;
 
 % and rotate
-point = (angle2dcm(T_rotation) * point')';
+point = (angle2dcm(T_rotation) * point')' + repmat(T_translation,size(x,1),1);
 
 end
 
