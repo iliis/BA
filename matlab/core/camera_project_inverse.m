@@ -32,9 +32,14 @@ function [ points_world, J_project_inv ] = camera_project_inverse( points_camera
 N = size(points_camera,1);
 
 % check parameters
-assert(size(points_camera) == [N,2]);
-assert(size(depths) == [N,1]);
+assert(all(size(points_camera) == [N,2]));
+assert(all(size(depths) == [N,1]));
 assert(isa(intrinsics, 'CameraIntrinsics'));
+
+% project into world coordinates
+points_world = [ ...
+    (points_camera - repmat(intrinsics.principal_point,N,1)) .* repmat(depths,1,2) ./ intrinsics.focal_length ...
+    -depths ]; % our Z-Axis points 'outwards' (toward viewer) => positive depth = negative Z
 
 end
 

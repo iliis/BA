@@ -1,8 +1,10 @@
 function D = read_depth_image(path, nr)
-% output: N x 3 coordinates (U, V are in camera plane, D is distance from
-% camera origin)
+% output: H * W depth values (distance from camera origin)
 
-global_parameters
+% depth images are 16bit grayscale, color images 8bit RGB
+% TODO: move this into a global object or something?
+DEPTH_IMAGE_MAXVAL = 65535;
+CAMERA_CLIPPING = [0.1 100];
 
 D = imread(fullfile(path, sprintf('depth%04u.png', nr))); % BW, 16bit
 

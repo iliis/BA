@@ -1,7 +1,7 @@
-function inside = is_in_img_range( x )
+function inside = is_in_img_range( x, image )
 % returns true if x = [u,v] is inside image dimensions (1:W, 1:H)
 
-global_parameters;
+[H, W] = size(image);
 
 if size(x,2) == 1
     U = x(1);

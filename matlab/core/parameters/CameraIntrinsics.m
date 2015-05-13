@@ -5,7 +5,7 @@ classdef CameraIntrinsics
         camera_width    % width of image  [pixels]
         camera_height   % height of image [pixels]
         principal_point % [u,v] center of image [pixels]
-        focal_length    % [TODO:units?]
+        focal_length    % [1/pixels or meter/pixels]
     end
     
     methods
@@ -17,7 +17,12 @@ classdef CameraIntrinsics
             obj.camera_width    = width;
             obj.camera_height   = height;
             obj.focal_length    = focal;
-            obj.principal_point = [width/2 height/2];
+            
+            % [1,1] is at center of first pixel at the top left
+            % [W,H] is at center of last pixel at the bottom right
+            % i.e. integer coordinates directly corespond to pixel values
+            %      (this is the same grid as interp2() uses)
+            obj.principal_point = [width/2+0.5 height/2+0.5];
         end
     end
     
