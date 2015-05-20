@@ -40,8 +40,9 @@ N = size(points_keyframe, 1);
 assert(all(size(points_keyframe) == [N 3]));
 assert(all(size(T_keyframe_to_current) == [1 6]));
 
-% apply transformation
-points_current = points_keyframe * angle2dcm(T_keyframe_to_current(4:6)) + repmat(T_keyframe_to_current(1:3), N, 1);
+% apply transformation R * X + T
+% points_keyframe is list of row vectors
+points_current = (angle2dcm(T_keyframe_to_current(4:6)) * points_keyframe')' + repmat(T_keyframe_to_current(1:3), N, 1);
 
 end
 
