@@ -1,22 +1,22 @@
-function T = levenberg_marquardt(D1,I1,I2,T,restrict)
+function T = levenberg_marquardt(D1,I1,I2,T,intrinsics,restrict)
 
 global minimization_running;
 
-if nargin == 4
+if nargin == 5
     restrict = false;
 end
 
 lambda = 0.01;
 lambda_inc_factor = 2;
 
-[err, J] = intensity_error(D1,I1,I2,T);
+[err, J] = camera_warp(I1,D1,I2,T,intrinsics);
 
 hold on;
 for i = 1:1000
     % invalid terms are zero in Jacobi
     
     
-    disp(['[LM] step ' num2str(i) ': error = ' num2str(sum(err.^2)) '  T = [ ' num2str(T) ' ]']);
+    disp(['[LM] step ' num2str(i) ': error = ' num2str(sum(err.^2)) '  T = [ ' num2str(T') ' ]']);
     
     %step = inv(J'*J) * J' * err';
     
@@ -28,13 +28,13 @@ for i = 1:1000
 
         JTJ = J'*J;
         %step = -(JTJ + lambda * diag(diag(JTJ))) \ J' * err;
-        step = -(JTJ + lambda * eye(6)) \ J' * err;
+        step = -(JTJ + lambda * eye(6)) \ J' * err';
 
         % try out step
-        T_tmp = T + step';
-        [err_tmp, J_tmp] = intensity_error(D1,I1,I2,T_tmp);
+        T_tmp = T + step;
+        [err_tmp, J_tmp] = camera_warp(I1,D1,I2,T,intrinsics);
         
-        disp(['[LM] temp step ' num2str(i) ': error = ' num2str(sum(err_tmp.^2)) ' lambda = ' num2str(lambda) ' T = [ ' num2str(T_tmp) ' ]']);
+        disp(['[LM] temp step ' num2str(i) ': error = ' num2str(sum(err_tmp.^2)) ' lambda = ' num2str(lambda) ' T = [ ' num2str(T_tmp') ' ]']);
 
         plot(T_tmp(1), T_tmp(2), '.r');
         drawnow;
@@ -64,6 +64,6 @@ for i = 1:1000
     end
 end
 hold off;
-disp(['[GN] final step : error = ' num2str(sum(err.^2)) '  T = [ ' num2str(T) ' ]']);
+disp(['[GN] final step : error = ' num2str(sum(err.^2)) '  T = [ ' num2str(T') ' ]']);
 
 end

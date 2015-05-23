@@ -1,4 +1,4 @@
-function [ errors, J_warp ] = camera_warp( image_keyframe, depths_keyframe, image_current, T, intrinsics )
+function [ errors, J_warp ] = camera_warp( image_keyframe, depths_keyframe, image_current, T, intrinsics, plot )
 % projects points into world, transforms and projects back
 %
 % TODO: write some tests for this function! There are some critical things
@@ -25,6 +25,7 @@ function [ errors, J_warp ] = camera_warp( image_keyframe, depths_keyframe, imag
 [H, W] = size(image_keyframe);
 
 calc_jacobian = nargout > 1;
+show_plots = nargin > 5;
 
 % check input parameters
 assert(all(size(depths_keyframe) == [H,W]), 'depth matrix must have same size as intensity image');
@@ -41,7 +42,7 @@ points_keyframe_camera = image_to_list(cat(3,X,Y));
 points_world = camera_project_inverse(points_keyframe_camera, image_to_list(flipud(depths_keyframe)), intrinsics);
 
 if calc_jacobian
-    [points_current, J_T] = camera_transform(points_world, T);
+    [points_current,        J_T] = camera_transform(points_world, T);
     [points_current_camera, J_P] = camera_project(points_current, intrinsics);
 else
     points_current        = camera_transform(points_world, T);
@@ -55,6 +56,8 @@ valid_points              = is_in_img_range(points_current_camera, image_current
 points_current_camera     = points_current_camera(:, valid_points);
 
 if calc_jacobian
+    J_T = J_T(:,:,valid_points);
+    J_P = J_P(:,:,valid_points);
     [intensities_current, J_I] = camera_intensity_sample(points_current_camera, image_current);
 else
     intensities_current = camera_intensity_sample(points_current_camera, image_current);
@@ -63,10 +66,10 @@ end
 % only compare points that projected inside the current image
 intensities_keyframe = camera_intensity_sample(points_keyframe_camera, image_keyframe); %image_to_list(flipud(image_keyframe));
 intensities_keyframe = intensities_keyframe(:, valid_points);
-errors = (intensities_keyframe - intensities_current).^2;
+errors = (intensities_keyframe - intensities_current);
 
 if calc_jacobian
-    N = size(points,1);
+    N = size(points_current_camera,2);
     assert(N == size(J_T,3));
     assert(N == size(J_P,3));
     assert(N == size(J_I,3));
@@ -77,26 +80,28 @@ if calc_jacobian
     end
 end
 
-subplot(2,2,1);
-colormap('jet');
-scatter(points_keyframe_camera(1,valid_points), points_keyframe_camera(2,valid_points), 2, errors);
-colorbar();
-title('errors in original (keyframe) view');
+if show_plots
+    subplot(2,2,1);
+    colormap('jet');
+    scatter(points_keyframe_camera(1,valid_points), points_keyframe_camera(2,valid_points), 2, errors);
+    colorbar();
+    title('errors in original (keyframe) view');
 
-subplot(2,2,2);
-scatter(points_keyframe_camera(1,valid_points), points_keyframe_camera(2,valid_points), 2, intensities_keyframe);
-colorbar();
-title('keyframe intensity image');
+    subplot(2,2,2);
+    scatter(points_keyframe_camera(1,valid_points), points_keyframe_camera(2,valid_points), 2, intensities_keyframe);
+    colorbar();
+    title('keyframe intensity image');
 
-subplot(2,2,3);
-scatter(points_current_camera(1,:), points_current_camera(2,:), 2, errors);
-colorbar();
-title('errors of warped points (in current view)');
+    subplot(2,2,3);
+    scatter(points_current_camera(1,:), points_current_camera(2,:), 2, errors);
+    colorbar();
+    title('errors of warped points (in current view)');
 
-subplot(2,2,4);
-scatter(points_current_camera(1,:), points_current_camera(2,:), 2, intensities_keyframe);
-colorbar();
-title('warped keyframe intensity image');
+    subplot(2,2,4);
+    scatter(points_current_camera(1,:), points_current_camera(2,:), 2, intensities_keyframe);
+    colorbar();
+    title('warped keyframe intensity image');
+end
 
 end
 

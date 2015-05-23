@@ -1,7 +1,5 @@
 function do_global_minimization( image_path, image_scale, min_method, restrict_to_xy, step_size, T_init)
 
-global_parameters
-
 D1 = read_depth_image(image_path, 1);
 I1 = read_intensity_image(image_path, 1);
 %C1 = read_color_image(image_path, 1);
@@ -24,7 +22,12 @@ end
 %T = levenberg_marquardt(D1,I1,I2, T_init);
 %T = gradient_descent(D1,I1,I2, T_init, 0.001);
 
-min_method(D1,I1,I2,T_init,restrict_to_xy,step_size);
+% TODO: read intrinsics from input data
+% Blender uses 35mm focal length and a 32mm wide sensor
+FOCAL = 0.035 * size(I1,2) / 0.032;
+intrinsics = CameraIntrinsics(size(I1,2), size(I1,1), FOCAL);
+
+min_method(D1,I1,I2,T_init,intrinsics,restrict_to_xy,step_size);
 
 end
 

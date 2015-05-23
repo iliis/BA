@@ -17,10 +17,6 @@ FOCAL = 0.035 * size(I1,2) / 0.032;
 intrinsics = CameraIntrinsics(size(I1,2), size(I1,1), FOCAL);
 
 % do the actual calculations
-err = camera_warp(I1,D1,I2,T,intrinsics);
+[err, J] = camera_warp(I1,D1,I2,T,intrinsics, true);
 
-%figure;
-
-disp(['total error: ' num2str(sqrt(sum(err)))]);
-
-%points_cc_valid = points_current_camera(is_in_img_range(points_current_camera, I2), :);
+disp(['total error: ' num2str(norm(err))]);
