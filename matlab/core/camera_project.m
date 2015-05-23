@@ -33,12 +33,17 @@ assert(all(size(points_world) == [3,N]));
 assert(isa(intrinsics, 'CameraIntrinsics'));
 
 % project back onto image plane
-% Z-Axis points 'outwards' (towards viewer)
-% => points in front of camera have negative Z values and thence comes the
-%    minus in front of points_world(:,3)
+
+
+
+% X-Axis is mirrored relative to U-Axis in camera plane
+% --> U = -X / Z * focal + principal
+points_world(1,:) = -points_world(1,:);
+
+% Z-Axis points 'inwards' (away from viewer)
 %
 % [ u v ]' = [ x y ]' / z * focal + printcipal_point
-points_camera = points_world(1:2,:) ./ repmat(-points_world(3,:),2,1) .* intrinsics.focal_length + repmat(intrinsics.principal_point,1,N);
+points_camera = points_world(1:2,:) ./ repmat(points_world(3,:),2,1) .* intrinsics.focal_length + repmat(intrinsics.principal_point,1,N);
 
 end
 

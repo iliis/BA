@@ -2,7 +2,7 @@
 % loads an image pair and warps the keyframe onto the current frame
 
 image_path = 'input/testscene1';
-T = [-2 0 4 0 0 0]'; % TODO: read this from camera_trajectory.csv
+T = [2 0 -4 0 0 0]'; % TODO: read this from camera_trajectory.csv
 %T = [0 0 0 0 0 0]';
 
 D1 = read_depth_image(image_path, 1);

@@ -1,5 +1,6 @@
 classdef camera_project_test < matlab.unittest.TestCase
-    
+% unit tests for core::camera_project() and core::camera_project_inverse()
+
     properties
         % these values shouldn't affect the test at all
         % (TODO: actually verify this!)
@@ -11,7 +12,7 @@ classdef camera_project_test < matlab.unittest.TestCase
             % generate some random pixels and depth values
             N = 10000;
             points = rand(2,N) * 100 - 50;
-            depths = rand(1,N) * 100;
+            depths = rand(1,N) * 100 - 50;
             
             % project into world
             points_world = camera_project_inverse(points, depths, tc.intrinsics);
@@ -31,15 +32,38 @@ classdef camera_project_test < matlab.unittest.TestCase
             
             % center pixel (should be equal to principal point)
             point_world = camera_project_inverse([4 3]', 10, ci);
-            tc.assertEqual(point_world, [0 0 -10]');
+            tc.assertEqual(point_world, [0 0 10]');
+            tc.assertEqual(camera_project(point_world, ci), [4 3]');
             
             % top left pixel
-            point_world = camera_project_inverse([1 1]', 10, ci);
-            tc.assertEqual(point_world, [-30 -20 -10]');
+            point_world = camera_project_inverse([1 5]', 10, ci);
+            tc.assertEqual(point_world, [30 20 10]');
+            tc.assertEqual(camera_project(point_world, ci), [1 5]');
             
             % top right pixel
-            point_world = camera_project_inverse([7 1]', 2, ci);
-            tc.assertEqual(point_world, [6 -4 -2]');
+            point_world = camera_project_inverse([7 5]', 2, ci);
+            tc.assertEqual(point_world, [-6 4 2]');
+            tc.assertEqual(camera_project(point_world, ci), [7 5]');
+            
+            % bottom left pixel
+            point_world = camera_project_inverse([1 1]', 10, ci);
+            tc.assertEqual(point_world, [30 -20 10]');
+            tc.assertEqual(camera_project(point_world, ci), [1 1]');
+            
+            % bottom right pixel
+            point_world = camera_project_inverse([7 1]', 10, ci);
+            tc.assertEqual(point_world, [-30 -20 10]');
+            tc.assertEqual(camera_project(point_world, ci), [7 1]');
+            
+            % a bit right of center
+            point_world = camera_project_inverse([5 3]', 10, ci);
+            tc.assertEqual(point_world, [-10 0 10]');
+            tc.assertEqual(camera_project(point_world, ci), [5 3]');
+            
+            % a bit above center
+            point_world = camera_project_inverse([4 4]', 10, ci);
+            tc.assertEqual(point_world, [0 10 10]');
+            tc.assertEqual(camera_project(point_world, ci), [4 4]');
         end
     end
     
