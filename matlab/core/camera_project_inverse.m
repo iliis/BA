@@ -6,10 +6,11 @@ function [ points_world, J_project_inv ] = camera_project_inverse( points_camera
 % INPUT:
 %
 % points_camera
-%   N * [u v] points on camera sensor (in pixels) 
+%   [u v]' * N points on camera sensor (in pixels) 
 %
 % depths
 %   N depth values (units?!), corresponding to pixels in points_camera
+%   (row vector!)
 %
 % intrinsics
 %   instance of camera_intrinsics
@@ -18,7 +19,7 @@ function [ points_world, J_project_inv ] = camera_project_inverse( points_camera
 % OUTPUT:
 %
 % points_world
-%   N * [x y z] points in world coordinates (usually in keyframe)
+%   [x y z]' * N points in world coordinates (usually in keyframe)
 %
 % J_proj_inv
 %   3 * 3 * N Jacobian of camera_project_inverse
@@ -29,16 +30,18 @@ function [ points_world, J_project_inv ] = camera_project_inverse( points_camera
 %   dproj_inv_z [ .  .  . ]
 %
 
-N = size(points_camera,1);
+N = size(points_camera,2);
 
 % check parameters
-assert(all(size(points_camera) == [N,2]));
-assert(all(size(depths) == [N,1]));
+assert(all(size(points_camera) == [2,N]));
+assert(all(size(depths) == [1,N]));
 assert(isa(intrinsics, 'CameraIntrinsics'));
 
 % project into world coordinates
+% [x,y]' = ([u v]' - principal_point) * depth / focal_length
+%    z   = -depth
 points_world = [ ...
-    (points_camera - repmat(intrinsics.principal_point,N,1)) .* repmat(depths,1,2) ./ intrinsics.focal_length ...
+    (points_camera - repmat(intrinsics.principal_point,1,N)) .* repmat(depths,2,1) ./ intrinsics.focal_length; ...
     -depths ]; % our Z-Axis points 'outwards' (toward viewer) => positive depth = negative Z
 
 end

@@ -12,10 +12,10 @@ function [ points_current, J_transform ] = camera_transform( points_keyframe, T_
 % INPUT:
 %
 % points_keyframe
-%   N * [x y z] points in original (keyframe/world) coordinate system
+%   [x y z]' * N points in original (keyframe/world) coordinate system
 %
 % T_keyframe_to_current
-%   [Tx Ty Tz alpha beta gamma]
+%   [Tx Ty Tz alpha beta gamma]'
 %   Transformation to apply to points_keyframe (first rotation, then
 %   translation)
 %
@@ -23,7 +23,7 @@ function [ points_current, J_transform ] = camera_transform( points_keyframe, T_
 % OUTPUT:
 %
 % points_current
-%   N * [x y z] points in new (current frame) coordinate system
+%   [x y z]' * N points in new (current frame) coordinate system
 %
 % J_transform
 %   3 * 6 * N Jacobian matrix of camera_transform(), evaluated at points_keyframe
@@ -34,15 +34,15 @@ function [ points_current, J_transform ] = camera_transform( points_keyframe, T_
 % dtransform_z [ .   .   .     .       .       .    ]
 %
 
-N = size(points_keyframe, 1);
+N = size(points_keyframe, 2);
 
 % check parameters
-assert(all(size(points_keyframe) == [N 3]));
-assert(all(size(T_keyframe_to_current) == [1 6]));
+assert(all(size(points_keyframe) == [3 N]));
+assert(all(size(T_keyframe_to_current) == [6 1]));
 
 % apply transformation R * X + T
-% points_keyframe is list of row vectors
-points_current = (angle2dcm(T_keyframe_to_current(4:6)) * points_keyframe')' + repmat(T_keyframe_to_current(1:3), N, 1);
+% points_keyframe is list of column vectors
+points_current = (angle2dcm(T_keyframe_to_current(4:6)) * points_keyframe) + repmat(T_keyframe_to_current(1:3), 1, N);
 
 end
 

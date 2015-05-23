@@ -7,9 +7,10 @@ function [ intensities, J_intensity ] = camera_intensity_sample( points_camera, 
 % INPUT:
 %
 % points_camera
-%   N * [u v] points in camera coordinate system (in pixels)
-%   [1 1] = top left pixel
-%   [W H] = bottom right pixel
+%   [u v]' * N points in camera coordinate system (in pixels)
+%       where:
+%           [1 1]' = bottom left pixel
+%           [W H]' = top right pixel
 %   see CameraIntrinsics for details
 %
 % image
@@ -19,25 +20,25 @@ function [ intensities, J_intensity ] = camera_intensity_sample( points_camera, 
 % OUTPUT:
 %
 % intensities
-%   N intensity values
+%   N intensity values (row vector)
 %
 % J_intensity
 %   1 * 2 * N Jacobian of camera_intensity_sample()
 %
-%   [  dI(u,v)/du  dI(u,v)/du  ]
+%   [  dI(u,v)/du  dI(u,v)/dv  ]
 
-N = size(points_camera,1);
+N = size(points_camera,2);
 [H, W] = size(image);
 
 % check parameters
-assert(all(size(points_camera) == [N, 2]));
+assert(all(size(points_camera) == [2, N]));
 assert(H > 0); assert(W > 0);
 assert(all(all(points_camera >= 1)));
-assert(all(all(points_camera(:,1) <= W)));
-assert(all(all(points_camera(:,2) <= H)));
+assert(all(all(points_camera(1,:) <= W)));
+assert(all(all(points_camera(2,:) <= H)));
 
 % actually sample image ;)
-intensities = interp2(image, points_camera(:,1), points_camera(:,2));
+intensities = interp2(image, points_camera(1,:), points_camera(2,:));
 
 end
 

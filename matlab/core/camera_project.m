@@ -7,7 +7,7 @@ function [ points_camera, J_project ] = camera_project( points_world, intrinsics
 % INPUT:
 %
 % points_world
-%   N * [x y z] points in world coordinates (usually in current frame)
+%   [x y z]' * N points in world coordinates (usually in current frame)
 %
 % intrinsics
 %   instance of camera_intrinsics
@@ -17,7 +17,7 @@ function [ points_camera, J_project ] = camera_project( points_world, intrinsics
 % OUTPUT:
 %
 % points_camera
-%   N * [u v] points on camera sensor (in pixels)
+%   [u v]' * N points on camera sensor (in pixels)
 %
 % J_project
 %   2 * 3 * N Jacobian of camera_project()
@@ -26,17 +26,19 @@ function [ points_camera, J_project ] = camera_project( points_world, intrinsics
 %   dproj_u [ .  .  . ]
 %   dproj_v [ .  .  . ]
 
-N = size(points_world,1);
+N = size(points_world,2);
 
 % check parameters
-assert(all(size(points_world) == [N,3]));
+assert(all(size(points_world) == [3,N]));
 assert(isa(intrinsics, 'CameraIntrinsics'));
 
 % project back onto image plane
 % Z-Axis points 'outwards' (towards viewer)
 % => points in front of camera have negative Z values and thence comes the
 %    minus in front of points_world(:,3)
-points_camera = points_world(:,1:2) ./ repmat(-points_world(:,3),1,2) .* intrinsics.focal_length + repmat(intrinsics.principal_point,N,1);
+%
+% [ u v ]' = [ x y ]' / z * focal + printcipal_point
+points_camera = points_world(1:2,:) ./ repmat(-points_world(3,:),2,1) .* intrinsics.focal_length + repmat(intrinsics.principal_point,1,N);
 
 end
 
