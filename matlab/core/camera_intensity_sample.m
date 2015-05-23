@@ -38,7 +38,7 @@ assert(all(all(points_camera(1,:) <= W)));
 assert(all(all(points_camera(2,:) <= H)));
 
 % actually sample image ;)
-intensities = interp2(image, points_camera(1,:), points_camera(2,:));
+intensities = interp2(image, points_camera(1,:), H-points_camera(2,:)+1);
 
 end
 
