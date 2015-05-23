@@ -45,5 +45,19 @@ points_world(1,:) = -points_world(1,:);
 % [ u v ]' = [ x y ]' / z * focal + printcipal_point
 points_camera = points_world(1:2,:) ./ repmat(points_world(3,:),2,1) .* intrinsics.focal_length + repmat(intrinsics.principal_point,1,N);
 
+if nargout > 1
+        
+    % calculate Jacobian symbolically
+    syms x y z real;
+    J = jacobian(camera_project([x y z]', intrinsics), [x y z]);
+    
+    % convert points into cell array of Z vectors (i.e. {X Y Z} where X = cat(3,P1.x,P2.x,...)
+    pts = num2cell(permute(points_world, [3,1,2]), 3);
+    
+    % evaluate symbolic derivation
+    J_project = subs(J, [x y z], pts);
+    
+end
+
 end
 

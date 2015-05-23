@@ -33,8 +33,8 @@ function [ points_world, J_project_inv ] = camera_project_inverse( points_camera
 N = size(points_camera,2);
 
 % check parameters
-assert(all(size(points_camera) == [2,N]));
-assert(all(size(depths) == [1,N]));
+assert(all(size(points_camera) == [2,N]), 'points must be 2 x N matrix');
+assert(all(size(depths) == [1,N]), 'depths must be 1 x N row vector');
 assert(isa(intrinsics, 'CameraIntrinsics'));
 
 % project into world coordinates
@@ -44,6 +44,21 @@ points_world = [ ...
     -(points_camera(1,:) - intrinsics.principal_point(1)) .* depths ./ intrinsics.focal_length; % -X = +U !
      (points_camera(2,:) - intrinsics.principal_point(2)) .* depths ./ intrinsics.focal_length;
     depths ]; % our Z-Axis points 'inwards' (away from viewer) => positive depth = positive Z
+
+
+if nargout > 1
+    
+    % calculate Jacobian symbolically
+    syms u v D real;
+    J = jacobian(camera_project_inverse([u v]', D, intrinsics), [u v D]);
+    
+    % convert points into cell array of Z vectors (i.e. {X Y Z} where X = cat(3,P1.x,P2.x,...)
+    pts = num2cell(permute([points_camera; depths], [3,1,2]), 3);
+    
+    % evaluate symbolic derivation
+    J_project_inv = subs(J, [u v D], pts);
+    
+end
 
 end
 

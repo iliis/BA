@@ -39,10 +39,32 @@ N = size(points_keyframe, 2);
 % check parameters
 assert(all(size(points_keyframe) == [3 N]));
 assert(numel(T_keyframe_to_current_inv) == 6);
+T_keyframe_to_current_inv = reshape(T_keyframe_to_current_inv, 6, 1); % ensure T is a colum vector
 
 % apply transformation R * X + T
 % points_keyframe is list of column vectors
 points_current = (angle2dcm(T_keyframe_to_current_inv(4:6)) * points_keyframe) + repmat(T_keyframe_to_current_inv(1:3), 1, N);
+
+
+if nargout > 1
+        
+    % calculate Jacobian symbolically
+    syms x y z real;
+    syms    Tx Ty Tz Talpha Tbeta Tgamma real;
+    Tsym = [Tx Ty Tz Talpha Tbeta Tgamma];
+    
+    J = jacobian(camera_transform([x y z]', Tsym), Tsym);
+    
+    % evaluate symbolic derivation for current transformation -> still symbolic!
+    J = subs(J, Tsym, T_keyframe_to_current_inv');
+    
+    % convert points into cell array of Z vectors (i.e. {X Y Z} where X = cat(3,P1.x,P2.x,...)
+    pts = num2cell(permute(points_keyframe, [3,1,2]), 3);
+    
+    % evaluate symbolic derivation
+    J_transform = subs(J, [x y z], pts);
+    
+end
 
 end
 
