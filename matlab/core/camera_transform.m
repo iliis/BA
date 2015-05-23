@@ -1,4 +1,4 @@
-function [ points_current, J_transform ] = camera_transform( points_keyframe, T_keyframe_to_current )
+function [ points_current, J_transform ] = camera_transform( points_keyframe, T_keyframe_to_current_inv )
 % transforms (rotates & translates) 3D points in original (keyframe) frame to
 % 3D points in current camera frame
 %
@@ -38,11 +38,11 @@ N = size(points_keyframe, 2);
 
 % check parameters
 assert(all(size(points_keyframe) == [3 N]));
-assert(all(size(T_keyframe_to_current) == [6 1]));
+assert(numel(T_keyframe_to_current_inv) == 6);
 
 % apply transformation R * X + T
 % points_keyframe is list of column vectors
-points_current = (angle2dcm(T_keyframe_to_current(4:6)) * points_keyframe) + repmat(T_keyframe_to_current(1:3), 1, N);
+points_current = (angle2dcm(T_keyframe_to_current_inv(4:6)) * points_keyframe) + repmat(T_keyframe_to_current_inv(1:3), 1, N);
 
 end
 
