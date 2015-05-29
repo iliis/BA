@@ -2,7 +2,7 @@
 % loads an image pair and warps the keyframe onto the current frame
 
 image_path = 'input/testscene1';
-T = [2 0 -4 0 0 0]'; % TODO: read this from camera_trajectory.csv
+T = [-2 0 -4 0 0 0]'; % TODO: read this from camera_trajectory.csv
 %T = [0 0 0 0 0 0]';
 
 D1 = read_depth_image(image_path, 1);
@@ -17,6 +17,7 @@ FOCAL = 0.035 * size(I1,2) / 0.032;
 intrinsics = CameraIntrinsics(size(I1,2), size(I1,1), FOCAL);
 
 % do the actual calculations
+%err = camera_warp(I1,D1,I2,T,intrinsics, true);
 [err, J] = camera_warp(I1,D1,I2,T,intrinsics, true);
 
 disp(['total error: ' num2str(norm(err))]);

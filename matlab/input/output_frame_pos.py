@@ -54,8 +54,8 @@ def RunPerFrame(scene):
         previous_position = current_position;
         previous_rotation = current_rotation;
         
-        posfile.writerow([-pos.x, pos.y, pos.z, \
-        -rot.x, rot.y, rot.z])
+        posfile.writerow([pos.x, pos.y, pos.z, \
+        rot.x, rot.y, rot.z])
     
     print("rendered a frame!")
 

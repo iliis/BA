@@ -37,9 +37,6 @@ assert(all(all(points_camera >= 1)));
 assert(all(all(points_camera(1,:) <= W)));
 assert(all(all(points_camera(2,:) <= H)));
 
-% [1,1] is bottom left in image coordinates -> invert V-axis!
-image = flipud(image);
-
 % actually sample image ;)
 intensities = interp2(image, points_camera(1,:), points_camera(2,:));
 

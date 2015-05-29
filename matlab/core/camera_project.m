@@ -34,12 +34,6 @@ assert(isa(intrinsics, 'CameraIntrinsics'));
 
 % project back onto image plane
 
-
-
-% X-Axis is mirrored relative to U-Axis in camera plane
-% --> U = -X / Z * focal + principal
-points_world(1,:) = -points_world(1,:);
-
 % Z-Axis points 'inwards' (away from viewer)
 %
 % [ u v ]' = [ x y ]' / z * focal + printcipal_point

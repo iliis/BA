@@ -18,7 +18,7 @@ for i = 1:1000
     end
     
     %step = inv(J'*J) * J' * err';
-    step = (J'*J) \ J' * err';
+    step = - (J'*J) \ J' * err';
     
     if restrict
         step = [step'  0 0 0 0]';
@@ -27,7 +27,7 @@ for i = 1:1000
     plot(T(1), T(2), '.g');
     drawnow;
     
-    T = T - step;
+    T = T + step;
     
     if (~minimization_running)
         break;

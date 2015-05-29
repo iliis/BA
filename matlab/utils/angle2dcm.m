@@ -1,6 +1,8 @@
 function [DCM] = angle2dcm(angles)
 % angles = [yaw pitch roll]
 
+% this uses 'ZYX' angles
+
 assert(isequal(numel(angles), 3));
 
 Rx = [ ...
@@ -18,6 +20,6 @@ Rz = [ ...
     sin(angles(3))  cos(angles(3)) 0; ...
     0 0 1];
 
-DCM = Rz * Ry * Rx; % TODO: check order
+DCM = Rz * Ry * Rx;
 
 end

@@ -41,8 +41,8 @@ assert(isa(intrinsics, 'CameraIntrinsics'));
 % [x,y]' = ([u v]' - principal_point) * depth / focal_length
 %    z   = depth
 points_world = [ ...
-    -(points_camera(1,:) - intrinsics.principal_point(1)) .* depths ./ intrinsics.focal_length; % -X = +U !
-     (points_camera(2,:) - intrinsics.principal_point(2)) .* depths ./ intrinsics.focal_length;
+    (points_camera(1,:) - intrinsics.principal_point(1)) .* depths ./ intrinsics.focal_length;
+    (points_camera(2,:) - intrinsics.principal_point(2)) .* depths ./ intrinsics.focal_length;
     depths ]; % our Z-Axis points 'inwards' (away from viewer) => positive depth = positive Z
 
 

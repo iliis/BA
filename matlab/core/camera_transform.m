@@ -62,6 +62,7 @@ if nargout > 1
     pts = num2cell(permute(points_keyframe, [3,1,2]), 3);
     
     % evaluate symbolic derivation
+    % TODO: optimize this, it is REALLY slow!
     J_transform = subs(J, [x y z], pts);
     
 end

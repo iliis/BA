@@ -39,7 +39,7 @@ assert(isa(intrinsics, 'CameraIntrinsics'));
 points_keyframe_camera = image_to_list(cat(3,X,Y));
 
 % attention: inverted V-Axis -> flip depths!
-points_world = camera_project_inverse(points_keyframe_camera, image_to_list(flipud(depths_keyframe)), intrinsics);
+points_world = camera_project_inverse(points_keyframe_camera, image_to_list(depths_keyframe), intrinsics);
 
 if calc_jacobian
     [points_current,        J_T] = camera_transform(points_world, T);
@@ -64,7 +64,7 @@ else
 end
 
 % only compare points that projected inside the current image
-intensities_keyframe = camera_intensity_sample(points_keyframe_camera, image_keyframe); %image_to_list(flipud(image_keyframe));
+intensities_keyframe = camera_intensity_sample(points_keyframe_camera, image_keyframe);
 intensities_keyframe = intensities_keyframe(:, valid_points);
 errors = (intensities_keyframe - intensities_current);
 
@@ -74,7 +74,9 @@ if calc_jacobian
     assert(N == size(J_P,3));
     assert(N == size(J_I,3));
     J_warp = zeros(N,numel(T));
+    
     % this seems to be one of the fastest way of doing N matrix multiplications:
+    % TODO: optimize this, it is REALLY slow!
     for i = 1:N
         J_warp(i,:) = J_I(:,:,i) * J_P(:,:,i) * J_T(:,:,i);
     end
