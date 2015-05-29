@@ -48,16 +48,19 @@ points_world = [ ...
 
 if nargout > 1
     
+    % This code is actually never used ;)
+    
     % calculate Jacobian symbolically
     syms u v D real;
     J = jacobian(camera_project_inverse([u v]', D, intrinsics), [u v D]);
     
-    % convert points into cell array of Z vectors (i.e. {X Y Z} where X = cat(3,P1.x,P2.x,...)
-    pts = num2cell(permute([points_camera; depths], [3,1,2]), 3);
+    % convert symbolic expression into function handle
+    func = matlabFunction(J, 'vars', [u v D]);
     
-    % evaluate symbolic derivation
-    J_project_inv = subs(J, [u v D], pts);
+    % evaluate function for all pixels
+    J_project_inv = reshape(cell2mat(arrayfun(func, points_camera(1,:), points_camera(2,:), depths, 'UniformOutput', false)), 3, 3, N);
     
+    assert(all(size(J_project_inv) == [3,3,N]));
 end
 
 end

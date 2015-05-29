@@ -21,3 +21,4 @@ intrinsics = CameraIntrinsics(size(I1,2), size(I1,1), FOCAL);
 [err, J] = camera_warp(I1,D1,I2,T,intrinsics, true);
 
 disp(['total error: ' num2str(norm(err))]);
+whos J;

@@ -10,14 +10,14 @@ for i = 1:1000
     % invalid terms don't exist in Jacobi
     [err, J] = camera_warp(I1,D1,I2,T,intrinsics);
     
-    disp(['[GD] step ' num2str(i) ': error = ' num2str(sum(err.^2)) '  T = [ ' num2str(T') ' ]']);
+    disp(['[GD] step ' num2str(i) ': error = ' num2str(norm(err)) '  T = [ ' num2str(T') ' ]']);
     
     if nargout > 1
         T_path = [T_path; T];
     end
     
     if restrict
-        J(:,3:end) = 0;
+        J(:,4:end) = 0;
     end
     
     step = step_size * J' * err';
@@ -35,7 +35,7 @@ for i = 1:1000
     end
 end
 
-disp(['[GD] final step : error = ' num2str(sum(err.^2)) '  T = [ ' num2str(T') ' ]']);
+disp(['[GD] final step : error = ' num2str(norm(err)) '  T = [ ' num2str(T') ' ]']);
 
 if nargout > 1
     T_path = [T_path; T];

@@ -58,13 +58,14 @@ if nargout > 1
     % evaluate symbolic derivation for current transformation -> still symbolic!
     J = subs(J, Tsym, T_keyframe_to_current_inv');
     
-    % convert points into cell array of Z vectors (i.e. {X Y Z} where X = cat(3,P1.x,P2.x,...)
-    pts = num2cell(permute(points_keyframe, [3,1,2]), 3);
+    % convert symbolic expression into function handle
+    func = matlabFunction(J, 'vars', [x y z]);
     
-    % evaluate symbolic derivation
-    % TODO: optimize this, it is REALLY slow!
-    J_transform = subs(J, [x y z], pts);
+    % evaluate function for all points
+    J_transform = reshape(cell2mat(arrayfun(func, points_keyframe(1,:), points_keyframe(2,:), points_keyframe(3,:), 'UniformOutput', false)), 3, 6, N);
     
+    
+    assert(all(size(J_transform) == [3,6,N]));
 end
 
 end

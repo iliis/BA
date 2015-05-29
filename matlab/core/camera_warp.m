@@ -73,13 +73,17 @@ if calc_jacobian
     assert(N == size(J_T,3));
     assert(N == size(J_P,3));
     assert(N == size(J_I,3));
-    J_warp = zeros(N,numel(T));
     
+    %J_warp = z_matmultiply(J_I, z_matmultiply(J_P, J_T)); % 3.121s
+    %J_warp = z_matmultiply(z_matmultiply(J_I, J_P), J_T); % 6.039s
+    
+    J_warp = zeros(N,numel(T));
     % this seems to be one of the fastest way of doing N matrix multiplications:
-    % TODO: optimize this, it is REALLY slow!
     for i = 1:N
         J_warp(i,:) = J_I(:,:,i) * J_P(:,:,i) * J_T(:,:,i);
     end
+    
+    assert(all(size(J_warp) == [N,6]));
 end
 
 if show_plots

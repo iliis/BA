@@ -16,14 +16,17 @@ for i = 1:1000
     % invalid terms are zero in Jacobi
     
     
-    disp(['[LM] step ' num2str(i) ': error = ' num2str(sum(err.^2)) '  T = [ ' num2str(T') ' ]']);
+    disp(['[LM]      step ' num2str(i) ': error = ' num2str(norm(err)) '  T = [ ' num2str(T') ' ]']);
     
     %step = inv(J'*J) * J' * err';
     
     while true
+        if (~minimization_running)
+            break;
+        end
         
         if restrict
-            J(:,3:end) = 0;
+            J(:,4:end) = 0;
         end
 
         JTJ = J'*J;
@@ -32,14 +35,14 @@ for i = 1:1000
 
         % try out step
         T_tmp = T + step;
-        [err_tmp, J_tmp] = camera_warp(I1,D1,I2,T,intrinsics);
+        [err_tmp, J_tmp] = camera_warp(I1,D1,I2,T_tmp,intrinsics);
         
-        disp(['[LM] temp step ' num2str(i) ': error = ' num2str(sum(err_tmp.^2)) ' lambda = ' num2str(lambda) ' T = [ ' num2str(T_tmp') ' ]']);
+        disp(['[LM] temp step ' num2str(i) ': error = ' num2str(norm(err_tmp)) ' lambda = ' num2str(lambda) ' T = [ ' num2str(T_tmp') ' ]']);
 
         plot(T_tmp(1), T_tmp(2), '.r');
         drawnow;
 
-        if (sum(err_tmp.^2) > sum(err.^2))
+        if (norm(err_tmp) > norm(err))
             % new value is worse, increase dampening factor
             lambda = lambda * lambda_inc_factor;
         else
@@ -64,6 +67,6 @@ for i = 1:1000
     end
 end
 hold off;
-disp(['[GN] final step : error = ' num2str(sum(err.^2)) '  T = [ ' num2str(T') ' ]']);
+disp(['[GN] final step : error = ' num2str(norm(err)) '  T = [ ' num2str(T') ' ]']);
 
 end

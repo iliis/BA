@@ -71,9 +71,7 @@ Kostenfunktion: Hubart (maybe try others)
 
 29.5:
 - weg mit minuszeichen
-    -> unittests anpassen
     -> Blender script
 - warp current frame to keyframe to get camera movement
 - check image gradient
-- profile jacobian calculations
-    -> derivation vs. subs?
+- write errorsurface plotter

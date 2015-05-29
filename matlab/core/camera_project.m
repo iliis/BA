@@ -45,12 +45,13 @@ if nargout > 1
     syms x y z real;
     J = jacobian(camera_project([x y z]', intrinsics), [x y z]);
     
-    % convert points into cell array of Z vectors (i.e. {X Y Z} where X = cat(3,P1.x,P2.x,...)
-    pts = num2cell(permute(points_world, [3,1,2]), 3);
+    % convert symbolic expression into function handle
+    func = matlabFunction(J, 'vars', [x y z]);
     
-    % evaluate symbolic derivation
-    J_project = subs(J, [x y z], pts);
+    % evaluate function for all points
+    J_project = reshape(cell2mat(arrayfun(func, points_world(1,:), points_world(2,:), points_world(3,:), 'UniformOutput', false)), 2, 3, N);
     
+    assert(all(size(J_project) == [2,3,N]));
 end
 
 end

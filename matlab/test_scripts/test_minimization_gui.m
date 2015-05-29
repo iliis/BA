@@ -12,7 +12,7 @@ min_methods = {'Gradient Descent', @gradient_descent; ...
 
 %min_init = [1.1 0 0 0 0 0];
 %min_init = [2 0 -4 0 0 0]'; % TODO: read this from camera_trajectory.csv
-min_init = [1.8 0 -4.1 0 0 0]';
+min_init = [-1.8 0 -4.1 0 0 0]';
 
 % main gui elements
 
@@ -48,8 +48,8 @@ hmin_method = uicontrol('Style', 'popupmenu', ...
     'String', min_methods(:,1), ...
     'Position', [10 350 300 25]);
 
-hmin_restrict2D = uicontrol('Style', 'checkbox', ...
-    'String', 'restrict to X and Y', ...
+hmin_restrict_translation = uicontrol('Style', 'checkbox', ...
+    'String', 'restrict to translation in X, Y and Z', ...
     'Position', [10 320 300 25]);
 
 hmin_step_size_label = uicontrol('Style', 'text', ...
@@ -74,7 +74,9 @@ hmin_start_button = uicontrol('Style', 'pushbutton', ...
     'Callback', @start_minimization, ...
     'Position', [10 10 300 50]);
 
-aplot_axes = axes('Units', 'pixels', 'Position', [340 30 850 660]);
+aplot_axes = axes('Units', 'pixels', ...
+    'Position', [340 30 850 660], ...
+    'Color', [0.2 0.2 0.2]);
 
 
 
@@ -89,7 +91,7 @@ hscale_text.Units = 'normalized';
 hscale.Units = 'normalized';
 himg_show.Units = 'normalized';
 hmin_method.Units = 'normalized';
-hmin_restrict2D.Units = 'normalized';
+hmin_restrict_translation.Units = 'normalized';
 hmin_init_text.Units = 'normalized';
 hchoose_min_init.Units = 'normalized';
 hmin_start_button.Units = 'normalized';
@@ -149,7 +151,7 @@ f.Visible = 'on';
 
             minimization_running = true;
             hmin_start_button.String = 'STOP';
-            do_global_minimization(image_path, hscale.Value, min_methods{hmin_method.Value,2}, hmin_restrict2D.Value, str2num(hmin_step_size.String), min_init);
+            do_global_minimization(image_path, hscale.Value, min_methods{hmin_method.Value,2}, hmin_restrict_translation.Value, str2num(hmin_step_size.String), min_init);
         else
             % abort minimization currently in progress
             minimization_running = false;

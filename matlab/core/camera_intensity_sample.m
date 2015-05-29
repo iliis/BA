@@ -62,6 +62,8 @@ if nargout > 1
     
     %diff_x = conv2(image, [-1 0 1]/2, 'same');
     %diff_y = conv2(image, [-1 0 1]'/2, 'same');
+    
+    assert(all(size(J_intensity) == [1,2,N]));
 end
 
 end
