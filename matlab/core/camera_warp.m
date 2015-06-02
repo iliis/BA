@@ -1,4 +1,4 @@
-function [ errors, J_warp ] = camera_warp( image_keyframe, depths_keyframe, image_current, T, intrinsics, plot )
+function [ errors, J_warp ] = camera_warp( scene, T, plot )
 % projects points into world, transforms and projects back
 %
 % TODO: write some tests for this function! There are some critical things
@@ -6,47 +6,49 @@ function [ errors, J_warp ] = camera_warp( image_keyframe, depths_keyframe, imag
 %
 % INPUT:
 %
-% image_keyframe:
-%   H * W intensity image, this will be warped
-%
-% depths_keyframe:
-%   H * W depths of keyframe image
-%
-% image_current:
-%   H * W intensity image, this is the target
+% scene, containing:
+% (TODO: update this, e.g. add a get_keyframe(i) or something to Scene class)
+    % image_keyframe:
+    %   H * W intensity image, this will be warped
+    %
+    % depths_keyframe:
+    %   H * W depths of keyframe image
+    %
+    % image_current:
+    %   H * W intensity image, this is the target
 %
 % T:
 %   [x y z alpha beta gamma]' transformation to apply
 %
-% intrinsics:
-%   camera intrinsics
 % 
+
+
+image_keyframe  = scene.I1;
+depths_keyframe = scene.D1;
+image_current   = scene.I2;
 
 [H, W] = size(image_keyframe);
 
 calc_jacobian = nargout > 1;
-show_plots = nargin > 5;
+show_plots    = nargin > 2;
 
 % check input parameters
-assert(all(size(depths_keyframe) == [H,W]), 'depth matrix must have same size as intensity image');
-assert(all(size(image_current)   == [H,W]), 'current image must have same size as keyframe image');
 assert(numel(T) == 6);
-assert(isa(intrinsics, 'CameraIntrinsics'));
+assert(isa(scene, 'Scene'));
 
 
 [X,Y] = meshgrid(1:W, 1:H);
 
 points_keyframe_camera = image_to_list(cat(3,X,Y));
 
-% attention: inverted V-Axis -> flip depths!
-points_world = camera_project_inverse(points_keyframe_camera, image_to_list(depths_keyframe), intrinsics);
+points_world = camera_project_inverse(points_keyframe_camera, image_to_list(depths_keyframe), scene.intrinsics);
 
 if calc_jacobian
     [points_current,        J_T] = camera_transform(points_world, T);
-    [points_current_camera, J_P] = camera_project(points_current, intrinsics);
+    [points_current_camera, J_P] = camera_project(points_current, scene.intrinsics);
 else
     points_current        = camera_transform(points_world, T);
-    points_current_camera = camera_project(points_current, intrinsics);
+    points_current_camera = camera_project(points_current, scene.intrinsics);
 end
 
 
@@ -66,7 +68,7 @@ end
 % only compare points that projected inside the current image
 intensities_keyframe = camera_intensity_sample(points_keyframe_camera, image_keyframe);
 intensities_keyframe = intensities_keyframe(:, valid_points);
-errors = (intensities_keyframe - intensities_current);
+errors = -(intensities_keyframe - intensities_current);
 
 if calc_jacobian
     N = size(points_current_camera,2);
@@ -86,27 +88,42 @@ if calc_jacobian
     assert(all(size(J_warp) == [N,6]));
 end
 
+% TODO: move this elsewhere ...
 if show_plots
-    subplot(2,2,1);
+    whitebg([0 0 0]);
+    
+    subplot(2,3,1);
     colormap('jet');
-    scatter(points_keyframe_camera(1,valid_points), points_keyframe_camera(2,valid_points), 2, errors);
+    scatter(points_keyframe_camera(1,valid_points), points_keyframe_camera(2,valid_points), 2, errors.^2, 'filled');
+    set(gca,'YDir','reverse'); xlim([0 W]); ylim([0 H]);
     colorbar();
     title('errors in original (keyframe) view');
 
-    subplot(2,2,2);
-    scatter(points_keyframe_camera(1,valid_points), points_keyframe_camera(2,valid_points), 2, intensities_keyframe);
+    subplot(2,3,2);
+    scatter(points_keyframe_camera(1,valid_points), points_keyframe_camera(2,valid_points), 2, intensities_keyframe, 'filled');
+    set(gca,'YDir','reverse'); xlim([0 W]); ylim([0 H]);
     colorbar();
     title('keyframe intensity image');
+    
+    subplot(2,3,3);
+    imagesc(image_keyframe);
+    title('keyframe image');
 
-    subplot(2,2,3);
-    scatter(points_current_camera(1,:), points_current_camera(2,:), 2, errors);
+    subplot(2,3,4);
+    scatter(points_current_camera(1,:), points_current_camera(2,:), 2, errors.^2, 'filled');
+    set(gca,'YDir','reverse'); xlim([0 W]); ylim([0 H]);
     colorbar();
     title('errors of warped points (in current view)');
 
-    subplot(2,2,4);
-    scatter(points_current_camera(1,:), points_current_camera(2,:), 2, intensities_keyframe);
+    subplot(2,3,5);
+    scatter(points_current_camera(1,:), points_current_camera(2,:), 2, intensities_keyframe, 'filled');
+    set(gca,'YDir','reverse'); xlim([0 W]); ylim([0 H]);
     colorbar();
     title('warped keyframe intensity image');
+    
+    subplot(2,3,6);
+    imagesc(image_current);
+    title('current image');
 end
 
 end

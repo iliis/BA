@@ -6,6 +6,40 @@ import csv
 # 
 # execute script once to register handler (or whenever you change the code)
 
+def writeIntrinsics():
+    cam = bpy.context.scene.camera
+    r = bpy.context.scene.render
+    with open(bpy.path.abspath('//camera_intrinsics.csv'), 'w', newline='') as csvfile:
+        intr_file = csv.writer(csvfile, delimiter=',')
+        intr_file.writerow([ \
+            'focal length', \
+            'focal length mm', \
+            'image width', \
+            'image height', \
+            'sensor width mm', \
+            'sensor height mm', \
+            'clip start', \
+            'clip end', \
+            'color depth', \
+            'depth depth'])
+            
+        W = r.resolution_x * r.resolution_percentage / 100
+        H = r.resolution_y * r.resolution_percentage / 100
+        
+        focal = cam.data.lens * W / cam.data.sensor_width
+            
+        intr_file.writerow([ \
+            focal, \
+            cam.data.lens, \
+            W, \
+            H, \
+            cam.data.sensor_width, \
+            cam.data.sensor_height, \
+            cam.data.clip_start, \
+            cam.data.clip_end, \
+            255, \
+            65535])
+
 def RunPerFrame(scene):
     
     global previous_position
@@ -60,6 +94,7 @@ def RunPerFrame(scene):
     print("rendered a frame!")
 
 
+
 # remove function handler from previous execution of this script
 bpy.app.handlers.render_post.clear()
 
@@ -68,3 +103,5 @@ bpy.app.handlers.render_post.append(RunPerFrame)
 
 previous_position = bpy.context.scene.camera.location.copy()
 previous_rotation = bpy.context.scene.camera.rotation_euler.copy()
+
+writeIntrinsics()

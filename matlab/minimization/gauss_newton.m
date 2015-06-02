@@ -13,12 +13,16 @@ for i = 1:1000
     
     disp(['[GN] step ' num2str(i) ': error = ' num2str(norm(err)) '  T = [ ' num2str(T') ' ]']);
     
+    
+    W = diag(error_weighting(err, 0.1));
+    
+    
     if restrict
         J(:,4:end) = [];
     end
     
     %step = inv(J'*J) * J' * err';
-    step = - (J'*J) \ J' * err';
+    step = - (J'*W*J) \ J' * W * err';
     
     if restrict
         step = [step'  0 0 0]';

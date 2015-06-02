@@ -20,7 +20,7 @@ for i = 1:1000
         J(:,4:end) = 0;
     end
     
-    step = step_size * J' * err';
+    step = - step_size * J' * err';
     
     % TODO: shouldn't this be -step?
     T = T + step;

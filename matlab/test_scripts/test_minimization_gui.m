@@ -12,7 +12,9 @@ min_methods = {'Gradient Descent', @gradient_descent; ...
 
 %min_init = [1.1 0 0 0 0 0];
 %min_init = [2 0 -4 0 0 0]'; % TODO: read this from camera_trajectory.csv
-min_init = [-1.8 0 -4.1 0 0 0]';
+%min_init = [-1.8 0 -4.1 0 0 0]';
+%min_init = [-1.95 0 -4.02 0 0 0]';
+min_init = [-1.8 0 -3.9 0 0 0]';
 
 % main gui elements
 
