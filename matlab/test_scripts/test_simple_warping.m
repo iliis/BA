@@ -2,7 +2,7 @@
 % loads an image pair and warps the keyframe onto the current frame
 
 testscene = Scene('input/testscene1');
-testscene.ground_truth = [-2 0 -4 0 0 0]'; % TODO: read this from camera_trajectory.csv
+testscene.ground_truth = [2 0 4 0 0 0]'; % TODO: read this from camera_trajectory.csv
 T = testscene.ground_truth;
 
 

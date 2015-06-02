@@ -1,4 +1,4 @@
-function [ errors, J_warp ] = camera_warp( scene, T, plot )
+function [ errors, J_warp ] = camera_warp( scene, T, show_plots )
 % projects points into world, transforms and projects back
 %
 % TODO: write some tests for this function! There are some critical things
@@ -22,56 +22,70 @@ function [ errors, J_warp ] = camera_warp( scene, T, plot )
 %
 % 
 
+% check input parameters
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 image_keyframe  = scene.I1;
-depths_keyframe = scene.D1;
 image_current   = scene.I2;
+depths_current  = scene.D2;
 
-[H, W] = size(image_keyframe);
+[H, W] = size(image_current);
 
 calc_jacobian = nargout > 1;
-show_plots    = nargin > 2;
 
-% check input parameters
+if nargin < 3
+    show_plots = false;
+end
+
 assert(numel(T) == 6);
 assert(isa(scene, 'Scene'));
 
+% re-project into world
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 [X,Y] = meshgrid(1:W, 1:H);
 
-points_keyframe_camera = image_to_list(cat(3,X,Y));
+points_current_camera = image_to_list(cat(3,X,Y));
 
-points_world = camera_project_inverse(points_keyframe_camera, image_to_list(depths_keyframe), scene.intrinsics);
+points_world = camera_project_inverse(points_current_camera, image_to_list(depths_current), scene.intrinsics);
+
+% transform & project points
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 if calc_jacobian
-    [points_current,        J_T] = camera_transform(points_world, T);
-    [points_current_camera, J_P] = camera_project(points_current, scene.intrinsics);
+    [points_keyframe,        J_T] = camera_transform(points_world, T);
+    [points_keyframe_camera, J_P] = camera_project(points_keyframe, scene.intrinsics);
 else
-    points_current        = camera_transform(points_world, T);
-    points_current_camera = camera_project(points_current, scene.intrinsics);
+    points_keyframe        = camera_transform(points_world, T);
+    points_keyframe_camera = camera_project(points_keyframe, scene.intrinsics);
 end
 
-
-
 % filter points outside of image range
-valid_points              = is_in_img_range(points_current_camera, image_current);
-points_current_camera     = points_current_camera(:, valid_points);
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+valid_points              = is_in_img_range(points_keyframe_camera, image_keyframe);
+points_keyframe_camera    = points_keyframe_camera(:, valid_points);
+points_current_camera     = points_current_camera (:, valid_points);
+
+% sample target image
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 if calc_jacobian
     J_T = J_T(:,:,valid_points);
     J_P = J_P(:,:,valid_points);
-    [intensities_current, J_I] = camera_intensity_sample(points_current_camera, image_current);
+    [intensities_keyframe, J_I] = camera_intensity_sample(points_keyframe_camera, image_keyframe);
 else
-    intensities_current = camera_intensity_sample(points_current_camera, image_current);
+    intensities_keyframe = camera_intensity_sample(points_keyframe_camera, image_keyframe);
 end
 
-% only compare points that projected inside the current image
-intensities_keyframe = camera_intensity_sample(points_keyframe_camera, image_keyframe);
-intensities_keyframe = intensities_keyframe(:, valid_points);
-errors = -(intensities_keyframe - intensities_current);
+% calculate errors
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+intensities_current = camera_intensity_sample(points_current_camera, image_current);
+errors = intensities_keyframe - intensities_current;
 
+% assemble complete Jacobian
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if calc_jacobian
-    N = size(points_current_camera,2);
+    N = size(points_keyframe_camera,2);
     assert(N == size(J_T,3));
     assert(N == size(J_P,3));
     assert(N == size(J_I,3));
@@ -88,43 +102,46 @@ if calc_jacobian
     assert(all(size(J_warp) == [N,6]));
 end
 
+% plot everything
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % TODO: move this elsewhere ...
 if show_plots
     whitebg([0 0 0]);
     
     subplot(2,3,1);
     colormap('jet');
-    scatter(points_keyframe_camera(1,valid_points), points_keyframe_camera(2,valid_points), 2, errors.^2, 'filled');
-    set(gca,'YDir','reverse'); xlim([0 W]); ylim([0 H]);
-    colorbar();
-    title('errors in original (keyframe) view');
-
-    subplot(2,3,2);
-    scatter(points_keyframe_camera(1,valid_points), points_keyframe_camera(2,valid_points), 2, intensities_keyframe, 'filled');
-    set(gca,'YDir','reverse'); xlim([0 W]); ylim([0 H]);
-    colorbar();
-    title('keyframe intensity image');
-    
-    subplot(2,3,3);
-    imagesc(image_keyframe);
-    title('keyframe image');
-
-    subplot(2,3,4);
     scatter(points_current_camera(1,:), points_current_camera(2,:), 2, errors.^2, 'filled');
     set(gca,'YDir','reverse'); xlim([0 W]); ylim([0 H]);
     colorbar();
-    title('errors of warped points (in current view)');
+    title('errors in current view');
 
-    subplot(2,3,5);
-    scatter(points_current_camera(1,:), points_current_camera(2,:), 2, intensities_keyframe, 'filled');
+    subplot(2,3,2);
+    scatter(points_current_camera(1,:), points_current_camera(2,:), 2, intensities_current, 'filled');
     set(gca,'YDir','reverse'); xlim([0 W]); ylim([0 H]);
     colorbar();
-    title('warped keyframe intensity image');
+    title('current intensity image');
     
-    subplot(2,3,6);
+    subplot(2,3,3);
     imagesc(image_current);
     title('current image');
+
+    subplot(2,3,4);
+    scatter(points_keyframe_camera(1,:), points_keyframe_camera(2,:), 2, errors.^2, 'filled');
+    set(gca,'YDir','reverse'); xlim([0 W]); ylim([0 H]);
+    colorbar();
+    title('errors of warped points (in keyframe view)');
+
+    subplot(2,3,5);
+    scatter(points_keyframe_camera(1,:), points_keyframe_camera(2,:), 2, intensities_current, 'filled');
+    set(gca,'YDir','reverse'); xlim([0 W]); ylim([0 H]);
+    colorbar();
+    title('warped current intensity image');
+    
+    subplot(2,3,6);
+    imagesc(image_keyframe);
+    title('keyframe image');
 end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 end
 
