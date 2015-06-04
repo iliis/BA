@@ -1,4 +1,5 @@
 function do_global_minimization( image_path, image_scale, min_method, restrict_to_xy, step_size, T_init)
+% TODO: update this function to use Scene etc.!
 
 D1 = read_depth_image(image_path, 1);
 I1 = read_intensity_image(image_path, 1);

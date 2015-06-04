@@ -1,4 +1,4 @@
-function T = gauss_newton(D1,I1,I2,T,intrinsics,restrict)
+function T = gauss_newton(scene, T_init, rel_tol, weight_function, restrict)
 
 global minimization_running;
 
@@ -6,15 +6,21 @@ if nargin == 5
     restrict = false;
 end
 
+if nargin < 4
+    weight_function = @uniform_weights;
+end
+
+T = T_init;
+
 hold on;
 for i = 1:1000
     % invalid terms don't exist in Jacobi
-    [err, J] = camera_warp(I1,D1,I2,T,intrinsics);
+    [err, J] = camera_warp(scene, T);
     
     disp(['[GN] step ' num2str(i) ': error = ' num2str(norm(err)) '  T = [ ' num2str(T') ' ]']);
     
     
-    W = diag(error_weighting(err, 0.1));
+    W = diag(weight_function(err));
     
     
     if restrict
@@ -32,6 +38,12 @@ for i = 1:1000
     drawnow;
     
     T = T + step;
+    
+    
+    if (norm(step) < rel_tol)
+        disp('[GD] found minimum!');
+        break;
+    end
     
     if (~minimization_running)
         break;

@@ -63,7 +63,7 @@ Gauss Newton: Kann divergieren wenn nicht positiv semi-definit -> Schrittgrösse
 (J'WJ+l*I)*deltaT = -J*W*e(T)
 -> l grösser machen wenn aktueller Schritt Fehler nicht verkleinert
 
-Kostenfunktion: Hubart (maybe try others)
+Kostenfunktion: Huber (maybe try others)
 
 
 
@@ -72,6 +72,19 @@ Kostenfunktion: Hubart (maybe try others)
 29.5:
 - weg mit minuszeichen
     -> Blender script
-- warp current frame to keyframe to get camera movement
 - check image gradient
-- write errorsurface plotter
+
+TODO MATLAB:
+- write tests for all core functions, including camera_warp()
+- fix Blender script
+- render more cost surfaces
+    -> also with weighted errors
+- render longer trajectory
+    - with more surrounding geometry
+
+
+IDEAS
+
+> measure convergence radius for trajectory
+    - determine how much offset can be tolerated
+    -> required framerate / movement speed

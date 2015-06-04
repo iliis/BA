@@ -1,10 +1,15 @@
 import bpy
 import csv
+from mathutils import *
+from math import *
 
 # this script writes the position and orientation of the camera
 # at every frame into a CSV file named 'camera_trajectory.csv'
 # 
 # execute script once to register handler (or whenever you change the code)
+
+
+blender_to_matlab_rot = Euler((radians(180), 0, 0), 'ZYX')
 
 def writeIntrinsics():
     cam = bpy.context.scene.camera
@@ -46,53 +51,52 @@ def RunPerFrame(scene):
     global previous_rotation
     
     cam = bpy.context.scene.camera
-    print("current frame:", scene.frame_current)
-    print("position", cam.location)
-    print("rotation", cam.rotation_euler)
     
+    current_position = cam.location.copy()
+    current_rotation = cam.rotation_euler.copy()
+    
+    print("current frame:", scene.frame_current)
+    print("position", current_position)
+    print("rotation", current_rotation)
+
     if scene.frame_current == scene.frame_start:
         # overwrite existing CSV file and write CSV header
         # x y z alpha beta gamma
-        with open(bpy.path.abspath('//camera_trajectory.csv'), 'w', newline='') as csvfile:
-            posfile = csv.writer(csvfile, delimiter=',')
-            posfile.writerow(['X', 'Y', 'Z', 'alpha', 'beta', 'gamma'])
-        
         with open(bpy.path.abspath('//camera_trajectory_relative.csv'), 'w', newline='') as csvfile:
             posfile = csv.writer(csvfile, delimiter=',')
             posfile.writerow(['deltaX', 'deltaY', 'deltaZ', 'delta_alpha', 'delta_beta', 'delta_gamma'])
-   
-    with open(bpy.path.abspath('//camera_trajectory.csv'), 'a', newline='') as csvfile:
-        posfile = csv.writer(csvfile, delimiter=',')
-        posfile.writerow([-cam.location.x, cam.location.y, cam.location.z, \
-        -cam.rotation_euler.x, cam.rotation_euler.y, cam.rotation_euler.z])
     
     # write position and rotation relative to previous frame
     with open(bpy.path.abspath('//camera_trajectory_relative.csv'), 'a', newline='') as csvfile:
         posfile = csv.writer(csvfile, delimiter=',')
         
-        current_position = cam.location.copy()
-        current_rotation = cam.rotation_euler.copy()
+        #print(previous_position)
+        #print(previous_rotation)
+        #print(current_position)
+        #print(current_rotation)
         
-        print(previous_position)
-        print(previous_rotation)
-        print(current_position)
-        print(current_rotation)
+        # calculate relative rotation
+        # get inverse of previous rotation
+        prev_rot_inv = previous_rotation.to_matrix()
+        prev_rot_inv.transpose()
+        # apply it to current rotation (i.e. new-old)
+        delta_rot = current_rotation.copy()
+        delta_rot.rotate(prev_rot_inv)
         
-        pos = current_position - previous_position
-        rot = current_rotation.copy()
-        rot.rotate(previous_rotation)
+        # calculate relative movement
+        delta_pos = current_position - previous_position # in global frame
+        delta_pos.rotate(prev_rot_inv) # in camera frame
+        delta_pos.rotate(blender_to_matlab_rot) # in camera frame used by Matlab code
         
-        print(pos)
-        print(rot)
+        print('delta position:', delta_pos)
+        print('delta rotation:', delta_rot)
         
         previous_position = current_position;
         previous_rotation = current_rotation;
         
-        posfile.writerow([pos.x, pos.y, pos.z, \
-        rot.x, rot.y, rot.z])
-    
-    print("rendered a frame!")
-
+        posfile.writerow([ \
+            delta_pos.x, delta_pos.y, delta_pos.z, \
+            delta_rot.x, delta_rot.y, delta_rot.z])
 
 
 # remove function handler from previous execution of this script

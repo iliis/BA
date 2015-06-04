@@ -1,5 +1,5 @@
 function [DCM] = angle2dcm(angles)
-% angles = [yaw pitch roll]
+% angles = [yaw pitch roll] = [gamma beta alpha]
 
 % this uses 'ZYX' angles
 

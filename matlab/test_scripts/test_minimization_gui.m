@@ -1,4 +1,5 @@
 function test_minimization_gui
+% TODO: update this function to use Scene etc.!
 
 f = figure('visible', 'off', 'Position', [0,0,1200,700]);
 

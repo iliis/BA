@@ -1,4 +1,4 @@
-function T = levenberg_marquardt(D1,I1,I2,T,intrinsics,restrict)
+function T = levenberg_marquardt(scene, T_init, rel_tol, weight_function, restrict)
 
 global minimization_running;
 
@@ -6,10 +6,16 @@ if nargin == 5
     restrict = false;
 end
 
+if nargin < 4
+    weight_function = @uniform_weights;
+end
+
 lambda = 0.01;
 lambda_inc_factor = 2;
 
-[err, J] = camera_warp(I1,D1,I2,T,intrinsics);
+T = T_init;
+
+[err, J] = camera_warp(scene, T);
 
 hold on;
 for i = 1:1000
@@ -20,6 +26,7 @@ for i = 1:1000
     
     %step = inv(J'*J) * J' * err';
     
+    % TODO: add Abbruchkriterium, otherwise this loop might never exit
     while true
         if (~minimization_running)
             break;
@@ -29,13 +36,16 @@ for i = 1:1000
             J(:,4:end) = 0;
         end
 
-        JTJ = J'*J;
+        W = diag(weight_function(err));
+        
+        JTJ = J'*W*J;
+        
         %step = -(JTJ + lambda * diag(diag(JTJ))) \ J' * err;
-        step = -(JTJ + lambda * eye(6)) \ J' * err';
+        step = -(JTJ + lambda * eye(6)) \ J' * W * err';
 
         % try out step
         T_tmp = T + step;
-        [err_tmp, J_tmp] = camera_warp(I1,D1,I2,T_tmp,intrinsics);
+        [err_tmp, J_tmp] = camera_warp(scene, T_tmp);
         
         disp(['[LM] temp step ' num2str(i) ': error = ' num2str(norm(err_tmp)) ' lambda = ' num2str(lambda) ' T = [ ' num2str(T_tmp') ' ]']);
 
@@ -61,6 +71,11 @@ for i = 1:1000
     
     plot(T(1), T(2), 'xg');
     drawnow;
+    
+    if (norm(step) < rel_tol)
+        disp('[GD] found minimum!');
+        break;
+    end
     
     if (~minimization_running)
         break;
