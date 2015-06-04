@@ -13,10 +13,13 @@ classdef Scene
     methods
         function obj = Scene( scene_path, scale )
             % loads a pair of images, including intrinsics and ground truth
-
+            
             obj.source_path  = scene_path;
-            obj.ground_truth = [-2 0 -4 0 0 0]'; % TODO: read this from camera_trajectory.csv
+            obj.ground_truth = csvread(fullfile(scene_path, 'camera_trajectory_relative.csv'), 1, 0);
+            obj.ground_truth = obj.ground_truth(2,:)'; % second line is delta between first and second frame
             obj.intrinsics = CameraIntrinsics.loadFromCSV(scene_path);
+            
+            assert(size(obj.ground_truth,1) == 6, 'ground truth csv must have correct format (6 columns, 1 row per frame)');
             
             obj.D1 = read_depth_image(scene_path, 1, obj.intrinsics);
             obj.I1 = read_intensity_image(scene_path, 1, obj.intrinsics);

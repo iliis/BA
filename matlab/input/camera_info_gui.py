@@ -35,9 +35,10 @@ class HelloWorldPanel(bpy.types.Panel):
         self.layout.label(euler_to_degstring(S.camera.rotation_euler))
         
         
-        delta_rot = current_rotation
+        
         old_rot = S.camera.rotation_euler.to_matrix().copy()
         old_rot.transpose()
+        delta_rot = current_rotation.copy()
         delta_rot.rotate(old_rot)
         
         delta_pos = current_position - S.camera.location
@@ -45,12 +46,10 @@ class HelloWorldPanel(bpy.types.Panel):
         delta_pos.rotate(blender_to_matlab_rot)
         
         self.layout.label(text="delta: " + str(delta_pos))
-        
         self.layout.label(text="delta: " + euler_to_degstring(delta_rot))
         
         S.frame_set(current_frame)
-        
 
+bpy.utils.register_class(HelloWorldPanel)
 
 #bpy.utils.unregister_class(HelloWorldPanel)
-bpy.utils.register_class(HelloWorldPanel)
