@@ -1,4 +1,4 @@
-function [ errors, J_warp ] = camera_warp( scene, T, show_plots )
+function [ errors, J_warp ] = camera_warp( scene_step, T, show_plots )
 % projects points into world, transforms and projects back
 %
 % TODO: write some tests for this function! There are some critical things
@@ -25,9 +25,9 @@ function [ errors, J_warp ] = camera_warp( scene, T, show_plots )
 % check input parameters
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-image_keyframe  = scene.I1;
-image_current   = scene.I2;
-depths_current  = scene.D2;
+image_keyframe  = scene_step.I1;
+image_current   = scene_step.I2;
+depths_current  = scene_step.D2;
 
 [H, W] = size(image_current);
 
@@ -38,7 +38,7 @@ if nargin < 3
 end
 
 assert(numel(T) == 6);
-assert(isa(scene, 'Scene'));
+assert(isa(scene_step, 'SceneStep'));
 
 % re-project into world
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -47,17 +47,17 @@ assert(isa(scene, 'Scene'));
 
 points_current_camera = image_to_list(cat(3,X,Y));
 
-points_world = camera_project_inverse(points_current_camera, image_to_list(depths_current), scene.intrinsics);
+points_world = camera_project_inverse(points_current_camera, image_to_list(depths_current), scene_step.intrinsics);
 
 % transform & project points
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 if calc_jacobian
     [points_keyframe,        J_T] = camera_transform(points_world, T);
-    [points_keyframe_camera, J_P] = camera_project(points_keyframe, scene.intrinsics);
+    [points_keyframe_camera, J_P] = camera_project(points_keyframe, scene_step.intrinsics);
 else
     points_keyframe        = camera_transform(points_world, T);
-    points_keyframe_camera = camera_project(points_keyframe, scene.intrinsics);
+    points_keyframe_camera = camera_project(points_keyframe, scene_step.intrinsics);
 end
 
 % filter points outside of image range

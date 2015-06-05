@@ -9,6 +9,10 @@ from eulerdiff import *
 # at every frame into a CSV file named 'camera_trajectory.csv'
 # 
 # execute script once to register handler (or whenever you change the code)
+#
+# WARNING:
+# This script doesn't work correctly if camera isn't at the root!
+# (for example, when it is parented to something or following a path)
 
 def writeIntrinsics():
     cam = bpy.context.scene.camera

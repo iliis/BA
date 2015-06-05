@@ -113,6 +113,8 @@ classdef camera_transformation_tests < matlab.unittest.TestCase
             tc.assertEqual(points(:,6), [-1 0 1]', 'AbsTol', 1e-15);
         end
         
+        % TODO: more rotations
+        
         function test_full_transformation(tc)
             % TODO
         end

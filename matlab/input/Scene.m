@@ -1,13 +1,14 @@
 classdef Scene
-    % represents a step between two frames
-    % TODO: generalize for longer trajectories
+    % represents a trajectory, i.e. a full data set
     
     properties
-        I1, I2 % intensity images
-        D1, D2 % depth images
-        intrinsics % camera parameters
-        source_path % path to original images
-        ground_truth % true transformation between frames
+        frame_count  % number of frames N
+        step_count   % number of steps = N-1
+        intensities  % N intensity images
+        depths       % N depth images
+        intrinsics   % camera parameters
+        source_path  % path to original images
+        ground_truth % true transformation between frames (first column gives absolute position and can be ignored)
     end
     
     methods
@@ -15,29 +16,36 @@ classdef Scene
             % loads a pair of images, including intrinsics and ground truth
             
             obj.source_path  = scene_path;
-            obj.ground_truth = csvread(fullfile(scene_path, 'camera_trajectory_relative.csv'), 1, 0);
-            obj.ground_truth = obj.ground_truth(2,:)'; % second line is delta between first and second frame
+            obj.ground_truth = csvread(fullfile(scene_path, 'camera_trajectory_relative.csv'), 1, 0)'; % we want column vectors!
             obj.intrinsics = CameraIntrinsics.loadFromCSV(scene_path);
             
+            obj.frame_count = size(obj.ground_truth,2);
+            obj.step_count  = obj.frame_count - 1;
+            
             assert(size(obj.ground_truth,1) == 6, 'ground truth csv must have correct format (6 columns, 1 row per frame)');
+            assert(size(obj.ground_truth,2) >  1, 'ground truth must containt at least two frames');
             
-            obj.D1 = read_depth_image(scene_path, 1, obj.intrinsics);
-            obj.I1 = read_intensity_image(scene_path, 1, obj.intrinsics);
-
-            obj.D2 = read_depth_image(scene_path, 2, obj.intrinsics);
-            obj.I2 = read_intensity_image(scene_path, 2, obj.intrinsics);
+            obj.intensities = cell(obj.frame_count, 1);
+            obj.depths      = cell(obj.frame_count, 1);
             
-            [H, W] = size(obj.D1);
-            assert(W == obj.intrinsics.camera_width,  'image must have same width as specified in camera intrinsics');
-            assert(H == obj.intrinsics.camera_height, 'image must have same height as specified in camera intrinsics');
-            assert(all(size(obj.I1) == [H,W]), 'images must all have the same size');
-            assert(all(size(obj.I2) == [H,W]), 'images must all have the same size');
-            assert(all(size(obj.D2) == [H,W]), 'images must all have the same size');
-
+            for k = 1:obj.frame_count
+                D = read_depth_image    (scene_path, k, obj.intrinsics);
+                I = read_intensity_image(scene_path, k, obj.intrinsics);
+            
+                [H, W] = size(D);
+                assert(W == obj.intrinsics.camera_width,  'image must have same width as specified in camera intrinsics');
+                assert(H == obj.intrinsics.camera_height, 'image must have same height as specified in camera intrinsics');
+                assert(all(size(I) == [H,W]), 'images must all have the same size');
+                
+                obj.intensities{k} = I;
+                obj.depths{k}      = D;
+            end
 
             if nargin > 1
                 obj = scale_scene(obj, scale);
             end
+            
+            disp(['loaded scene with ' num2str(obj.frame_count) ' frames']);
         end
         
         function obj = scale_down( obj, scale_factor )
@@ -58,6 +66,22 @@ classdef Scene
             % don't scale focal length (TODO: is this correct?)
             obj.intrinsics = CameraIntrinsics(size(obj.I1,2), size(obj.I1,1), obj.intrinsics.focal_length);
 
+        end
+        
+        function step = getStep(obj, step_idx)
+            % returns a SceneStep, representing a single movement step
+            % first step is between first and second frame
+            
+            assert(step_idx >= 1, 'step index begins with one');
+            assert(step_idx < obj.frame_count, 'max step index is frame_count-1 (fence post error)');
+            
+            step = SceneStep;
+            step.I1 = obj.intensities{step_idx};
+            step.D1 = obj.depths{step_idx};
+            step.I2 = obj.intensities{step_idx+1};
+            step.D2 = obj.depths{step_idx+1};
+            step.intrinsics = obj.intrinsics;
+            step.ground_truth = obj.ground_truth(:, step_idx+1);
         end
     end
     
