@@ -2,7 +2,8 @@
 % loads an image pair and warps the keyframe onto the current frame
 
 %testscene = Scene('input/testscene1');
-testscene = Scene('input/testscene2_rotonly');
+testscene = Scene('input/testscene2');
+%testscene = Scene('input/testscene_rotonly');
 
 T = testscene.ground_truth;
 
