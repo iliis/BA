@@ -4,4 +4,5 @@ addpath('plotting');
 addpath('test_scripts');
 addpath('utils');
 addpath('minimization');
+addpath('minimization/weight_functions');
 addpath('input');

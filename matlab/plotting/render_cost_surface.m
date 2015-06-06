@@ -1,4 +1,4 @@
-function [ errs, gradients ] = render_cost_surface( scene, dimensions, ranges, T, render_gradient )
+function [ errs, gradients ] = render_cost_surface( scene_step, dimensions, ranges, T, weight_function, render_gradient )
 % renders the cost surface for given area and dimensions
 %
 % INPUT:
@@ -21,7 +21,7 @@ function [ errs, gradients ] = render_cost_surface( scene, dimensions, ranges, T
 % INPUT PARAMETER VERIFICATION
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-assert(isa(scene, 'Scene'));
+assert(isa(scene_step, 'SceneStep'));
 
 assert(numel(dimensions) == 2);
 assert(all(dimensions >= 1), 'dimensions must contain valid index into 6 dimensional transformation vector');
@@ -38,7 +38,12 @@ end
 assert(size(T,1) == 6);
 assert(size(T,2) == 1);
 
+
 if nargin < 5
+    weight_function = @uniform_weights;
+end
+
+if nargin < 6
     render_gradient = false;
 end
 
@@ -68,10 +73,14 @@ for y = 1:Ny
         
         % actual error calculation
         if render_gradient
-            [e, J] = camera_warp(scene, v);
+            [e, J] = camera_warp(scene_step, v);
+            w = weight_function(e);
+            e = (w.^2 .* e);
             gradients(y,x,:) = - J' * e';
         else
-            e = camera_warp(scene, v);
+            e = camera_warp(scene_step, v);
+            w = weight_function(e);
+            e = (w.^2 .* e);
         end
         
         v
@@ -94,15 +103,16 @@ minpos_y = ranges{2}(iy(ix));
 imagesc(minmax(ranges{1}),minmax(ranges{2}),errs);
 hold on;
 plot(minpos_x, minpos_y, 'or');
-plot(scene.ground_truth(dimensions(1)), scene.ground_truth(dimensions(2)), 'xg');
+plot(scene_step.ground_truth(dimensions(1)), scene_step.ground_truth(dimensions(2)), 'xg');
 
 title({['Error (min = ' num2str(min(min(errs))) ')'], ...
      ['min at ' dim_names{dimensions(1)} ' = ' num2str(minpos_x) ', ' dim_names{dimensions(2)} ' = ' num2str(minpos_y)], ...
-     ['solution at ' dim_names{dimensions(1)} ' = ' num2str(scene.ground_truth(dimensions(1))) ...
-                ', ' dim_names{dimensions(2)} ' = ' num2str(scene.ground_truth(dimensions(2)))], ...
+     ['solution at ' dim_names{dimensions(1)} ' = ' num2str(scene_step.ground_truth(dimensions(1))) ...
+                ', ' dim_names{dimensions(2)} ' = ' num2str(scene_step.ground_truth(dimensions(2)))], ...
      ... %['scale = ' num2str(image_scale)], ...
-     ['image = ' scene.source_path ]}, ...
-     'Interpreter','none'); % don't treat underscores as control characters
+     ... %['image = ' scene_step.source_path ]
+     }, ...
+     'Interpreter','none'); % don't treat underscores as LaTex control characters
 xlabel(dim_names{dimensions(1)});
 ylabel(dim_names{dimensions(2)});
 colorbar;
