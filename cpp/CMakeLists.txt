@@ -1,3 +1,9 @@
+# requires:
+# SFML 2   (for displaying pretty things)
+# Eigen 3  (for fast numerics)
+# // Boost    (for various helper stuff like string conversions)
+
+
 # source:
 # https://github.com/SFML/SFML/wiki/Tutorial:-Build-your-SFML-project-with-CMake
 
@@ -8,7 +14,8 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic -Wextra")
 
 set(SOURCES
     "main.cpp"
-    "utils/eigen_sfml_conversions.cpp"
+    "core/image_data.cpp"
+    "input/scene.cpp"
 )
 
 

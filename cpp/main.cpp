@@ -2,7 +2,8 @@
 #include <iostream>
 #include <SFML/Graphics.hpp>
 
-#include "utils/eigen_sfml_conversions.h"
+#include "core/image_data.h"
+#include "input/scene.h"
 
 using namespace std;
 
@@ -11,7 +12,7 @@ int main()
     sf::RenderWindow window(sf::VideoMode(1024, 768), "SFML test");
 
     sf::Image img;
-    if (!img.loadFromFile("../matlab/input/trajectory1/color0001.png")) {
+    if (!img.loadFromFile("../matlab/input/testscene1/color0001.png")) {
         cerr << "cannot load image." << endl;
         return EXIT_FAILURE;
     }
@@ -20,14 +21,14 @@ int main()
     cout << "image size: " << img.getSize().x << " x " << img.getSize().y << endl;
     cout << "first pixel: " << (int) img.getPixel(0, 0).r << endl;
 
-    Eigen::MatrixXf* matrix = image_to_matrix(img);
+    ImageData imgdata2;
+    imgdata2.loadFromImage(img);
 
-    sf::Image* img2 = matrix_to_image(*matrix);
+    ImageData imgdata;
+    imgdata.loadFromMatrix(imgdata2.getData());
 
-    img.copy(*img2, 0, 0);
-
-    delete img2;
-    delete matrix;
+    SceneImage scene_image;
+    scene_image.loadFromSceneDirectory("../matlab/input/testscene1", 1);
 
 
     sf::Texture tex;
@@ -36,6 +37,7 @@ int main()
     }
     sf::Sprite sprite;
     sprite.setTexture(tex);
+    sprite.setPosition(500,0);
 
     while (window.isOpen())
     {
@@ -48,6 +50,8 @@ int main()
 
         window.clear();
         window.draw(sprite);
+        //window.draw(imgdata);
+        window.draw(scene_image);
         window.display();
     }
 

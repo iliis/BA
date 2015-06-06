@@ -7,7 +7,7 @@ function [ errors, J_warp ] = camera_warp( scene_step, T, show_plots )
 % INPUT:
 %
 % scene, containing:
-% (TODO: update this, e.g. add a get_keyframe(i) or something to Scene class)
+% (TODO: update this documentation, e.g. add a get_keyframe(i) or something to Scene class)
     % image_keyframe:
     %   H * W intensity image, this will be warped
     %
@@ -21,6 +21,9 @@ function [ errors, J_warp ] = camera_warp( scene_step, T, show_plots )
 %   [x y z alpha beta gamma]' transformation to apply
 %
 % 
+
+% TODO: handle extreme warpings, where no pixel matches (i.e. empty
+% Jacobian and error term)
 
 % check input parameters
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
