@@ -1,7 +1,8 @@
 #include <stdlib.h>
 #include <iostream>
 #include <SFML/Graphics.hpp>
-//#include <SFML/Image.hpp>
+
+#include "utils/eigen_sfml_conversions.h"
 
 using namespace std;
 
@@ -14,6 +15,20 @@ int main()
         cerr << "cannot load image." << endl;
         return EXIT_FAILURE;
     }
+
+
+    cout << "image size: " << img.getSize().x << " x " << img.getSize().y << endl;
+    cout << "first pixel: " << (int) img.getPixel(0, 0).r << endl;
+
+    Eigen::MatrixXf* matrix = image_to_matrix(img);
+
+    sf::Image* img2 = matrix_to_image(*matrix);
+
+    img.copy(*img2, 0, 0);
+
+    delete img2;
+    delete matrix;
+
 
     sf::Texture tex;
     if (!tex.loadFromImage(img)) {
