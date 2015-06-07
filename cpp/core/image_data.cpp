@@ -102,3 +102,19 @@ void ImageData::matrix_to_image(const Eigen::MatrixXf& source, sf::Image& dest)
     // cout << "done." << endl;
 }
 ///////////////////////////////////////////////////////////////////////////////
+float ImageData::sampleValue(Eigen::Vector2f pos) const
+{
+    assert(pos.x() >= 0);
+    assert(pos.y() >= 0);
+    assert(pos.x() <= width-1);
+    assert(pos.y() <= height-1);
+
+    // remember: data[row, col] = data[y, x]!
+    float v1 = data(floor(pos.y()), floor(pos.x()));
+    float v2 = data( ceil(pos.y()), floor(pos.x()));
+    float v3 = data(floor(pos.y()),  ceil(pos.x()));
+    float v4 = data( ceil(pos.y()),  ceil(pos.x()));
+
+    return (v1 + v2 + v3 + v4) / 4;
+}
+///////////////////////////////////////////////////////////////////////////////

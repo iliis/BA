@@ -1,6 +1,7 @@
 #ifndef IMAGE_DATA_H_INCLUDED
 #define IMAGE_DATA_H_INCLUDED
 
+#include <cmath>
 #include <string>
 #include <iostream>
 #include <SFML/Graphics.hpp>
@@ -39,7 +40,9 @@ public:
     inline unsigned int getHeight() const { return height; }
     inline sf::Vector2f getSize()   const { return sf::Vector2f(width, height); }
 
-    inline const Eigen::MatrixXf& getData() { return data; }
+    inline const Eigen::MatrixXf& getData() const { return data; }
+    inline float getValue(Eigen::Vector2i pos) const { return data(pos.y(), pos.x()); }
+    float sampleValue(Eigen::Vector2f pos) const;
 
 private:
     unsigned int width, height;

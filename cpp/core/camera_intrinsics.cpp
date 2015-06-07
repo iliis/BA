@@ -60,14 +60,15 @@ void CameraIntrinsics::loadFromCSV(const std::string& filename)
     // i.e. integer coordinates directly corespond to pixel values
     this->principal_point_x = this->camera_width  / 2 - 0.5;
     this->principal_point_y = this->camera_height / 2 - 0.5;
+}
+///////////////////////////////////////////////////////////////////////////////
+std::ostream& operator <<(std::ostream &output, const CameraIntrinsics &intrinsics)
+{
+    cout << "focal length = " << intrinsics.focal_length << endl;
+    cout << "width = " << intrinsics.camera_width << "  height = " << intrinsics.camera_height << endl;
+    cout << "principal point = " << intrinsics.principal_point_x << " " << intrinsics.principal_point_y << endl;
+    cout << "clipping = " << intrinsics.near_clipping << " to " << intrinsics.far_clipping << endl;
 
-    // print loaded values for easier debugging
-    ///////////////////////////////////
-
-    cout << "loaded camera intrinsics:" << endl;
-    cout << "focal_length = " << this->focal_length << endl;
-    cout << "width = " << this->camera_width << "  height = " << this->camera_height << endl;
-    cout << "principal point = " << this->principal_point_x << " " << this->principal_point_y << endl;
-    cout << "clipping = " << this->near_clipping << " to " << this->far_clipping << endl;
+    return output;
 }
 ///////////////////////////////////////////////////////////////////////////////

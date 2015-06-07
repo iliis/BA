@@ -17,7 +17,10 @@ set(SOURCES
     "core/image_data.cpp"
     "core/camera_intrinsics.cpp"
     "core/transformation.cpp"
-    "input/scene.cpp"
+    "core/scene.cpp"
+    "core/camera_step.cpp"
+    "core/camera_image.cpp"
+    "core/warp.cpp"
 )
 
 

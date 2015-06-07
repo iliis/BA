@@ -69,3 +69,18 @@ std::vector<Transformation> Transformation::loadFromCSV(const std::string& filen
     return transformations;
 }
 ///////////////////////////////////////////////////////////////////////////////
+Eigen::Matrix3f Transformation::getRotationMatrix() const
+{
+    // TODO: cache this matrix
+    Eigen::Matrix3f m;
+    m = Eigen::AngleAxisf(this->alpha, Eigen::Vector3f::UnitX())
+      * Eigen::AngleAxisf(this->beta,  Eigen::Vector3f::UnitY())
+      * Eigen::AngleAxisf(this->gamma, Eigen::Vector3f::UnitZ());
+    return m;
+}
+///////////////////////////////////////////////////////////////////////////////
+Eigen::Vector3f Transformation::operator()(const Eigen::Vector3f& vect) const
+{
+    return this->getRotationMatrix() * vect + this->getTranslation();
+}
+///////////////////////////////////////////////////////////////////////////////

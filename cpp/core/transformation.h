@@ -4,6 +4,8 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <Eigen/Dense>
+#include <Eigen/Geometry>
 
 #include "../utils/csv.h"
 
@@ -19,6 +21,11 @@ public:
 
     float x, y, z;
     float alpha, beta, gamma;
+
+    Eigen::Matrix3f getRotationMatrix() const;
+    inline Eigen::Vector3f getTranslation() const { return Eigen::Vector3f(x,y,z); };
+
+    Eigen::Vector3f operator()(const Eigen::Vector3f& vect) const;
 };
 
 #endif /* end of include guard: TRANSFORMATION_H_INCLUDED */

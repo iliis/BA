@@ -2,10 +2,11 @@
 #include <iostream>
 #include <SFML/Graphics.hpp>
 
-#include "input/scene.h"
+#include "core/scene.h"
 #include "core/image_data.h"
 #include "core/transformation.h"
 #include "core/camera_intrinsics.h"
+#include "core/warp.h"
 
 using namespace std;
 
@@ -29,7 +30,7 @@ int main()
     ImageData imgdata;
     imgdata.loadFromMatrix(imgdata2.getData());
 
-    SceneImage scene_image;
+    CameraImage scene_image;
     scene_image.loadFromSceneDirectory("../matlab/input/testscene1", 1);
 
 
@@ -38,6 +39,8 @@ int main()
     CameraIntrinsics intrinsics;
     intrinsics.loadFromCSV("../matlab/input/testscene1/camera_intrinsics.csv");
 
+    cout << "intrinsics:" << intrinsics << endl;
+
 
     Transformation t;
     cout << "some Transformation: " << t << endl;
@@ -45,6 +48,15 @@ int main()
     vector<Transformation> path = Transformation::loadFromCSV("../matlab/input/testscene1/camera_trajectory_relative.csv");
 
     cout << "loaded " << path.size() << " frames" << endl;
+
+
+    Scene testscene;
+    testscene.loadFromSceneDirectory("../matlab/input/testscene1");
+
+    CameraStep step = testscene.getStep(0);
+
+    Pixel p = step.frame_second.getPixel(Eigen::Vector2i(100,100));
+    cout << "pixel [0,0]: " << p.pos.x() << " " << p.pos.y() << " = " << p.intensity << " / " << p.depth << endl;
 
 
 
@@ -56,6 +68,8 @@ int main()
     sprite.setTexture(tex);
     sprite.setPosition(500,0);
 
+
+    sf::Clock clock;
     while (window.isOpen())
     {
         sf::Event event;
@@ -68,7 +82,12 @@ int main()
         window.clear();
         window.draw(sprite);
         //window.draw(imgdata);
-        window.draw(scene_image);
+        //window.draw(scene_image);
+
+        clock.restart();
+        //Warp::drawError(window, testscene.getStep(0), Transformation(0,0,0,0,0,0));
+        Warp::drawError(window, testscene.getStep(0), testscene.getStep(0).ground_truth);
+        cout << clock.getElapsedTime().asMilliseconds() << endl;
         window.display();
     }
 
