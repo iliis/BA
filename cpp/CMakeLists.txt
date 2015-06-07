@@ -15,6 +15,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic -Wextra")
 set(SOURCES
     "main.cpp"
     "core/image_data.cpp"
+    "core/camera_intrinsics.cpp"
     "input/scene.cpp"
 )
 

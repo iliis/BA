@@ -4,6 +4,7 @@
 
 #include "core/image_data.h"
 #include "input/scene.h"
+#include "core/camera_intrinsics.h"
 
 using namespace std;
 
@@ -29,6 +30,14 @@ int main()
 
     SceneImage scene_image;
     scene_image.loadFromSceneDirectory("../matlab/input/testscene1", 1);
+
+
+
+
+    CameraIntrinsics intrinsics;
+    intrinsics.loadFromCSV("../matlab/input/testscene1/camera_intrinsics.csv");
+
+
 
 
     sf::Texture tex;
