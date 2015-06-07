@@ -16,6 +16,7 @@ set(SOURCES
     "main.cpp"
     "core/image_data.cpp"
     "core/camera_intrinsics.cpp"
+    "core/transformation.cpp"
     "input/scene.cpp"
 )
 

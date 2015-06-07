@@ -1,13 +1,7 @@
 #ifndef CAMERA_INTRINSICS_H_INCLUDED
 #define CAMERA_INTRINSICS_H_INCLUDED
 
-#include <string>
-#include <iostream>
-#include <fstream>
-#include <boost/tokenizer.hpp>
-#include <boost/lexical_cast.hpp>
-#include <boost/algorithm/string.hpp>
-
+#include "../utils/csv.h"
 
 class CameraIntrinsics
 {

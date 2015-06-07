@@ -2,8 +2,9 @@
 #include <iostream>
 #include <SFML/Graphics.hpp>
 
-#include "core/image_data.h"
 #include "input/scene.h"
+#include "core/image_data.h"
+#include "core/transformation.h"
 #include "core/camera_intrinsics.h"
 
 using namespace std;
@@ -37,6 +38,13 @@ int main()
     CameraIntrinsics intrinsics;
     intrinsics.loadFromCSV("../matlab/input/testscene1/camera_intrinsics.csv");
 
+
+    Transformation t;
+    cout << "some Transformation: " << t << endl;
+
+    vector<Transformation> path = Transformation::loadFromCSV("../matlab/input/testscene1/camera_trajectory_relative.csv");
+
+    cout << "loaded " << path.size() << " frames" << endl;
 
 
 
