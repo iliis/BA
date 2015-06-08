@@ -61,7 +61,7 @@ Eigen::Matrix<float, 1, 2> Warp::sampleJacobian(const Pixel& pixel, const Camera
     return image.getIntensityData().sampleDiff(pixel.pos);
 }
 ///////////////////////////////////////////////////////////////////////////////
-float Warp::calcError(const CameraStep& step, const Transformation& T, Eigen::VectorXf& error_out, Eigen::Matrix<float, Eigen::Dynamic, 6>& J_out)
+float Warp::calcError(const CameraStep& step, const Transformation& T, Eigen::VectorXf& error_out, Eigen::Matrix<float, Eigen::Dynamic, 6>& J_out, sf::RenderTarget* plotTarget)
 {
     const unsigned int W = step.scene->getIntrinsics().getCameraWidth();
     const unsigned int H = step.scene->getIntrinsics().getCameraHeight();
@@ -70,11 +70,11 @@ float Warp::calcError(const CameraStep& step, const Transformation& T, Eigen::Ve
 
     float total_error = 0;
 
-    /*
     sf::Image img_c, img_k;
-    img_c.create(W,H, sf::Color(0,0,255));
-    img_k.create(W,H, sf::Color(0,0,255));
-    */
+    if (plotTarget) {
+        img_c.create(W,H, sf::Color(0,0,255));
+        img_k.create(W,H, sf::Color(0,0,255));
+    }
 
     //Matrix3f R = T.getRotationMatrix();
     //Vector3f M = T.getTranslation();
@@ -122,16 +122,24 @@ float Warp::calcError(const CameraStep& step, const Transformation& T, Eigen::Ve
             total_error += error;
             ++pixel_count;
 
-            //img_c.setPixel(x,y, sf::Color(error*255, (1-error)*255, 0));
-            //img_k.setPixel(pixel_in_keyframe.pos.x(),pixel_in_keyframe.pos.y(), sf::Color(error*255, (1-error)*255, 0));
+
+            if (plotTarget) {
+                img_c.setPixel(x,y, sf::Color(error*255, (1-error)*255, 0));
+                //img_k.setPixel(pixel_in_keyframe.pos.x(),pixel_in_keyframe.pos.y(), sf::Color(error*255, (1-error)*255, 0));
+                img_k.setPixel(pixel_in_keyframe.pos.x(),pixel_in_keyframe.pos.y(), sf::Color(255*pixel_in_keyframe.intensity, 255*pixel_in_keyframe.intensity, 255*pixel_in_keyframe.intensity));
+            }
         }
     }
 
     error_out.conservativeResize(pixel_count);
     J_out.conservativeResize(pixel_count, Eigen::NoChange);
 
-    //drawImageAt(img_c, sf::Vector2f(0,0), target);
-    //drawImageAt(img_k, sf::Vector2f(0,H+2), target);
+    if (plotTarget) {
+        drawImageAt(img_c, sf::Vector2f(650,0),   *plotTarget);
+        drawImageAt(img_k, sf::Vector2f(650,H+2), *plotTarget);
+        step.frame_first .getIntensityData().drawAt( *plotTarget, sf::Vector2f(650+W+2,0));
+        step.frame_second.getIntensityData().drawAt( *plotTarget, sf::Vector2f(650+W+2,H+2));
+    }
 
     //cout << "total error: " << total_error << "  =  " << sqrt(total_error) << endl;
 

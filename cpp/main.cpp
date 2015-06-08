@@ -47,18 +47,18 @@ void drawArrow(sf::RenderTarget& target, float x, float y, float vect_x, float v
 
 int main()
 {
-    sf::RenderWindow window(sf::VideoMode(1024, 768), "SFML test");
+    sf::RenderWindow window(sf::VideoMode(1280, 768), "SFML test");
 
     Scene testscene;
     testscene.loadFromSceneDirectory("../matlab/input/trajectory1");
 
-    CameraStep step = testscene.getStep(0);
+    CameraStep teststep = testscene.getStep(19);
 
     VectorXf errors;
     Matrix<float, Dynamic, 6> jacobian;
 
-    cout << step.ground_truth << endl;
-    cout << "total error: " << Warp::calcError(step, step.ground_truth, errors, jacobian) << endl;
+    cout << teststep.ground_truth << endl;
+    cout << "total error: " << Warp::calcError(teststep, teststep.ground_truth, errors, jacobian) << endl;
 
 
     Warp::PlotRange range1(0, -1, 1,40);
@@ -72,7 +72,7 @@ int main()
 
     sf::Clock clock;
     clock.restart();
-    Warp::renderErrorSurface(errorsurface, errorgradients, step, step.ground_truth, range1, range2);
+    Warp::renderErrorSurface(errorsurface, errorgradients, teststep, teststep.ground_truth, range1, range2);
     sf::Int32 ms = clock.getElapsedTime().asMilliseconds();
 
     cout << "rendered surface in " << ms << "ms (" << ((float) ms) / (errorsurface.rows() * errorsurface.cols()) << "ms per point)" << endl;
@@ -80,6 +80,11 @@ int main()
     ImageData errorplot;
     errorplot.loadFromMatrix(errorsurface, Colormap::Hot());
 
+
+    Eigen::VectorXf error_tmp;
+    Eigen::Matrix<float, Eigen::Dynamic, 6> J_tmp;
+
+    unsigned int i = 0;
     while (window.isOpen())
     {
         sf::Event event;
@@ -103,6 +108,13 @@ int main()
             }
         }
 #endif
+
+        CameraStep step = testscene.getStep(i);
+        Warp::calcError(step, step.ground_truth, error_tmp, J_tmp, &window);
+
+        i++;
+        if (i >= testscene.getStepCount())
+            i = 0;
 
         window.display();
 

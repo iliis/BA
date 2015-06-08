@@ -3,13 +3,16 @@ import csv
 from mathutils import *
 from math import *
 
+from eulerdiff import *
+
 # this script writes the position and orientation of the camera
 # at every frame into a CSV file named 'camera_trajectory.csv'
 # 
 # execute script once to register handler (or whenever you change the code)
-
-
-blender_to_matlab_rot = Euler((radians(180), 0, 0), 'ZYX')
+#
+# WARNING:
+# This script doesn't work correctly if camera isn't at the root!
+# (for example, when it is parented to something or following a path)
 
 def writeIntrinsics():
     cam = bpy.context.scene.camera
@@ -80,16 +83,15 @@ def RunPerFrame(scene):
         prev_rot_inv = previous_rotation.to_matrix()
         prev_rot_inv.transpose()
         # apply it to current rotation (i.e. new-old)
-        delta_rot = current_rotation.copy()
-        delta_rot.rotate(prev_rot_inv)
+        delta_rot = euler_difference(previous_rotation, current_rotation)
         
         # calculate relative movement
         delta_pos = current_position - previous_position # in global frame
         delta_pos.rotate(prev_rot_inv) # in camera frame
-        delta_pos.rotate(blender_to_matlab_rot) # in camera frame used by Matlab code
+        delta_pos = blender_to_matlab_transl(delta_pos) # in camera frame used by Matlab code
         
         print('delta position:', delta_pos)
-        print('delta rotation:', delta_rot)
+        print('delta rotation:', euler_to_degstring(delta_rot), delta_rot)
         
         previous_position = current_position;
         previous_rotation = current_rotation;

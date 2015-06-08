@@ -35,7 +35,7 @@ classdef CameraIntrinsics
 
             % default values for Blender
             obj.intensity_img_depth = 255;
-            obj.depth_img_depth     = 65535;
+            obj.depth_img_depth     = 255;
             obj.near_clipping       = 0.1;
             obj.far_clipping        = 100;
         end
@@ -52,7 +52,6 @@ classdef CameraIntrinsics
             obj.far_clipping  = parameters(8);
             obj.intensity_img_depth = parameters(9);
             obj.depth_img_depth     = parameters(10);
-
         end
     end
     

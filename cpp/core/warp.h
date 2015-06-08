@@ -25,7 +25,7 @@ namespace Warp {
     Eigen::Matrix<float, 1, 2> sampleJacobian   (const Pixel& pixel, const CameraImage& image);
 
     //float drawError(sf::RenderTarget& target, const CameraStep& step, const Transformation& T);
-    float calcError(const CameraStep& step, const Transformation& T, Eigen::VectorXf& error_out, Eigen::Matrix<float, Eigen::Dynamic, 6>& J_out);
+    float calcError(const CameraStep& step, const Transformation& T, Eigen::VectorXf& error_out, Eigen::Matrix<float, Eigen::Dynamic, 6>& J_out, sf::RenderTarget* plotTarget = NULL);
 
     struct PlotRange {
 

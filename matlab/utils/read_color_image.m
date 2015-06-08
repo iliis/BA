@@ -3,7 +3,7 @@ function RGB = read_color_image(path, nr, intrinsics)
 
 assert(isa(intrinsics, 'CameraIntrinsics'));
 
-% depth images are 16bit grayscale, color images 8bit RGB
+% depth images are 8bit grayscale, color images 8bit RGB
 % COLOR_IMAGE_MAXVAL = 255;
 
 RGB = imread(fullfile(path, sprintf('color%04u.png', nr))); % RGB, 8bit / channel

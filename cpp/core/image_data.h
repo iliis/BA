@@ -51,8 +51,8 @@ public:
 
     inline const Eigen::MatrixXf& getData() const { return data; }
     inline       Eigen::MatrixXf& getData()       { return data; }
-    inline float getValue(Eigen::Vector2i pos) const { return data(pos.y(), pos.x()); }
-    inline float& getValue(Eigen::Vector2i pos)      { return data(pos.y(), pos.x()); }
+    inline float  getValue(Eigen::Vector2i pos) const { return data(pos.y(), pos.x()); }
+    inline float& getValue(Eigen::Vector2i pos)       { return data(pos.y(), pos.x()); }
     inline float& operator()(unsigned int x, unsigned int y) { return data(y,x); }
 
     float sampleValue(Eigen::Vector2f pos) const;
