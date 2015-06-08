@@ -37,7 +37,7 @@ WorldPoint Warp::transform(const WorldPoint& point, const Transformation& transf
     return p;
 }
 ///////////////////////////////////////////////////////////////////////////////
-void Warp::drawError(sf::RenderTarget& target, const CameraStep& step, const Transformation& T)
+float Warp::calcError(const CameraStep& step, const Transformation& T)
 {
     const unsigned int W = step.scene->getIntrinsics().getCameraWidth();
     const unsigned int H = step.scene->getIntrinsics().getCameraHeight();
@@ -46,16 +46,23 @@ void Warp::drawError(sf::RenderTarget& target, const CameraStep& step, const Tra
 
     float total_error = 0;
 
+    /*
+    sf::Image img_c, img_k;
+    img_c.create(W,H, sf::Color(0,0,255));
+    img_k.create(W,H, sf::Color(0,0,255));
+    */
+
+    //Matrix3f R = T.getRotationMatrix();
+    //Vector3f M = T.getTranslation();
+
     for (unsigned int y = 0; y < H; ++y) {
         for (unsigned int x = 0; x < W; ++x) {
             Pixel pixel_current  = step.frame_second.getPixel(Vector2i(x,y));
 
-            // TODO: use CameraIntrinsics here!!! (and do this upon loading the image)
-            pixel_current.depth = pixel_current.depth * (100-0.1) + 0.1;
-
             WorldPoint point = projectInv(pixel_current, step.scene->getIntrinsics());
 
-            point = transform(point, T);
+            point = transform(point, T); // 6.2ms per point, 3.7ms with cached rotation matrix
+            //point.pos = R * point.pos + M; // 3.5ms per point
 
             Pixel pixel_in_keyframe = project(point, step.scene->getIntrinsics());
 
@@ -70,20 +77,48 @@ void Warp::drawError(sf::RenderTarget& target, const CameraStep& step, const Tra
 
             total_error += error;
 
-            sf::RectangleShape r;
-            r.setSize(sf::Vector2f(1,1));
-            r.setPosition(x, y);
-            r.setFillColor(sf::Color(error*255, error*255, error*255));
-            //r.setFillColor(sf::Color(255,0,0));
-            target.draw(r);
-
-            r.setPosition(pixel_in_keyframe.pos.x(), pixel_in_keyframe.pos.y() + H);
-            target.draw(r);
-
-            //cout << x << " " << y << "  error: " << error << "  warped to: " << pixel_in_keyframe.pos << endl;
+            //img_c.setPixel(x,y, sf::Color(error*255, (1-error)*255, 0));
+            //img_k.setPixel(pixel_in_keyframe.pos.x(),pixel_in_keyframe.pos.y(), sf::Color(error*255, (1-error)*255, 0));
         }
     }
 
-    cout << "total error: " << total_error << "  =  " << sqrt(total_error) << endl;
+    //drawImageAt(img_c, sf::Vector2f(0,0), target);
+    //drawImageAt(img_k, sf::Vector2f(0,H+2), target);
+
+    //cout << "total error: " << total_error << "  =  " << sqrt(total_error) << endl;
+
+    return sqrt(total_error);
+}
+///////////////////////////////////////////////////////////////////////////////
+void Warp::renderErrorSurface(ImageData& target, const CameraStep& step, const Transformation& Tcenter, const PlotRange& range1, const PlotRange& range2)
+{
+    assert(range1.dim >= 0); assert(range1.dim <  6);
+    assert(range2.dim >= 0); assert(range2.dim <  6);
+    assert(range1.steps > 0);
+    assert(range2.steps > 0);
+
+    target.create(range1.steps, range2.steps);
+
+    for (unsigned int y = 0; y < range2.steps; ++y) {
+        for (unsigned int x = 0; x < range1.steps; ++x) {
+
+            Transformation T = Tcenter;
+
+            float xv = ((float) x / (range1.steps-1));
+            float yv = ((float) y / (range2.steps-1));
+            T.value(range1.dim) = Tcenter.value(range1.dim) + xv * (range1.to-range1.from) + range1.from;
+            T.value(range2.dim) = Tcenter.value(range2.dim) + yv * (range2.to-range2.from) + range2.from;
+            T.updateRotationMatrix();
+
+            float error = calcError(step, T);
+
+            target(x, y) = error;
+
+            //cout << x << " " << y << "  --> " << xv << " " << yv << endl;
+            //cout << T << "  -->  " << error << endl;
+        }
+    }
+
+    target.updateImageFromMatrix();
 }
 ///////////////////////////////////////////////////////////////////////////////

@@ -19,7 +19,23 @@ namespace Warp {
     Pixel      project(const WorldPoint& point, const CameraIntrinsics& intrinsics);
     WorldPoint transform(const WorldPoint& point, const Transformation& transformation);
 
-    void drawError(sf::RenderTarget& target, const CameraStep& step, const Transformation& T);
+    //float drawError(sf::RenderTarget& target, const CameraStep& step, const Transformation& T);
+    float calcError(const CameraStep& step, const Transformation& T);
+
+    struct PlotRange {
+
+        PlotRange(unsigned int dim, float from, float to, unsigned int steps)
+         : dim(dim), from(from), to(to), steps(steps) { assert(dim < 6); assert(steps > 0); };
+
+        unsigned int dim;
+
+        // linspace(from, to, steps);
+        float from;
+        float to;
+        unsigned int steps;
+    };
+
+    void renderErrorSurface(ImageData& target, const CameraStep& step, const Transformation& Tcenter, const PlotRange& range1, const PlotRange& range2);
     /*
     project_inverse();
     transform();

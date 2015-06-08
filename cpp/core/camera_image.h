@@ -29,7 +29,7 @@ class CameraImage : public sf::Drawable
 {
 public:
 
-    void loadFromSceneDirectory(const std::string& scene_path, const unsigned int index);
+    void loadFromSceneDirectory(const std::string& scene_path, const unsigned int index, const CameraIntrinsics& intrinsics);
     void loadFromMatrices(const Eigen::MatrixXf& mat_intensities, const Eigen::MatrixXf& mat_depths);
 
     inline int getWidth()  const { return intensities.getWidth(); }

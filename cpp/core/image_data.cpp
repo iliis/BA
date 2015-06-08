@@ -3,6 +3,16 @@
 using namespace std;
 
 ///////////////////////////////////////////////////////////////////////////////
+void ImageData::create(const unsigned int W, const unsigned int H)
+{
+    assert(W > 0); assert(H > 0);
+
+    sf_image.create(W,H);
+    data    .resize(H,W);
+    width  = W;
+    height = H;
+}
+///////////////////////////////////////////////////////////////////////////////
 void ImageData::loadFromMatrix(const Eigen::MatrixXf& source_data)
 {
     width  = source_data.cols();
@@ -43,14 +53,15 @@ void ImageData::loadFromFile(const std::string source_file)
 ///////////////////////////////////////////////////////////////////////////////
 void ImageData::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
-    this->draw_at(target, sf::Vector2f(0,0), states);
+    this->drawAt(target, sf::Vector2f(0,0), 1, states);
 }
 ///////////////////////////////////////////////////////////////////////////////
-void ImageData::draw_at(sf::RenderTarget& target, const sf::Vector2f pos, sf::RenderStates states) const
+void ImageData::drawAt(sf::RenderTarget& target, const sf::Vector2f pos, const float scale, sf::RenderStates states) const
 {
     sf::Sprite sf_sprite;
     sf_sprite.setPosition(pos.x, pos.y);
     sf_sprite.setTexture(sf_texture);
+    sf_sprite.setScale(scale, scale);
     target.draw(sf_sprite, states);
 }
 ///////////////////////////////////////////////////////////////////////////////
@@ -91,15 +102,25 @@ void ImageData::matrix_to_image(const Eigen::MatrixXf& source, sf::Image& dest)
     // initialize and clear image
     dest.create(source.cols(), source.rows());
 
+    float near = source.minCoeff();
+    float far  = source.maxCoeff();
+
     // convert matrix data into grayscale image
     for (unsigned int y = 0; y < source.rows(); y++) {
         for (unsigned int x = 0; x < source.cols(); x++) {
-            float v = source(y,x);
+            // scale values
+            float v = (source(y,x)-near) / (far-near);
             dest.setPixel(x, y, sf::Color(v*255, v*255, v*255));
         }
     }
 
     // cout << "done." << endl;
+}
+///////////////////////////////////////////////////////////////////////////////
+void ImageData::scale(float near, float far)
+{
+    data = data.array()*(far-near) + near;
+    // no need to update image
 }
 ///////////////////////////////////////////////////////////////////////////////
 float ImageData::sampleValue(Eigen::Vector2f pos) const
@@ -116,5 +137,19 @@ float ImageData::sampleValue(Eigen::Vector2f pos) const
     float v4 = data( ceil(pos.y()),  ceil(pos.x()));
 
     return (v1 + v2 + v3 + v4) / 4;
+}
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+void drawImageAt(const sf::Image& img, const sf::Vector2f& pos, sf::RenderTarget& target, sf::RenderStates states)
+{
+    sf::Texture t;
+    t.loadFromImage(img);
+
+    sf::Sprite s;
+    s.setTexture(t);
+    s.setPosition(pos.x, pos.y);
+
+    target.draw(s, states);
 }
 ///////////////////////////////////////////////////////////////////////////////

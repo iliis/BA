@@ -1,12 +1,13 @@
 #include "scene.h"
 
 using namespace std;
-///////////////////////////////////////////////////////////////////////////////
+
 ///////////////////////////////////////////////////////////////////////////////
 void Scene::loadFromSceneDirectory(const std::string& scene_path)
 {
     assert(frames.empty());
     assert(ground_truth.empty());
+    assert(scene_path[scene_path.length()-1] != '/'); // path should not end with slash
 
     this->intrinsics.loadFromCSV(scene_path + "/camera_intrinsics.csv");
     this->ground_truth = Transformation::loadFromCSV(scene_path + "/camera_trajectory_relative.csv");
@@ -14,7 +15,7 @@ void Scene::loadFromSceneDirectory(const std::string& scene_path)
     // use ground truth trajectory to determine how many frames this scene has
     this->frames.resize(ground_truth.size());
     for (unsigned int i = 0; i < ground_truth.size(); i++) {
-        this->frames[i].loadFromSceneDirectory(scene_path, i);
+        this->frames[i].loadFromSceneDirectory(scene_path, i, intrinsics);
     }
 
     this->source_path = scene_path;

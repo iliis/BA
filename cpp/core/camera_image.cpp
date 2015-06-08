@@ -4,7 +4,7 @@ using namespace std;
 using namespace Eigen;
 
 ///////////////////////////////////////////////////////////////////////////////
-void CameraImage::loadFromSceneDirectory(const std::string& scene_path, const unsigned int index)
+void CameraImage::loadFromSceneDirectory(const std::string& scene_path, const unsigned int index, const CameraIntrinsics& intrinsics)
 {
     //std::string index_string = "000001";
     ostringstream index_string;
@@ -14,6 +14,8 @@ void CameraImage::loadFromSceneDirectory(const std::string& scene_path, const un
 
     intensities.loadFromFile(scene_path + "/color" + index_string.str() + ".png");
     depths     .loadFromFile(scene_path + "/depth" + index_string.str() + ".png");
+
+    depths.scale(intrinsics.getNearClipping(), intrinsics.getFarClipping());
 }
 ///////////////////////////////////////////////////////////////////////////////
 void CameraImage::loadFromMatrices(const Eigen::MatrixXf& mat_intensities, const Eigen::MatrixXf& mat_depths)
@@ -57,7 +59,7 @@ bool CameraImage::isValidPixel(Eigen::Vector2f pos) const
 ///////////////////////////////////////////////////////////////////////////////
 void CameraImage::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
-    intensities.draw_at(target, sf::Vector2f(0,0), states);
-    depths     .draw_at(target, sf::Vector2f(0,intensities.getHeight()), states);
+    intensities.drawAt(target, sf::Vector2f(0,0), 1, states);
+    depths     .drawAt(target, sf::Vector2f(0,intensities.getHeight()), 1, states);
 }
 ///////////////////////////////////////////////////////////////////////////////

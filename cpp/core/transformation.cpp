@@ -5,21 +5,20 @@ using namespace boost;
 
 ///////////////////////////////////////////////////////////////////////////////
 Transformation::Transformation()
-  : x(0), y(0), z(0),
-    alpha(0), beta(0), gamma(0)
 {
+    this->value << 0,0,0,0,0,0;
 }
 ///////////////////////////////////////////////////////////////////////////////
 Transformation::Transformation(float x, float y, float z, float alpha, float beta, float gamma)
-  : x(x), y(y), z(z),
-    alpha(alpha), beta(beta), gamma(gamma)
 {
+    this->value << x, y, z, alpha, beta, gamma;
+    updateRotationMatrix();
 }
 ///////////////////////////////////////////////////////////////////////////////
 std::ostream& operator <<(std::ostream &output, const Transformation &T)
 {
-    output << "T[ " << T.x << " " << T.y << " " << T.z << " / ";
-    output << T.alpha << " " << T.beta << " " << T.gamma << " ]";
+    output << "T[ " << T.x() << " " << T.y() << " " << T.z() << " / ";
+    output << T.alpha() << " " << T.beta() << " " << T.gamma() << " ]";
     return output;
 }
 ///////////////////////////////////////////////////////////////////////////////
@@ -54,12 +53,14 @@ std::vector<Transformation> Transformation::loadFromCSV(const std::string& filen
         tokenizer<escaped_list_separator<char> >::iterator it = tok.begin();
 
         Transformation T;
-        T.x     = lexical_cast<float>(trim(*it++));
-        T.y     = lexical_cast<float>(trim(*it++));
-        T.z     = lexical_cast<float>(trim(*it++));
-        T.alpha = lexical_cast<float>(trim(*it++));
-        T.beta  = lexical_cast<float>(trim(*it++));
-        T.gamma = lexical_cast<float>(trim(*it++));
+
+        T.value(0) = lexical_cast<float>(trim(*it++));
+        T.value(1) = lexical_cast<float>(trim(*it++));
+        T.value(2) = lexical_cast<float>(trim(*it++));
+        T.value(3) = lexical_cast<float>(trim(*it++));
+        T.value(4) = lexical_cast<float>(trim(*it++));
+        T.value(5) = lexical_cast<float>(trim(*it++));
+        T.updateRotationMatrix();
 
         transformations.push_back(T);
     }
@@ -69,14 +70,11 @@ std::vector<Transformation> Transformation::loadFromCSV(const std::string& filen
     return transformations;
 }
 ///////////////////////////////////////////////////////////////////////////////
-Eigen::Matrix3f Transformation::getRotationMatrix() const
+void Transformation::updateRotationMatrix()
 {
-    // TODO: cache this matrix
-    Eigen::Matrix3f m;
-    m = Eigen::AngleAxisf(this->alpha, Eigen::Vector3f::UnitX())
-      * Eigen::AngleAxisf(this->beta,  Eigen::Vector3f::UnitY())
-      * Eigen::AngleAxisf(this->gamma, Eigen::Vector3f::UnitZ());
-    return m;
+    R = Eigen::AngleAxisf(this->alpha(), Eigen::Vector3f::UnitX())
+      * Eigen::AngleAxisf(this->beta(),  Eigen::Vector3f::UnitY())
+      * Eigen::AngleAxisf(this->gamma(), Eigen::Vector3f::UnitZ());
 }
 ///////////////////////////////////////////////////////////////////////////////
 Eigen::Vector3f Transformation::operator()(const Eigen::Vector3f& vect) const
