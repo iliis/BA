@@ -7,6 +7,8 @@
 #include <SFML/Graphics.hpp>
 #include <Eigen/Dense>
 
+#include "../utils/colormap.h"
+
 /*!
  * This class represents a basic image, with some additional helper functions
  * to make it usable both with Eigen and with SFML.
@@ -25,7 +27,7 @@ public:
     void create(const unsigned int W, const unsigned int H);
 
     // load data
-    void loadFromMatrix(const Eigen::MatrixXf& source_data);
+    void loadFromMatrix(const Eigen::MatrixXf& source_data, const Colormap::Colormap& colormap = Colormap::Colormap());
     void loadFromImage(const sf::Image& source_data);
     void loadFromFile(const std::string source_file);
 
@@ -35,10 +37,10 @@ public:
     void drawAt(sf::RenderTarget& target, const sf::Vector2f pos, const float scale = 1, sf::RenderStates states = sf::RenderStates()) const;
 
     static void image_to_matrix(const sf::Image& source, Eigen::MatrixXf& dest);
-    static void matrix_to_image(const Eigen::MatrixXf& source, sf::Image& dest); // like imagesc()
+    static void matrix_to_image(const Eigen::MatrixXf& source, sf::Image& dest, const Colormap::Colormap& colormap = Colormap::Colormap()); // like imagesc()
 
     void updateMatrixFromImage();
-    void updateImageFromMatrix();
+    void updateImageFromMatrix(const Colormap::Colormap& colormap = Colormap::Colormap());
 
     // scale values, so that 0 -> near, 1 -> far
     void scale(float near, float far);

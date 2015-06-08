@@ -35,7 +35,7 @@ namespace Warp {
         unsigned int steps;
     };
 
-    void renderErrorSurface(ImageData& target, const CameraStep& step, const Transformation& Tcenter, const PlotRange& range1, const PlotRange& range2);
+    void renderErrorSurface(Eigen::MatrixXf& target, const CameraStep& step, const Transformation& Tcenter, const PlotRange& range1, const PlotRange& range2);
     /*
     project_inverse();
     transform();

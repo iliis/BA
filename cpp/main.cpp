@@ -19,24 +19,25 @@ int main()
 
 
 
-    ImageData errorplot;
 
     CameraStep step = testscene.getStep(0);
 
     cout << step.ground_truth << endl;
 
+    Warp::PlotRange range1(0,-1,1,40);
+    Warp::PlotRange range2(4,-.1,.1,40);
+
+    Eigen::MatrixXf errors(range1.steps, range2.steps);
+
     sf::Clock clock;
     clock.restart();
-    //Warp::drawError(window, testscene.getStep(0), Transformation(0,0,0,0,0,0));
-    //Warp::drawError(window, testscene.getStep(0), testscene.getStep(0).ground_truth);
-    Warp::renderErrorSurface(errorplot, step, step.ground_truth, Warp::PlotRange(0,-1,1,40), Warp::PlotRange(4,-.1,.1,40));
-    //Warp::renderErrorSurface(errorplot, step, step.ground_truth, Warp::PlotRange(0,-1,1,3), Warp::PlotRange(4,-.1,.1,3));
-    //Warp::renderErrorSurface(errorplot, step, step.ground_truth, Warp::PlotRange(4,-.1,.1,3), Warp::PlotRange(0,-1,1,3));
+    Warp::renderErrorSurface(errors, step, step.ground_truth, range1, range2);
     sf::Int32 ms = clock.getElapsedTime().asMilliseconds();
 
-    cout << "size: " << errorplot.getWidth() << " x " << errorplot.getHeight() << endl;
+    cout << "rendered surface in " << ms << "ms (" << ((float) ms) / (errors.rows() * errors.cols()) << "ms per point)" << endl;
 
-    cout << "rendered surface in " << ms << "ms (" << ((float) ms) / (errorplot.getWidth() * errorplot.getHeight()) << "ms per point)" << endl;
+    ImageData errorplot;
+    errorplot.loadFromMatrix(errors, Colormap::Jet());
 
     while (window.isOpen())
     {
@@ -51,6 +52,8 @@ int main()
         //window.draw(errorplot);
         errorplot.drawAt(window, sf::Vector2f(0,0), 16);
         window.display();
+
+        sf::sleep(sf::milliseconds(100));
     }
 
     return 0;

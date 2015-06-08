@@ -13,14 +13,14 @@ void ImageData::create(const unsigned int W, const unsigned int H)
     height = H;
 }
 ///////////////////////////////////////////////////////////////////////////////
-void ImageData::loadFromMatrix(const Eigen::MatrixXf& source_data)
+void ImageData::loadFromMatrix(const Eigen::MatrixXf& source_data, const Colormap::Colormap& colormap)
 {
     width  = source_data.cols();
     height = source_data.rows();
 
     // copy data
     data   = source_data;
-    updateImageFromMatrix();
+    updateImageFromMatrix(colormap);
 
     // cout << "loaded image from matrix " << width << " x " << height << endl;
 }
@@ -70,9 +70,9 @@ void ImageData::updateMatrixFromImage()
     image_to_matrix(sf_image, data);
 }
 ///////////////////////////////////////////////////////////////////////////////
-void ImageData::updateImageFromMatrix()
+void ImageData::updateImageFromMatrix(const Colormap::Colormap& colormap)
 {
-    matrix_to_image(data, sf_image);
+    matrix_to_image(data, sf_image, colormap);
     sf_texture.loadFromImage(sf_image);
 }
 ///////////////////////////////////////////////////////////////////////////////
@@ -95,7 +95,7 @@ void ImageData::image_to_matrix(const sf::Image& source, Eigen::MatrixXf& dest)
     // cout << "done." << endl;
 }
 ///////////////////////////////////////////////////////////////////////////////
-void ImageData::matrix_to_image(const Eigen::MatrixXf& source, sf::Image& dest)
+void ImageData::matrix_to_image(const Eigen::MatrixXf& source, sf::Image& dest, const Colormap::Colormap& colormap)
 {
     // cout << "converting matrix to image ...";
 
@@ -108,9 +108,7 @@ void ImageData::matrix_to_image(const Eigen::MatrixXf& source, sf::Image& dest)
     // convert matrix data into grayscale image
     for (unsigned int y = 0; y < source.rows(); y++) {
         for (unsigned int x = 0; x < source.cols(); x++) {
-            // scale values
-            float v = (source(y,x)-near) / (far-near);
-            dest.setPixel(x, y, sf::Color(v*255, v*255, v*255));
+            dest.setPixel(x, y, colormap(source(y,x), near, far));
         }
     }
 

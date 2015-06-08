@@ -90,14 +90,14 @@ float Warp::calcError(const CameraStep& step, const Transformation& T)
     return sqrt(total_error);
 }
 ///////////////////////////////////////////////////////////////////////////////
-void Warp::renderErrorSurface(ImageData& target, const CameraStep& step, const Transformation& Tcenter, const PlotRange& range1, const PlotRange& range2)
+void Warp::renderErrorSurface(MatrixXf& target, const CameraStep& step, const Transformation& Tcenter, const PlotRange& range1, const PlotRange& range2)
 {
     assert(range1.dim >= 0); assert(range1.dim <  6);
     assert(range2.dim >= 0); assert(range2.dim <  6);
     assert(range1.steps > 0);
     assert(range2.steps > 0);
 
-    target.create(range1.steps, range2.steps);
+    target.resize(range1.steps, range2.steps);
 
     for (unsigned int y = 0; y < range2.steps; ++y) {
         for (unsigned int x = 0; x < range1.steps; ++x) {
@@ -112,13 +112,11 @@ void Warp::renderErrorSurface(ImageData& target, const CameraStep& step, const T
 
             float error = calcError(step, T);
 
-            target(x, y) = error;
+            target(y, x) = error;
 
             //cout << x << " " << y << "  --> " << xv << " " << yv << endl;
             //cout << T << "  -->  " << error << endl;
         }
     }
-
-    target.updateImageFromMatrix();
 }
 ///////////////////////////////////////////////////////////////////////////////
