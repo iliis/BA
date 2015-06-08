@@ -5,9 +5,9 @@ testscene = Scene('input/trajectory1');
 %min_init = [1.8 0.1 4 0 0 0]';
 min_init = testscene.getStep(1).ground_truth;
 disp(['solution: ' num2str(min_init')]);
-min_init = min_init + [0.01 0 -0.01 0 0.005 0]';
+min_init = min_init + [1 -0.5 0 0 0 0]';
 
-testscene.scale_down(2);
+%testscene.scale_down(2);
 
 step_size = [ ...
     1 1 1 ...

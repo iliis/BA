@@ -52,7 +52,7 @@ int main()
     Scene testscene;
     testscene.loadFromSceneDirectory("../matlab/input/trajectory1");
 
-    CameraStep teststep = testscene.getStep(19);
+    CameraStep teststep = testscene.getStep(24);
 
     VectorXf errors;
     Matrix<float, Dynamic, 6> jacobian;
@@ -63,7 +63,7 @@ int main()
 
     Warp::PlotRange range1(0, -1, 1,40);
     Warp::PlotRange range2(1, -1, 1,40);
-    //Warp::PlotRange range2(4,-.1,.1,4);
+    //Warp::PlotRange range2(4,-.1,.1,40); // beta = yaw
 
     Eigen::MatrixXf errorsurface(range1.steps, range2.steps);
     Eigen::Matrix<float, Dynamic, 6> errorgradients(range1.steps*range2.steps, 6);

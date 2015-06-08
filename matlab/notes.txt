@@ -96,7 +96,7 @@ IDEAS
 
 8.6:
 - check all scenes (and all steps, trajectory1/20 was wrong)
-    -> switch to 8bit PNG due to SFML
+    -> blender overwrote python script? And seems to break it when loading a second scene...
 - fix c++ code on single screen -.-
     -> kernel update -> reinstall ATI drivers
 - debug jacobians !!!
