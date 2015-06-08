@@ -1,9 +1,9 @@
 % basic test for new core functions
 % loads an image pair and warps the keyframe onto the current frame
 
-testscene = Scene('input/testscene1');
+%testscene = Scene('input/testscene1');
 %testscene = Scene('input/testscene2');
-%testscene = Scene('input/trajectory1');
+testscene = Scene('input/trajectory1');
 %testscene = Scene('input/testscene_rotonly');
 
 %testscene = testscene.scale_down(3);
@@ -15,6 +15,7 @@ k = 1;
     step = testscene.getStep(k);
 
     T = step.ground_truth;
+    %T = [ -0.26418     0.52966      1.6856    0.017505    0.059513  -0.0054971 ]';
     
     %image(step.D1);
     %title(['frame ' num2str(k)]);
@@ -22,8 +23,8 @@ k = 1;
 
     % do the actual calculations
     tic;
-    err = camera_warp(step, T, true);
-    %[err, J] 
+    %err = camera_warp(step, T);
+    [err, J] = camera_warp(step, T, true);
     toc;
 
     disp(['total error: ' num2str(norm(err))]);

@@ -5,13 +5,18 @@ testscene = Scene('input/trajectory1');
 %min_init = [1.8 0.1 4 0 0 0]';
 min_init = testscene.getStep(1).ground_truth;
 disp(['solution: ' num2str(min_init')]);
-min_init = min_init + [0.1 0 -0.1 0 0 0]';
+min_init = min_init + [0.01 0 -0.01 0 0.005 0]';
+
+testscene.scale_down(2);
 
 step_size = [ ...
     1 1 1 ...
     1/20 1/20 1/20]' / 1000;
-gradient_descent(testscene.getStep(1), min_init, 0.0001, @(x) huber_loss(x,0.1), false, step_size);
+
+step_size = ones(6,1);
+%gradient_descent(testscene.getStep(1), min_init, 0.0001, @(x) huber_loss(x,0.1), false, step_size);
 %gradient_descent(testscene, min_init, @uniform_weights, false, 0.00001);
+gauss_newton(testscene.getStep(1), min_init, 0.00001, @uniform_weights, false);
 
 % trajectory1, step 1
 %    -0.0372

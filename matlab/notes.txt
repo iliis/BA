@@ -92,3 +92,9 @@ IDEAS
 > measure convergence radius for trajectory
     - determine how much offset can be tolerated
     -> required framerate / movement speed
+
+
+8.6:
+- check all scenes (and all steps, trajectory1/20 was wrong)
+- fix c++ code on single screen -.-
+- debug jacobians !!!

@@ -14,7 +14,7 @@ T = T_init;
 
 for i = 1:1000
     % invalid terms don't exist in Jacobi
-    [err, J] = camera_warp(scene, T, true);
+    [err, J] = camera_warp(scene, T);
     
     disp(['[GD] step ' num2str(i) ': error = ' num2str(norm(err)) '  T = [ ' num2str(T') ' ]']);
     

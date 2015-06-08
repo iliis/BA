@@ -19,8 +19,11 @@ for i = 1:1000
     
     disp(['[GN] step ' num2str(i) ': error = ' num2str(norm(err)) '  T = [ ' num2str(T') ' ]']);
     
+    N = numel(err);
+    W = sparse(1:N, 1:N, weight_function(err));
     
-    W = diag(weight_function(err));
+    
+    %W = diag(weight_function(err));
     
     
     if restrict

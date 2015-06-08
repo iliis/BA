@@ -130,11 +130,49 @@ float ImageData::sampleValue(Eigen::Vector2f pos) const
 
     // remember: data[row, col] = data[y, x]!
     float v1 = data(floor(pos.y()), floor(pos.x()));
-    float v2 = data( ceil(pos.y()), floor(pos.x()));
-    float v3 = data(floor(pos.y()),  ceil(pos.x()));
+    float v2 = data(floor(pos.y()),  ceil(pos.x()));
+    float v3 = data( ceil(pos.y()), floor(pos.x()));
     float v4 = data( ceil(pos.y()),  ceil(pos.x()));
 
-    return (v1 + v2 + v3 + v4) / 4;
+    // weight (how close to img[ceil(x), ceil(y)] are we?
+    float sx = pos.x() - floor(pos.x());
+    float sy = pos.y() - floor(pos.y());
+
+    assert(sx >= 0); assert(sx < 1);
+    assert(sy >= 0); assert(sy < 1);
+
+    return v1 * ( (1-sx) * (1-sy) )
+         + v2 * (    sx  * (1-sy) )
+         + v3 * ( (1-sx) *    sy  )
+         + v4 * (    sx  *    sy  );
+}
+///////////////////////////////////////////////////////////////////////////////
+Eigen::Matrix<float, 1, 2> ImageData::sampleDiff(Eigen::Vector2f pos) const
+{
+    assert(pos.x() >= 0);
+    assert(pos.y() >= 0);
+    assert(pos.x() <= width-1);
+    assert(pos.y() <= height-1);
+
+    // remember: data[row, col] = data[y, x]!
+    float v1 = data(floor(pos.y()), floor(pos.x()));
+    float v2 = data(floor(pos.y()),  ceil(pos.x()));
+    float v3 = data( ceil(pos.y()), floor(pos.x()));
+    float v4 = data( ceil(pos.y()),  ceil(pos.x()));
+
+    // weight (how close to img[ceil(x), ceil(y)] are we?
+    float sx = pos.x() - floor(pos.x());
+    float sy = pos.y() - floor(pos.y());
+
+    float dx1 = v2 - v1,  dy1 = v3 - v1;
+    float dx2 = v4 - v2,  dy2 = v4 - v2;
+
+    Eigen::Matrix<float, 1, 2> J;
+
+    J(0) = dx1 * (1-sy)  +  dx2 * sy;
+    J(1) = dy1 * (1-sx)  +  dy2 * sx;
+
+    return J;
 }
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////

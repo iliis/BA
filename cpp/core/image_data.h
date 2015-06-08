@@ -56,6 +56,7 @@ public:
     inline float& operator()(unsigned int x, unsigned int y) { return data(y,x); }
 
     float sampleValue(Eigen::Vector2f pos) const;
+    Eigen::Matrix<float, 1, 2> sampleDiff(Eigen::Vector2f pos) const;
 
 private:
     unsigned int width, height;

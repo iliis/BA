@@ -34,6 +34,8 @@ public:
     inline const Eigen::Matrix3f& getRotationMatrix() const { return R; }
     inline Eigen::Vector3f getTranslation() const { return Eigen::Vector3f(x(),y(),z()); };
 
+    Eigen::Matrix<float, 3, 6> getJacobian(const Eigen::Vector3f& point) const;
+
     Eigen::Vector3f operator()(const Eigen::Vector3f& vect) const;
 
     void updateRotationMatrix();

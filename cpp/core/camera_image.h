@@ -40,6 +40,8 @@ public:
 
     bool isValidPixel(Eigen::Vector2f pos) const;
 
+    inline const ImageData& getIntensityData() const { return intensities; }
+    inline const ImageData& getDepthData()     const { return depths; }
 
     virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 

@@ -1,7 +1,7 @@
 # requires:
 # SFML 2   (for displaying pretty things)
 # Eigen 3  (for fast numerics)
-# // Boost    (for various helper stuff like string conversions)
+# Boost    (for various helper stuff like string conversions)
 
 
 # source:
@@ -51,4 +51,13 @@ find_package(Eigen3 REQUIRED)
 
 if(EIGEN3_FOUND)
     include_directories(${EIGEN3_INCLUDE_DIR})
+endif()
+
+
+# Detect and add Boost
+# http://www.cmake.org/cmake/help/v3.0/module/FindBoost.html
+find_package(Boost REQUIRED) # TODO: add specific libraries
+
+if (Boost_FOUND)
+    include_directories(${Boost_INCLUDE_DIRS})
 endif()

@@ -54,17 +54,16 @@ classdef Scene
             assert(scale_factor >= 1, 'scale factor must be larger than 1, otherwise no scaling will occur');
 
             scale_factor = 1/2^(scale_factor-1);
+            
+            for k = 1:obj.frame_count
+                
+                obj.intensities{k} = imresize(obj.intensities{k}, scale_factor);
+                obj.depths{k}      = imresize(obj.depths{k}, scale_factor);
 
-            obj.D1 = imresize(obj.D1, scale_factor);
-            obj.I1 = imresize(obj.I1, scale_factor);
-            %C1 = imresize(C1, 1/2^(scale-1));
-
-            obj.D2 = imresize(obj.D2, scale_factor);
-            obj.I2 = imresize(obj.I2, scale_factor);
-            %C2 = imresize(C2, 1/2^(scale-1));
+            end
 
             % don't scale focal length (TODO: is this correct?)
-            obj.intrinsics = CameraIntrinsics(size(obj.I1,2), size(obj.I1,1), obj.intrinsics.focal_length);
+            obj.intrinsics = CameraIntrinsics(size(obj.intensities{1},2), size(obj.intensities{1},1), obj.intrinsics.focal_length * scale_factor);
 
         end
         

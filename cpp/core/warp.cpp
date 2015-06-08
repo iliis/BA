@@ -29,6 +29,20 @@ Pixel Warp::project(const WorldPoint& point, const CameraIntrinsics& intrinsics)
     return p;
 }
 ///////////////////////////////////////////////////////////////////////////////
+Eigen::Matrix<float, 2, 3> Warp::projectJacobian(const WorldPoint& point, const CameraIntrinsics& intrinsics)
+{
+    float x = point.pos.x();
+    float y = point.pos.y();
+    float z = point.pos.z();
+    float F = intrinsics.getFocalLength();
+
+    Eigen::Matrix<float, 2, 3> J;
+    J << 280/z,     0, -(F*x)/(z*z),
+         0,     280/z, -(F*y)/(z*z);
+
+    return J;
+}
+///////////////////////////////////////////////////////////////////////////////
 WorldPoint Warp::transform(const WorldPoint& point, const Transformation& transformation)
 {
     WorldPoint p;
@@ -37,7 +51,17 @@ WorldPoint Warp::transform(const WorldPoint& point, const Transformation& transf
     return p;
 }
 ///////////////////////////////////////////////////////////////////////////////
-float Warp::calcError(const CameraStep& step, const Transformation& T)
+Eigen::Matrix<float, 3, 6> Warp::transformJacobian(const WorldPoint& point, const Transformation& transformation)
+{
+    return transformation.getJacobian(point.pos);
+}
+///////////////////////////////////////////////////////////////////////////////
+Eigen::Matrix<float, 1, 2> Warp::sampleJacobian(const Pixel& pixel, const CameraImage& image)
+{
+    return image.getIntensityData().sampleDiff(pixel.pos);
+}
+///////////////////////////////////////////////////////////////////////////////
+float Warp::calcError(const CameraStep& step, const Transformation& T, Eigen::VectorXf& error_out, Eigen::Matrix<float, Eigen::Dynamic, 6>& J_out)
 {
     const unsigned int W = step.scene->getIntrinsics().getCameraWidth();
     const unsigned int H = step.scene->getIntrinsics().getCameraHeight();
@@ -55,16 +79,22 @@ float Warp::calcError(const CameraStep& step, const Transformation& T)
     //Matrix3f R = T.getRotationMatrix();
     //Vector3f M = T.getTranslation();
 
+    // amount of successfully warped pixels
+    unsigned int pixel_count = 0;
+
+    error_out.resize(W*H);
+    J_out.resize(W*H, 6);
+
     for (unsigned int y = 0; y < H; ++y) {
         for (unsigned int x = 0; x < W; ++x) {
             Pixel pixel_current  = step.frame_second.getPixel(Vector2i(x,y));
 
             WorldPoint point = projectInv(pixel_current, step.scene->getIntrinsics());
 
-            point = transform(point, T); // 6.2ms per point, 3.7ms with cached rotation matrix
+            WorldPoint point_transformed = transform(point, T); // 6.2ms per point, 3.7ms with cached rotation matrix
             //point.pos = R * point.pos + M; // 3.5ms per point
 
-            Pixel pixel_in_keyframe = project(point, step.scene->getIntrinsics());
+            Pixel pixel_in_keyframe = project(point_transformed, step.scene->getIntrinsics());
 
             // skip pixels that project outside the keyframe
             if (!step.frame_first.isValidPixel(pixel_in_keyframe.pos))
@@ -75,12 +105,30 @@ float Warp::calcError(const CameraStep& step, const Transformation& T)
             float error = (intensity_keyframe - pixel_current.intensity);
             error = error * error; // squared differences
 
+
+            // calculate Jacobian
+            Matrix<float, 3, 6> J_T = Warp::transformJacobian(point, T);
+            Matrix<float, 2, 3> J_P = Warp::projectJacobian(point_transformed, step.scene->getIntrinsics());
+            Matrix<float, 1, 2> J_I = Warp::sampleJacobian(pixel_in_keyframe, step.frame_first);
+            Matrix<float, 1, 6> jacobian = J_I * J_P * J_T;
+
+
+            // store in output values
+            error_out(pixel_count) = error;
+
+            for (unsigned int i = 0; i < 6; i++)
+                J_out(pixel_count, i) = jacobian(i);
+
             total_error += error;
+            ++pixel_count;
 
             //img_c.setPixel(x,y, sf::Color(error*255, (1-error)*255, 0));
             //img_k.setPixel(pixel_in_keyframe.pos.x(),pixel_in_keyframe.pos.y(), sf::Color(error*255, (1-error)*255, 0));
         }
     }
+
+    error_out.conservativeResize(pixel_count);
+    J_out.conservativeResize(pixel_count, Eigen::NoChange);
 
     //drawImageAt(img_c, sf::Vector2f(0,0), target);
     //drawImageAt(img_k, sf::Vector2f(0,H+2), target);
@@ -90,14 +138,15 @@ float Warp::calcError(const CameraStep& step, const Transformation& T)
     return sqrt(total_error);
 }
 ///////////////////////////////////////////////////////////////////////////////
-void Warp::renderErrorSurface(MatrixXf& target, const CameraStep& step, const Transformation& Tcenter, const PlotRange& range1, const PlotRange& range2)
+void Warp::renderErrorSurface(MatrixXf& target_out, Matrix<float,Dynamic,6>& gradients_out, const CameraStep& step, const Transformation& Tcenter, const PlotRange& range1, const PlotRange& range2)
 {
-    assert(range1.dim >= 0); assert(range1.dim <  6);
-    assert(range2.dim >= 0); assert(range2.dim <  6);
+    assert(range1.dim <  6);
+    assert(range2.dim <  6);
     assert(range1.steps > 0);
     assert(range2.steps > 0);
 
-    target.resize(range1.steps, range2.steps);
+    target_out.resize(range1.steps, range2.steps);
+    gradients_out.resize(range1.steps * range2.steps, 6);
 
     for (unsigned int y = 0; y < range2.steps; ++y) {
         for (unsigned int x = 0; x < range1.steps; ++x) {
@@ -110,9 +159,17 @@ void Warp::renderErrorSurface(MatrixXf& target, const CameraStep& step, const Tr
             T.value(range2.dim) = Tcenter.value(range2.dim) + yv * (range2.to-range2.from) + range2.from;
             T.updateRotationMatrix();
 
-            float error = calcError(step, T);
+            Matrix<float, Eigen::Dynamic, 6> J;
+            VectorXf errs;
 
-            target(y, x) = error;
+            float error = calcError(step, T, errs, J);
+
+            Matrix<float, 1, 6> gradient = J.transpose() * errs;
+
+            for (int i = 0; i < 6; i++)
+                gradients_out(y * range1.steps + x, i) = gradient(i);
+
+            target_out(y, x) = error;
 
             //cout << x << " " << y << "  --> " << xv << " " << yv << endl;
             //cout << T << "  -->  " << error << endl;
