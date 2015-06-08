@@ -1,7 +1,7 @@
 function list = image_to_list(array)
-% input H x W x 3 = 2 dimensional array of points
-% output N x 3 list of points (N = H*W)
+% input H x W x D = 2 dimensional array of (D-dimensional) points
+% output D x N list of points (N = H*W)
 
-list = reshape(array,[],size(array,3));
+list = reshape(permute(array,[3,1,2]), size(array,3), []);
 
 end

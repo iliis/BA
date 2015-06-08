@@ -1,13 +1,15 @@
 function directories = find_img_source_directories()
 
-directories = {'input'};
+search_directories = {'input'};
+directories = {};
 
-
-ds = dir(fullfile('unit_tests'));
-for d = 1:numel(ds)
-    if ds(d).isdir && is_valid_dir(fullfile('unit_tests', ds(d).name))
-        %disp(['found dir: ' ds(d).name]);
-        directories = [directories, ['unit_tests/' ds(d).name]];
+for n = 1:numel(search_directories)
+    ds = dir(fullfile(search_directories{n}));
+    for d = 1:numel(ds)
+        if ds(d).isdir && is_valid_dir(fullfile(search_directories{n}, ds(d).name))
+            %disp(['found dir: ' ds(d).name]);
+            directories = [directories, [search_directories{n} '/' ds(d).name]];
+        end
     end
 end
 
