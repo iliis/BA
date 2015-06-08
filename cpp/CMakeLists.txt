@@ -22,6 +22,7 @@ set(SOURCES
     "core/camera_image.cpp"
     "core/warp.cpp"
     "utils/colormap.cpp"
+    "utils/progress.cpp"
 )
 
 

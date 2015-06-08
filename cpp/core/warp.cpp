@@ -117,6 +117,8 @@ void Warp::renderErrorSurface(MatrixXf& target, const CameraStep& step, const Tr
             //cout << x << " " << y << "  --> " << xv << " " << yv << endl;
             //cout << T << "  -->  " << error << endl;
         }
+
+        printfProgress(y,0,range2.steps-1);
     }
 }
 ///////////////////////////////////////////////////////////////////////////////

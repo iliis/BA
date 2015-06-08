@@ -8,6 +8,7 @@
 #include "transformation.h"
 #include "camera_step.h"
 #include "scene.h"
+#include "../utils/progress.h"
 
 namespace Warp {
 

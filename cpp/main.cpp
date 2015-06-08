@@ -17,9 +17,6 @@ int main()
     Scene testscene;
     testscene.loadFromSceneDirectory("../matlab/input/trajectory1");
 
-
-
-
     CameraStep step = testscene.getStep(0);
 
     cout << step.ground_truth << endl;
@@ -28,6 +25,8 @@ int main()
     Warp::PlotRange range2(4,-.1,.1,40);
 
     Eigen::MatrixXf errors(range1.steps, range2.steps);
+
+    cout << "rendering error surface ..." << endl;
 
     sf::Clock clock;
     clock.restart();
