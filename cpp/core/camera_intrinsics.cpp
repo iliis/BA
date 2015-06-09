@@ -14,6 +14,20 @@ using namespace boost;
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
+CameraIntrinsics::CameraIntrinsics()
+  : camera_width(0), camera_height(0),
+    principal_point_x(0), principal_point_y(0),
+    focal_length(0), near_clipping(0), far_clipping(0)
+{
+}
+///////////////////////////////////////////////////////////////////////////////
+CameraIntrinsics::CameraIntrinsics(unsigned int W, unsigned int H, float focal, float near, float far)
+  : camera_width(W), camera_height(H),
+    focal_length(focal), near_clipping(near), far_clipping(far)
+{
+    this->updatePrincipalPoint();
+}
+///////////////////////////////////////////////////////////////////////////////
 void CameraIntrinsics::loadFromCSV(const std::string& filename)
 {
     // read file
@@ -55,11 +69,16 @@ void CameraIntrinsics::loadFromCSV(const std::string& filename)
     // calculate other parameters
     ///////////////////////////////////
 
+    updatePrincipalPoint();
+}
+///////////////////////////////////////////////////////////////////////////////
+void CameraIntrinsics::updatePrincipalPoint()
+{
     // [0, 0]     is at the center of the first pixel at the top left
     // [W-1, H-1] is at the center of the last pixel at the bottom right
     // i.e. integer coordinates directly corespond to pixel values
-    this->principal_point_x = this->camera_width  / 2 - 0.5;
-    this->principal_point_y = this->camera_height / 2 - 0.5;
+    this->principal_point_x = this->camera_width  / 2.0f - 0.5;
+    this->principal_point_y = this->camera_height / 2.0f- 0.5;
 }
 ///////////////////////////////////////////////////////////////////////////////
 std::ostream& operator <<(std::ostream &output, const CameraIntrinsics &intrinsics)

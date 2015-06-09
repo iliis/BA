@@ -110,14 +110,11 @@ float Warp::calcError(const CameraStep& step, const Transformation& T, Eigen::Ve
             Matrix<float, 3, 6> J_T = Warp::transformJacobian(point, T);
             Matrix<float, 2, 3> J_P = Warp::projectJacobian(point_transformed, step.scene->getIntrinsics());
             Matrix<float, 1, 2> J_I = Warp::sampleJacobian(pixel_in_keyframe, step.frame_first);
-            Matrix<float, 1, 6> jacobian = J_I * J_P * J_T;
-
+            J_out.row(pixel_count) = J_I * J_P * J_T;
 
             // store in output values
             error_out(pixel_count) = error;
 
-            for (unsigned int i = 0; i < 6; i++)
-                J_out(pixel_count, i) = jacobian(i);
 
             total_error += error;
             ++pixel_count;
@@ -172,10 +169,11 @@ void Warp::renderErrorSurface(MatrixXf& target_out, Matrix<float,Dynamic,6>& gra
 
             float error = calcError(step, T, errs, J);
 
-            Matrix<float, 1, 6> gradient = J.transpose() * errs;
+            //Matrix<float, 1, 6> gradient = J.transpose() * errs;
+            gradients_out.row(y*range1.steps +x) = J.transpose() * errs;
 
-            for (int i = 0; i < 6; i++)
-                gradients_out(y * range1.steps + x, i) = gradient(i);
+            //for (int i = 0; i < 6; i++)
+                //gradients_out(y * range1.steps + x, i) = gradient(i);
 
             target_out(y, x) = error;
 

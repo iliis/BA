@@ -50,9 +50,10 @@ int main()
     sf::RenderWindow window(sf::VideoMode(1280, 768), "SFML test");
 
     Scene testscene;
-    testscene.loadFromSceneDirectory("../matlab/input/trajectory1");
+    //testscene.loadFromSceneDirectory("../matlab/input/trajectory1");
+    testscene.loadFromSceneDirectory("../matlab/input/testscene1");
 
-    CameraStep teststep = testscene.getStep(24);
+    CameraStep teststep = testscene.getStep(0);
 
     VectorXf errors;
     Matrix<float, Dynamic, 6> jacobian;
@@ -61,8 +62,8 @@ int main()
     cout << "total error: " << Warp::calcError(teststep, teststep.ground_truth, errors, jacobian) << endl;
 
 
-    Warp::PlotRange range1(0, -1, 1,40);
-    Warp::PlotRange range2(1, -1, 1,40);
+    Warp::PlotRange range1(0, -0.2, 0.2, 40);
+    Warp::PlotRange range2(1, -0.2, 0.2, 40);
     //Warp::PlotRange range2(4,-.1,.1,40); // beta = yaw
 
     Eigen::MatrixXf errorsurface(range1.steps, range2.steps);
@@ -98,7 +99,7 @@ int main()
         //window.draw(errorplot);
         errorplot.drawAt(window, sf::Vector2f(0,0), 16);
 
-#if 0
+#if 1
         // plot gradients (they are clearly wrong at the moment!)
         for (unsigned int y = 0; y < errorplot.getHeight(); ++y) {
             for (unsigned int x = 0; x < errorplot.getWidth(); ++x) {

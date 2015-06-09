@@ -8,6 +8,9 @@
 class CameraIntrinsics
 {
 public:
+    CameraIntrinsics();
+    CameraIntrinsics(unsigned int W, unsigned int H, float focal, float near = 0, float far = 0);
+
     void loadFromCSV(const std::string& filename);
 
     inline unsigned int getCameraWidth()  const { return camera_width; }
@@ -23,6 +26,9 @@ public:
     friend std::ostream& operator <<(std::ostream &output, const CameraIntrinsics &intrinsics);
 
 private:
+
+    void updatePrincipalPoint();
+
     // TODO: use Eigen::Vector2f to store these
     unsigned int camera_width, camera_height;   // size of image [pixels]
     float principal_point_x, principal_point_y; // center of image [pixels]

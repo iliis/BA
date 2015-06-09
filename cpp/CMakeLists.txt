@@ -13,7 +13,6 @@ project (dense_odometry)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic -Wextra")
 
 set(SOURCES
-    "main.cpp"
     "core/image_data.cpp"
     "core/camera_intrinsics.cpp"
     "core/transformation.cpp"
@@ -27,9 +26,15 @@ set(SOURCES
 
 
 
-# Define sources and executable
+# compile all sources to library, so we can use it for unit tests as well
+# without having to recompile everything
+set(LIBRARY_NAME "dense_odometry_lib")
+add_library(${LIBRARY_NAME} STATIC ${SOURCES})
+
+# define final executable
 set(EXECUTABLE_NAME "dense_odometry")
-add_executable(${EXECUTABLE_NAME} ${SOURCES})
+add_executable(${EXECUTABLE_NAME} "main.cpp")
+target_link_libraries(${EXECUTABLE_NAME} ${LIBRARY_NAME})
 
 
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
@@ -61,3 +66,7 @@ find_package(Boost REQUIRED) # TODO: add specific libraries
 if (Boost_FOUND)
     include_directories(${Boost_INCLUDE_DIRS})
 endif()
+
+
+enable_testing()
+add_subdirectory(tests)

@@ -147,25 +147,32 @@ float ImageData::sampleValue(Eigen::Vector2f pos) const
          + v4 * (    sx  *    sy  );
 }
 ///////////////////////////////////////////////////////////////////////////////
+// WARNING: This function has a very slight bias, as points with integer
+// coordinates (i.e. falling exactly on a pixel center) are not handled
+// specially. Instead, the gradient towards the next (right/lower) pixel is
+// taken.
 Eigen::Matrix<float, 1, 2> ImageData::sampleDiff(Eigen::Vector2f pos) const
 {
-    assert(pos.x() >= 0);
-    assert(pos.y() >= 0);
-    assert(pos.x() <= width-1);
-    assert(pos.y() <= height-1);
+    float fx = floor(pos.x()), fy = floor(pos.y());
+
+    // make sure, all four neighbouring points lie inside the image
+    assert(fx >= 0);
+    assert(fy >= 0);
+    assert(fx <= width-2);
+    assert(fy <= height-2);
 
     // remember: data[row, col] = data[y, x]!
-    float v1 = data(floor(pos.y()), floor(pos.x()));
-    float v2 = data(floor(pos.y()),  ceil(pos.x()));
-    float v3 = data( ceil(pos.y()), floor(pos.x()));
-    float v4 = data( ceil(pos.y()),  ceil(pos.x()));
+    float v1 = data(fy,   fx);
+    float v2 = data(fy,   fx+1);
+    float v3 = data(fy+1, fx);
+    float v4 = data(fy+1, fx+1);
 
     // weight (how close to img[ceil(x), ceil(y)] are we?
-    float sx = pos.x() - floor(pos.x());
-    float sy = pos.y() - floor(pos.y());
+    float sx = pos.x() - fx;
+    float sy = pos.y() - fy;
 
     float dx1 = v2 - v1,  dy1 = v3 - v1;
-    float dx2 = v4 - v2,  dy2 = v4 - v2;
+    float dx2 = v4 - v3,  dy2 = v4 - v2;
 
     Eigen::Matrix<float, 1, 2> J;
 

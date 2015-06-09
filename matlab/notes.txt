@@ -100,3 +100,6 @@ IDEAS
 - fix c++ code on single screen -.-
     -> kernel update -> reinstall ATI drivers
 - debug jacobians !!!
+
+
+- numerical derivation!

@@ -10,6 +10,9 @@
 
 struct Pixel
 {
+    Pixel(float x = 0, float y = 0, float depth = 0, float intensity = 0)
+        : pos(x,y), intensity(intensity), depth(depth) {}
+
     Eigen::Vector2f pos;
     float intensity;
     float depth;
@@ -17,8 +20,11 @@ struct Pixel
 
 struct WorldPoint
 {
-    Pixel pixel;
+    WorldPoint(float x = 0, float y = 0, float z = 0, Pixel p = Pixel())
+        : pos(x,y,z), pixel(p) {}
+
     Eigen::Vector3f pos;
+    Pixel pixel;
 };
 
 /*!
