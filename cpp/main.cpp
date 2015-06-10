@@ -60,10 +60,11 @@ int main()
 
     cout << teststep.ground_truth << endl;
     cout << "total error: " << Warp::calcError(teststep, teststep.ground_truth, errors, jacobian) << endl;
+    cout << "max per pixel error: " << errors.maxCoeff() << endl;
 
 
-    Warp::PlotRange range1(0, -0.2, 0.2, 40);
-    Warp::PlotRange range2(1, -0.2, 0.2, 40);
+    Warp::PlotRange range1(0, -1,1, 40);
+    Warp::PlotRange range2(1, -1,1, 40);
     //Warp::PlotRange range2(4,-.1,.1,40); // beta = yaw
 
     Eigen::MatrixXf errorsurface(range1.steps, range2.steps);
@@ -104,7 +105,7 @@ int main()
         for (unsigned int y = 0; y < errorplot.getHeight(); ++y) {
             for (unsigned int x = 0; x < errorplot.getWidth(); ++x) {
                 unsigned int idx = y*errorplot.getWidth()+x;
-                float factor = 0.1;
+                float factor = -0.004; // point *down*
                 drawArrow(window, x*16+8, y*16+8, errorgradients(idx, range1.dim)*factor, errorgradients(idx, range2.dim)*factor);
             }
         }

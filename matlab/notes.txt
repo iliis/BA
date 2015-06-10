@@ -85,6 +85,7 @@ TODO MATLAB:
 TODO BLENDER:
 - link common stuff from external .blend files (such as node layout and python scripts)
 - fix export script to handle camera's parented to other stuff (such as following a path)
+- create testscene with more geometry and better textures (das Atrium könnte gut sein)
 
 
 IDEAS

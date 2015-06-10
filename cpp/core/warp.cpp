@@ -37,8 +37,8 @@ Eigen::Matrix<float, 2, 3> Warp::projectJacobian(const WorldPoint& point, const 
     float F = intrinsics.getFocalLength();
 
     Eigen::Matrix<float, 2, 3> J;
-    J << 280/z,     0, -(F*x)/(z*z),
-         0,     280/z, -(F*y)/(z*z);
+    J << F/z,   0, -(F*x)/(z*z),
+         0,   F/z, -(F*y)/(z*z);
 
     return J;
 }
@@ -103,8 +103,6 @@ float Warp::calcError(const CameraStep& step, const Transformation& T, Eigen::Ve
             float intensity_keyframe = step.frame_first.samplePixel(pixel_in_keyframe.pos);
 
             float error = (intensity_keyframe - pixel_current.intensity);
-            error = error * error; // squared differences
-
 
             // calculate Jacobian
             Matrix<float, 3, 6> J_T = Warp::transformJacobian(point, T);
@@ -116,7 +114,7 @@ float Warp::calcError(const CameraStep& step, const Transformation& T, Eigen::Ve
             error_out(pixel_count) = error;
 
 
-            total_error += error;
+            total_error += error * error;
             ++pixel_count;
 
 
@@ -134,8 +132,8 @@ float Warp::calcError(const CameraStep& step, const Transformation& T, Eigen::Ve
     if (plotTarget) {
         drawImageAt(img_c, sf::Vector2f(650,0),   *plotTarget);
         drawImageAt(img_k, sf::Vector2f(650,H+2), *plotTarget);
-        step.frame_first .getIntensityData().drawAt( *plotTarget, sf::Vector2f(650+W+2,0));
-        step.frame_second.getIntensityData().drawAt( *plotTarget, sf::Vector2f(650+W+2,H+2));
+        step.frame_second.getIntensityData().drawAt( *plotTarget, sf::Vector2f(650+W+2,0));
+        step.frame_first .getIntensityData().drawAt( *plotTarget, sf::Vector2f(650+W+2,H+2));
     }
 
     //cout << "total error: " << total_error << "  =  " << sqrt(total_error) << endl;

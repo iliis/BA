@@ -59,8 +59,7 @@ if nargout > 1
     
     % evaluate function for all points
     J_transform = reshape(cell2mat(arrayfun(func, points_current(1,:), points_current(2,:), points_current(3,:), 'UniformOutput', false)), 3, 6, N);
-    
-    
+        
     assert(all(size(J_transform) == [3,6,N]));
 end
 
