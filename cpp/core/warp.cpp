@@ -63,8 +63,8 @@ Eigen::Matrix<float, 1, 2> Warp::sampleJacobian(const Pixel& pixel, const Camera
 ///////////////////////////////////////////////////////////////////////////////
 float Warp::calcError(const CameraStep& step, const Transformation& T, Eigen::VectorXf& error_out, Eigen::Matrix<float, Eigen::Dynamic, 6>& J_out, sf::RenderTarget* plotTarget, sf::Font* font)
 {
-    const unsigned int W = step.scene->getIntrinsics().getCameraWidth();
-    const unsigned int H = step.scene->getIntrinsics().getCameraHeight();
+    const unsigned int W = step.intrinsics.getCameraWidth();
+    const unsigned int H = step.intrinsics.getCameraHeight();
 
     //cout << "warping with " << T << endl;
 
@@ -89,12 +89,12 @@ float Warp::calcError(const CameraStep& step, const Transformation& T, Eigen::Ve
         for (unsigned int x = 0; x < W; ++x) {
             Pixel pixel_current  = step.frame_second.getPixel(Vector2i(x,y));
 
-            WorldPoint point = projectInv(pixel_current, step.scene->getIntrinsics());
+            WorldPoint point = projectInv(pixel_current, step.intrinsics);
 
             WorldPoint point_transformed = transform(point, T); // 6.2ms per point, 3.7ms with cached rotation matrix
             //point.pos = R * point.pos + M; // 3.5ms per point
 
-            Pixel pixel_in_keyframe = project(point_transformed, step.scene->getIntrinsics());
+            Pixel pixel_in_keyframe = project(point_transformed, step.intrinsics);
 
             // skip pixels that project outside the keyframe
             if (!step.frame_first.isValidPixel(pixel_in_keyframe.pos))
@@ -106,7 +106,7 @@ float Warp::calcError(const CameraStep& step, const Transformation& T, Eigen::Ve
 
             // calculate Jacobian
             Matrix<float, 3, 6> J_T = Warp::transformJacobian(point, T);
-            Matrix<float, 2, 3> J_P = Warp::projectJacobian(point_transformed, step.scene->getIntrinsics());
+            Matrix<float, 2, 3> J_P = Warp::projectJacobian(point_transformed, step.intrinsics);
             Matrix<float, 1, 2> J_I = Warp::sampleJacobian(pixel_in_keyframe, step.frame_first);
             J_out.row(pixel_count) = J_I * J_P * J_T;
 

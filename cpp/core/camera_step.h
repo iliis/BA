@@ -13,14 +13,21 @@ class Scene;
 class CameraStep
 {
 public:
-    CameraStep(const CameraImage& first, const CameraImage& second, const Transformation& ground_truth, unsigned int index = 0, const Scene* scene = NULL);
+    CameraStep(const CameraImage& first, const CameraImage& second, const Transformation& ground_truth, const Scene* scene, unsigned int index = 0);
 
-    const CameraImage& frame_first;
-    const CameraImage& frame_second;
+    CameraImage frame_first;
+    CameraImage frame_second;
 
-    const Transformation& ground_truth;
+    void downsampleBy(unsigned int s);
+
+    unsigned int scale;
+
+    CameraIntrinsics intrinsics;
+
+
 
     // for convenience
+    const Transformation& ground_truth;
     const unsigned int index;
     const Scene * const scene;
 };

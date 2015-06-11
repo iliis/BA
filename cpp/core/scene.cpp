@@ -27,7 +27,7 @@ CameraStep Scene::getStep(unsigned int index) const
 {
     assert(index < this->getStepCount());
 
-    return CameraStep(frames[index], frames[index+1], ground_truth[index+1], index, this);
+    return CameraStep(frames[index], frames[index+1], ground_truth[index+1], this, index);
 }
 ///////////////////////////////////////////////////////////////////////////////
 const CameraImage& Scene::getFrame(unsigned int index) const

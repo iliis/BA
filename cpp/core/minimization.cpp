@@ -12,7 +12,7 @@ float IterGaussNewton(const CameraStep& step, Transformation& T)
 
     float total_error = Warp::calcError(step, T, errors, J);
 
-    cout << T << " --> err: " << total_error;
+    cout << "[GN] " << T << " --> err: " << total_error;
 
     // step = - (J'*W*J) \ J' * W * err';
 
@@ -36,7 +36,7 @@ float IterGradientDescent(const CameraStep& step, Transformation& T, const Matri
 
     float total_error = Warp::calcError(step, T, errors, J);
 
-    cout << T << " --> err: " << total_error;
+    cout << "[GD] " << T << " --> err: " << total_error;
 
     // step = - step_size .* (J' * (w.^2 .* err)');
 
@@ -51,5 +51,41 @@ float IterGradientDescent(const CameraStep& step, Transformation& T, const Matri
     T = T_new;
 
     return delta.norm();
+}
+///////////////////////////////////////////////////////////////////////////////
+Transformation findTransformation(const CameraStep& step)
+{
+    Transformation T;
+
+    float prev_delta = 0;
+    float delta = 0;
+
+    while (true) {
+        prev_delta = delta;
+        delta = IterGaussNewton(step, T);
+
+        if (delta < 0.0001) // found good enough solution
+            break;
+
+        if (abs(prev_delta - delta) < 0.0001) // convergence rate is decreasing
+            break;
+
+        //cout << abs(prev_delta - delta) << " ";
+    }
+
+    cout << " >>>>> found solution: " << T << endl;
+
+    return T;
+}
+///////////////////////////////////////////////////////////////////////////////
+std::vector<Transformation> findTrajectory(const Scene& scene)
+{
+    std::vector<Transformation> traj(scene.getStepCount());
+
+    for (size_t i = 0; i < scene.getStepCount(); i++) {
+        traj[i] = findTransformation(scene.getStep(i));
+    }
+
+    return traj;
 }
 ///////////////////////////////////////////////////////////////////////////////

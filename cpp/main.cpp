@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <iostream>
+#include <fstream>
 #include <SFML/Graphics.hpp>
 
 #include "core/scene.h"
@@ -13,8 +14,8 @@ using namespace std;
 using namespace Eigen;
 
 sf::Font font;
-//sf::RenderWindow window(sf::VideoMode(1280, 768), "SFML test");
-sf::RenderWindow window(sf::VideoMode(256*2+2, 128*3), "SFML test");
+//sf::RenderWindow window(sf::VideoMode(1280, 768), "dense odometry");
+sf::RenderWindow window(sf::VideoMode(256*2+2, 128*3), "dense odometry");
 
 inline sf::Vector2f toSF(Eigen::Vector2f v)
 {
@@ -166,6 +167,22 @@ void draw_error_surface(const CameraStep& step)
     }
 }
 ///////////////////////////////////////////////////////////////////////////////
+void write_trajectory(const Scene& scene)
+{
+    std::vector<Transformation> traj = findTrajectory(scene);
+
+    string path = scene.getSourceDirectory() + "/measured_trajectory.csv";
+    ofstream outfile(path.c_str());
+
+    outfile << "x, y, z, alpha, beta, gamma" << endl;
+
+    for(size_t i = 0; i < traj.size(); i++) {
+        traj[i].printCSV(outfile) << endl;
+    }
+
+    outfile.close();
+}
+///////////////////////////////////////////////////////////////////////////////
 bool min_paused = true; // start in paused state, global to keep value :P
 void run_minimization(const CameraStep& step, const Transformation& T_init)
 {
@@ -273,8 +290,10 @@ int main()
     //testscene.loadFromSceneDirectory("../matlab/input/courtyard/lux");
     testscene.loadFromSceneDirectory("../matlab/input/courtyard");
 
+    // choose one of these functions:
     //test_warping(testscene);
     //draw_error_surface(testscene.getStep(0));
+    //write_trajectory(testscene);
 
 #if 0
     CameraStep teststep = testscene.getStep(5);
@@ -284,6 +303,10 @@ int main()
     unsigned int i = 0;
     while (window.isOpen()) {
         CameraStep teststep = testscene.getStep(i);
+
+        cout << "downsampling ... " << endl;
+        //teststep.downsampleBy(3);
+        cout << "running minimization" << endl;
 
         run_minimization(teststep, Transformation(0,0,0,0,0,0));
         //run_minimization(teststep, teststep.ground_truth + Transformation(0.4,0,0.2,0.05,0,0));

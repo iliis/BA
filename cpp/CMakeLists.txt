@@ -21,6 +21,7 @@ set(SOURCES
     "core/camera_image.cpp"
     "core/warp.cpp"
     "core/minimization.cpp"
+    "core/weight_functions.cpp"
     "utils/colormap.cpp"
     "utils/progress.cpp"
 )

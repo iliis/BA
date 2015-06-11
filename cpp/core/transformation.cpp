@@ -28,6 +28,17 @@ std::ostream& operator <<(std::ostream &output, const Transformation &T)
     return output;
 }
 ///////////////////////////////////////////////////////////////////////////////
+std::ostream& Transformation::printCSV(std::ostream &output)
+{
+    output << this->x() << ", "
+           << this->y() << ", "
+           << this->z() << ", "
+           << this->alpha() << ", "
+           << this->beta() << ", "
+           << this->gamma();
+    return output;
+}
+///////////////////////////////////////////////////////////////////////////////
 std::vector<Transformation> Transformation::loadFromCSV(const std::string& filename)
 {
     std::vector<Transformation> transformations;

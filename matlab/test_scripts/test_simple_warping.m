@@ -14,8 +14,8 @@ testscene = Scene('input/courtyard/lux');
 k = 4;
     
     step = testscene.getStep(k);
-
-    T = step.ground_truth;
+    T = [-3 3 0 0 0 0];
+    %T = step.ground_truth;
     %T = [ -0.26418     0.52966      1.6856    0.017505    0.059513  -0.0054971 ]';
     
     %image(step.D1);
@@ -35,5 +35,3 @@ k = 4;
     
     %disp(['step ' num2str(k) ' of ' num2str(testscene.step_count)]);
 %end
-
-plot(err)

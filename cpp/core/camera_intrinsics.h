@@ -23,6 +23,8 @@ public:
     inline float getNearClipping()        const { return near_clipping; }
     inline float getFarClipping()         const { return far_clipping; }
 
+    void downsample2();
+
     friend std::ostream& operator <<(std::ostream &output, const CameraIntrinsics &intrinsics);
 
 private:

@@ -16,7 +16,8 @@ public:
     Transformation();
     Transformation(float x, float y, float z, float alpha, float beta, float gamma);
 
-    friend std::ostream& operator <<(std::ostream &output, const Transformation &q);
+    friend std::ostream& operator <<(std::ostream &output, const Transformation &T);
+           std::ostream& printCSV   (std::ostream &output);
 
     static std::vector<Transformation> loadFromCSV(const std::string& filename);
 

@@ -41,14 +41,6 @@ namespace Warp {
     };
 
     void renderErrorSurface(Eigen::MatrixXf& target_out, Eigen::Matrix<float,Eigen::Dynamic,6>& gradients_out, const CameraStep& step, const Transformation& Tcenter, const PlotRange& range1, const PlotRange& range2);
-    /*
-    project_inverse();
-    transform();
-    project();
-    sample();
-
-    error, J = warp();
-    */
 
 }
 

@@ -15,7 +15,7 @@ void CameraImage::loadFromSceneDirectory(const std::string& scene_path, const un
     intensities.loadFromFile(scene_path + "/color" + index_string.str() + ".png");
     depths     .loadFromFile(scene_path + "/depth" + index_string.str() + ".png");
 
-    depths.scale(intrinsics.getNearClipping(), intrinsics.getFarClipping());
+    depths.normalizeTo(intrinsics.getNearClipping(), intrinsics.getFarClipping());
 }
 ///////////////////////////////////////////////////////////////////////////////
 void CameraImage::loadFromMatrices(const Eigen::MatrixXf& mat_intensities, const Eigen::MatrixXf& mat_depths)

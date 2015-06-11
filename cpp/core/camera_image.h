@@ -51,6 +51,8 @@ public:
 
     virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 
+    void downsample2() { intensities.downsample2(); depths.downsample2(); }
+
 private:
     ImageData intensities, depths;
 };

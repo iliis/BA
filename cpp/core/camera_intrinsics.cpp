@@ -81,6 +81,14 @@ void CameraIntrinsics::updatePrincipalPoint()
     this->principal_point_y = this->camera_height / 2.0f- 0.5;
 }
 ///////////////////////////////////////////////////////////////////////////////
+void CameraIntrinsics::downsample2()
+{
+    this->camera_width  /= 2;
+    this->camera_height /= 2;
+    this->focal_length  /= 2;
+    this->updatePrincipalPoint();
+}
+///////////////////////////////////////////////////////////////////////////////
 std::ostream& operator <<(std::ostream &output, const CameraIntrinsics &intrinsics)
 {
     cout << "focal length = " << intrinsics.focal_length << endl;

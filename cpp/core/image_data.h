@@ -43,7 +43,7 @@ public:
     void updateImageFromMatrix(const Colormap::Colormap& colormap = Colormap::Colormap());
 
     // scale values, so that 0 -> near, 1 -> far
-    void scale(float near, float far);
+    void normalizeTo(float near, float far);
 
     inline unsigned int getWidth()  const { return width; }
     inline unsigned int getHeight() const { return height; }
@@ -57,6 +57,10 @@ public:
 
     float sampleValue(Eigen::Vector2f pos) const;
     Eigen::Matrix<float, 1, 2> sampleDiff(Eigen::Vector2f pos) const;
+
+
+    // halve image size
+    void downsample2(const Colormap::Colormap& colormap = Colormap::Colormap());
 
 private:
     unsigned int width, height;

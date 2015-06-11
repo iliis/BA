@@ -29,8 +29,10 @@ public:
     const CameraImage& getFrame(unsigned int index) const;
     inline const CameraIntrinsics& getIntrinsics() const { return intrinsics; }
 
+    inline std::string getSourceDirectory() const { return source_path; }
+
 private:
-    std::string source_path; // path to the scene directory
+    std::string source_path; // path to the scene directory (no trailing slash)
     std::vector<CameraImage> frames;
     std::vector<Transformation> ground_truth;
     CameraIntrinsics intrinsics;

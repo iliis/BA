@@ -115,7 +115,7 @@ void ImageData::matrix_to_image(const Eigen::MatrixXf& source, sf::Image& dest, 
     // cout << "done." << endl;
 }
 ///////////////////////////////////////////////////////////////////////////////
-void ImageData::scale(float near, float far)
+void ImageData::normalizeTo(float near, float far)
 {
     data = data.array()*(far-near) + near;
     // no need to update image
@@ -185,6 +185,27 @@ Eigen::Matrix<float, 1, 2> ImageData::sampleDiff(Eigen::Vector2f pos) const
     J(1) = dy1 * (1-sx)  +  dy2 * sx;
 
     return J;
+}
+///////////////////////////////////////////////////////////////////////////////
+void ImageData::downsample2(const Colormap::Colormap& colormap)
+{
+    cout << data.size() << endl;
+
+    for (int r = 0; r < data.rows()/2; r++) {
+        for (int c = 0; c < data.cols()/2; c++) {
+            data(r,c) = (data(2*r,   2*c)
+                      +  data(2*r+1, 2*c)
+                      +  data(2*r,   2*c+1)
+                      +  data(2*r+1, 2*c+1)) / 4;
+        }
+    }
+
+    width  /= 2;
+    height /= 2;
+
+    data.conservativeResize(height, width);
+
+    this->updateImageFromMatrix(colormap);
 }
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
