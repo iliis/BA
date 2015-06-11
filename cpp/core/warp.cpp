@@ -123,7 +123,7 @@ float Warp::calcError(const CameraStep& step, const Transformation& T, Eigen::Ve
                 error = abs(error);
                 img_c.setPixel(x,y, sf::Color(error*255, (1-error)*255, 0));
                 //img_k.setPixel(pixel_in_keyframe.pos.x(),pixel_in_keyframe.pos.y(), sf::Color(error*255, (1-error)*255, 0));
-                img_k.setPixel(pixel_in_keyframe.pos.x(),pixel_in_keyframe.pos.y(), sf::Color(255*pixel_in_keyframe.intensity, 255*pixel_in_keyframe.intensity, 255*pixel_in_keyframe.intensity));
+                img_k.setPixel(pixel_in_keyframe.pos.x()+0.5,pixel_in_keyframe.pos.y()+0.5, sf::Color(255*pixel_in_keyframe.intensity, 255*pixel_in_keyframe.intensity, 255*pixel_in_keyframe.intensity));
             }
         }
     }
@@ -152,6 +152,13 @@ float Warp::calcError(const CameraStep& step, const Transformation& T, Eigen::Ve
                 + "\nabs max: " + boost::lexical_cast<string>(error_out.array().abs().maxCoeff());
         t.setString(s); t.setPosition(2,H+H+4); plotTarget->draw(t);
         t.setString("step "+boost::lexical_cast<string>(step.index));      t.setPosition(W+4,H+H+4); plotTarget->draw(t);
+
+        ostringstream str_T_current; str_T_current << T;
+        t.setString("current: "+str_T_current.str());      t.setPosition(2,H+H+8+2*t.getCharacterSize()); plotTarget->draw(t);
+        ostringstream str_T_gt; str_T_gt << step.ground_truth;
+        t.setString("truth:   "+str_T_gt.str());      t.setPosition(2,H+H+8+3*t.getCharacterSize()); plotTarget->draw(t);
+        string r = boost::lexical_cast<string>((T.value-step.ground_truth.value).norm());
+        t.setString("error: "+r);      t.setPosition(2,H+H+10+4*t.getCharacterSize()); plotTarget->draw(t);
     }
 
     //cout << "total error: " << total_error << "  =  " << sqrt(total_error) << endl;

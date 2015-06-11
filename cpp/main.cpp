@@ -14,7 +14,7 @@ using namespace Eigen;
 
 sf::Font font;
 //sf::RenderWindow window(sf::VideoMode(1280, 768), "SFML test");
-sf::RenderWindow window(sf::VideoMode(256*2+2, 128*2+20), "SFML test");
+sf::RenderWindow window(sf::VideoMode(256*2+2, 128*3), "SFML test");
 
 inline sf::Vector2f toSF(Eigen::Vector2f v)
 {
@@ -166,6 +166,7 @@ void draw_error_surface(const CameraStep& step)
     }
 }
 ///////////////////////////////////////////////////////////////////////////////
+bool min_paused = true; // start in paused state, global to keep value :P
 void run_minimization(const CameraStep& step, const Transformation& T_init)
 {
     Transformation T = T_init;
@@ -180,6 +181,7 @@ void run_minimization(const CameraStep& step, const Transformation& T_init)
     Eigen::Matrix<float, Eigen::Dynamic, 6> J_tmp;
 
     int iter = 0;
+    bool show_keyframe = false;
     while (window.isOpen())
     {
         sf::Event event;
@@ -189,21 +191,58 @@ void run_minimization(const CameraStep& step, const Transformation& T_init)
                 window.close();
 
             if (event.type == sf::Event::KeyPressed) {
-                if (event.key.code == sf::Keyboard::Space)
-                    return;
+
+                switch (event.key.code) {
+                    // go to next frame
+                    case sf::Keyboard::N:
+                        return;
+
+                    // distrub
+                    case sf::Keyboard::D:
+                        T.value = T.value.array() + T.value.Random().array() * Transformation(0.2,0.2,0.2,0.002,0.002,0.002).value.array();
+                        T.updateRotationMatrix();
+                        break;
+
+                    // reset
+                    case sf::Keyboard::R:
+                        T = T_init;
+                        break;
+
+                    // [un]pause minimization
+                    case sf::Keyboard::Space:
+                    case sf::Keyboard::P:
+                        min_paused = !min_paused;
+                        break;
+
+                    // overlay keyframe over warped current frame
+                    case sf::Keyboard::K:
+                        show_keyframe = !show_keyframe;
+                        break;
+
+                    // go to previous frame
+
+
+                    default:
+                        break;
+                }
             }
         }
 
         window.clear();
 
+        if (!min_paused) {
 #if 1
-        IterGaussNewton(step, T);
+            IterGaussNewton(step, T);
 #else
-        IterGradientDescent(step, T, step_size);
+            IterGradientDescent(step, T, step_size);
 #endif
-        iter++;
+            iter++;
+        }
 
         Warp::calcError(step, T, error_tmp, J_tmp, &window, &font);
+
+        if (show_keyframe)
+            step.frame_first.getIntensityData().drawAt(window, sf::Vector2f(0,step.frame_second.getHeight()+2));
 
         window.display();
 
@@ -231,13 +270,13 @@ int main()
     //testscene.loadFromSceneDirectory("../matlab/input/test_wide");
     //testscene.loadFromSceneDirectory("../matlab/input/trajectory1");
     //testscene.loadFromSceneDirectory("../matlab/input/testscene1");
-    testscene.loadFromSceneDirectory("../matlab/input/courtyard/lux");
-    //testscene.loadFromSceneDirectory("../matlab/input/courtyard");
+    //testscene.loadFromSceneDirectory("../matlab/input/courtyard/lux");
+    testscene.loadFromSceneDirectory("../matlab/input/courtyard");
 
     //test_warping(testscene);
     //draw_error_surface(testscene.getStep(0));
 
-#if 1
+#if 0
     CameraStep teststep = testscene.getStep(5);
     run_minimization(teststep, Transformation(0.1,-0.1,0,0.1,0.1,0));
 #else
@@ -256,6 +295,6 @@ int main()
     }
 #endif
 
-    return 0;
+    return EXIT_SUCCESS;
 }
 ///////////////////////////////////////////////////////////////////////////////
