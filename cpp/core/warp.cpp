@@ -61,7 +61,7 @@ Eigen::Matrix<float, 1, 2> Warp::sampleJacobian(const Pixel& pixel, const Camera
     return image.getIntensityData().sampleDiff(pixel.pos);
 }
 ///////////////////////////////////////////////////////////////////////////////
-float Warp::calcError(const CameraStep& step, const Transformation& T, Eigen::VectorXf& error_out, Eigen::Matrix<float, Eigen::Dynamic, 6>& J_out, sf::RenderTarget* plotTarget)
+float Warp::calcError(const CameraStep& step, const Transformation& T, Eigen::VectorXf& error_out, Eigen::Matrix<float, Eigen::Dynamic, 6>& J_out, sf::RenderTarget* plotTarget, sf::Font* font)
 {
     const unsigned int W = step.scene->getIntrinsics().getCameraWidth();
     const unsigned int H = step.scene->getIntrinsics().getCameraHeight();
@@ -119,6 +119,8 @@ float Warp::calcError(const CameraStep& step, const Transformation& T, Eigen::Ve
 
 
             if (plotTarget) {
+                //error = error * error;
+                error = abs(error);
                 img_c.setPixel(x,y, sf::Color(error*255, (1-error)*255, 0));
                 //img_k.setPixel(pixel_in_keyframe.pos.x(),pixel_in_keyframe.pos.y(), sf::Color(error*255, (1-error)*255, 0));
                 img_k.setPixel(pixel_in_keyframe.pos.x(),pixel_in_keyframe.pos.y(), sf::Color(255*pixel_in_keyframe.intensity, 255*pixel_in_keyframe.intensity, 255*pixel_in_keyframe.intensity));
@@ -130,10 +132,26 @@ float Warp::calcError(const CameraStep& step, const Transformation& T, Eigen::Ve
     J_out.conservativeResize(pixel_count, Eigen::NoChange);
 
     if (plotTarget) {
-        drawImageAt(img_c, sf::Vector2f(650,0),   *plotTarget);
-        drawImageAt(img_k, sf::Vector2f(650,H+2), *plotTarget);
-        step.frame_second.getIntensityData().drawAt( *plotTarget, sf::Vector2f(650+W+2,0));
-        step.frame_first .getIntensityData().drawAt( *plotTarget, sf::Vector2f(650+W+2,H+2));
+        drawImageAt(img_c, sf::Vector2f(0,0),   *plotTarget);
+        drawImageAt(img_k, sf::Vector2f(0,H+2), *plotTarget);
+        step.frame_second.getIntensityData().drawAt( *plotTarget, sf::Vector2f(W+2,0));
+        step.frame_first .getIntensityData().drawAt( *plotTarget, sf::Vector2f(W+2,H+2));
+
+        assert(font);
+
+        sf::Text t;
+        t.setFont(*font);
+        t.setCharacterSize(12);
+        t.setString("current frame"); t.setPosition(W+4,H-t.getCharacterSize()-2);     plotTarget->draw(t);
+        t.setString("keyframe");      t.setPosition(W+4,H-t.getCharacterSize()-2+H+2); plotTarget->draw(t);
+        t.setString("errors in current");  t.setPosition(2,H-t.getCharacterSize()-2);     plotTarget->draw(t);
+        t.setString("warped current frame"); t.setPosition(2,H-t.getCharacterSize()-2+H+2); plotTarget->draw(t);
+
+        string s = "total error: " + boost::lexical_cast<string>(sqrt(total_error))
+                //+ "\nabs min: " + boost::lexical_cast<string>(error_out.array().abs().minCoeff())
+                + "\nabs max: " + boost::lexical_cast<string>(error_out.array().abs().maxCoeff());
+        t.setString(s); t.setPosition(2,H+H+4); plotTarget->draw(t);
+        t.setString("step "+boost::lexical_cast<string>(step.index));      t.setPosition(W+4,H+H+4); plotTarget->draw(t);
     }
 
     //cout << "total error: " << total_error << "  =  " << sqrt(total_error) << endl;

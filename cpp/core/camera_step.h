@@ -13,7 +13,7 @@ class Scene;
 class CameraStep
 {
 public:
-    CameraStep(const CameraImage& first, const CameraImage& second, const Transformation& ground_truth, unsigned int index = 0, Scene* scene = NULL);
+    CameraStep(const CameraImage& first, const CameraImage& second, const Transformation& ground_truth, unsigned int index = 0, const Scene* scene = NULL);
 
     const CameraImage& frame_first;
     const CameraImage& frame_second;

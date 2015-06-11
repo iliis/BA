@@ -3,14 +3,15 @@
 
 %testscene = Scene('input/testscene1');
 %testscene = Scene('input/testscene2');
-testscene = Scene('input/trajectory1');
+%testscene = Scene('input/trajectory1');
+testscene = Scene('input/courtyard/lux');
 %testscene = Scene('input/testscene_rotonly');
 
 %testscene = testscene.scale_down(3);
 
 %for k = 1:testscene.step_count
 
-k = 25;
+k = 4;
     
     step = testscene.getStep(k);
 
@@ -34,3 +35,5 @@ k = 25;
     
     %disp(['step ' num2str(k) ' of ' num2str(testscene.step_count)]);
 %end
+
+plot(err)

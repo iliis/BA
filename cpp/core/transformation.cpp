@@ -7,6 +7,7 @@ using namespace boost;
 Transformation::Transformation()
 {
     this->value << 0,0,0,0,0,0;
+    updateRotationMatrix();
 }
 ///////////////////////////////////////////////////////////////////////////////
 Transformation::Transformation(float x, float y, float z, float alpha, float beta, float gamma)
@@ -17,8 +18,13 @@ Transformation::Transformation(float x, float y, float z, float alpha, float bet
 ///////////////////////////////////////////////////////////////////////////////
 std::ostream& operator <<(std::ostream &output, const Transformation &T)
 {
-    output << "T[ " << T.x() << " " << T.y() << " " << T.z() << " / ";
-    output << T.alpha() << " " << T.beta() << " " << T.gamma() << " ]";
+    output << "T[ " << setiosflags(ios::fixed) << setprecision(6)
+        << setw(12) << T.x() << " "
+        << setw(12) << T.y() << " "
+        << setw(12) << T.z() << " / "
+        << setw(12) << T.alpha() << " "
+        << setw(12) << T.beta() << " "
+        << setw(12) << T.gamma() << " ]";
     return output;
 }
 ///////////////////////////////////////////////////////////////////////////////
@@ -80,6 +86,14 @@ void Transformation::updateRotationMatrix()
 Eigen::Vector3f Transformation::operator()(const Eigen::Vector3f& vect) const
 {
     return this->getRotationMatrix() * vect + this->getTranslation();
+}
+///////////////////////////////////////////////////////////////////////////////
+Transformation Transformation::operator+(const Transformation& other) const
+{
+    Transformation T = *this;
+    T.value += other.value;
+    T.updateRotationMatrix();
+    return T;
 }
 ///////////////////////////////////////////////////////////////////////////////
 Eigen::Matrix<float, 3, 6> Transformation::getJacobian(const Eigen::Vector3f& point) const

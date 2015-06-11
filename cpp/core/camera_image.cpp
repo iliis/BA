@@ -51,10 +51,8 @@ bool CameraImage::isValidPixel(Eigen::Vector2f pos) const
     // center of top-left pixel is at [0,0]
     // center of bottom-right pixel is at [W-1, H-1]
     // therefore, both these coordinates are valid
-    return pos.x() >= 0
-        && pos.x() <= getWidth() - 1
-        && pos.y() >= 0
-        && pos.y() <= getHeight() - 1;
+    return pos.x() >= 0 && floor(pos.x()) <= getWidth()  - 2
+        && pos.y() >= 0 && floor(pos.y()) <= getHeight() - 2;
 }
 ///////////////////////////////////////////////////////////////////////////////
 void CameraImage::draw(sf::RenderTarget& target, sf::RenderStates states) const

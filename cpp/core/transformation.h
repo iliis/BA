@@ -2,6 +2,7 @@
 #define TRANSFORMATION_H_INCLUDED
 
 #include <iostream>
+#include <iomanip>
 #include <vector>
 #include <string>
 #include <Eigen/Dense>
@@ -37,6 +38,8 @@ public:
     Eigen::Matrix<float, 3, 6> getJacobian(const Eigen::Vector3f& point) const;
 
     Eigen::Vector3f operator()(const Eigen::Vector3f& vect) const;
+
+    Transformation operator+(const Transformation& other) const;
 
     void updateRotationMatrix();
 

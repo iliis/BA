@@ -155,6 +155,11 @@ Eigen::Matrix<float, 1, 2> ImageData::sampleDiff(Eigen::Vector2f pos) const
 {
     float fx = floor(pos.x()), fy = floor(pos.y());
 
+    if (fx > width-2) {
+        cout << "fail: " << pos.transpose() << " --> " << fx << " " << fy << endl;
+        cout << "W: " << width << " H: " << height << endl;
+    }
+
     // make sure, all four neighbouring points lie inside the image
     assert(fx >= 0);
     assert(fy >= 0);

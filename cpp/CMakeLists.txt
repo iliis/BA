@@ -20,6 +20,7 @@ set(SOURCES
     "core/camera_step.cpp"
     "core/camera_image.cpp"
     "core/warp.cpp"
+    "core/minimization.cpp"
     "utils/colormap.cpp"
     "utils/progress.cpp"
 )

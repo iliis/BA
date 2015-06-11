@@ -23,7 +23,7 @@ void Scene::loadFromSceneDirectory(const std::string& scene_path)
     cout << "loaded scene with " << this->getFrameCount() << " frames." << endl;
 }
 ///////////////////////////////////////////////////////////////////////////////
-CameraStep Scene::getStep(unsigned int index)
+CameraStep Scene::getStep(unsigned int index) const
 {
     assert(index < this->getStepCount());
 
