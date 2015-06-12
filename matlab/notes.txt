@@ -79,6 +79,7 @@ TODO MATLAB:
 - fix Blender script
 - render more cost surfaces
     -> also with weighted errors
+
 - render longer trajectory
     - with more surrounding geometry
 
@@ -109,6 +110,7 @@ IDEAS
 - bigger images
 - add 'play with min' modus:
     - choose algo?
+    - key for downsampling
     - press 'm' or something to enter menu on command line
         - choose scene step
         - scale down scene
@@ -120,3 +122,12 @@ IDEAS
 - auto pyramid scheme
     -> measure convergence speed
 - profile everything
+
+
+1. pyramidenstufen
+2. mask only interesting pixels
+    - strong gradients
+        comport: direct iterative closest point
+        enge (?), TUM: semidense visual odometry
+3. fehler gewichtung
+4. use real(tm) data

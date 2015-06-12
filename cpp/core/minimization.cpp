@@ -53,14 +53,16 @@ float IterGradientDescent(const CameraStep& step, Transformation& T, const Matri
     return delta.norm();
 }
 ///////////////////////////////////////////////////////////////////////////////
-Transformation findTransformation(const CameraStep& step)
+Transformation findTransformation(const CameraStep& step, Transformation T_init)
 {
-    Transformation T;
+    Transformation T = T_init;
 
     float prev_delta = 0;
     float delta = 0;
 
-    while (true) {
+    int max_iterations = 100;
+
+    while (max_iterations-- > 0) {
         prev_delta = delta;
         delta = IterGaussNewton(step, T);
 
@@ -74,6 +76,28 @@ Transformation findTransformation(const CameraStep& step)
     }
 
     cout << " >>>>> found solution: " << T << endl;
+
+    return T;
+}
+///////////////////////////////////////////////////////////////////////////////
+Transformation findTransformationWithPyramid(const CameraStep& step, const unsigned int pyramid_scale)
+{
+    // downsample images
+    CameraStep s = step;
+    std::vector<CameraStep> pyramid;
+    pyramid.push_back(s);
+
+    for (unsigned int i = 1; i <= pyramid_scale; i++) {
+        s.downsampleBy(1);
+        pyramid.push_back(s);
+    }
+
+
+    // actually process them
+    Transformation T;
+    for (std::vector<CameraStep>::const_reverse_iterator it = pyramid.rbegin(); it != pyramid.rend(); ++it) {
+        T = findTransformation(*it, T);
+    }
 
     return T;
 }

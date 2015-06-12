@@ -13,7 +13,8 @@
 float IterGaussNewton    (const CameraStep& step, Transformation& T);
 float IterGradientDescent(const CameraStep& step, Transformation& T, const Eigen::Matrix<float,6,1>& stepSize);
 
-Transformation findTransformation(const CameraStep& step);
+Transformation findTransformation(const CameraStep& step, Transformation T_init = Transformation());
+Transformation findTransformationWithPyramid(const CameraStep& step, const unsigned int pyramid_scale);
 
 std::vector<Transformation> findTrajectory(const Scene& scene);
 

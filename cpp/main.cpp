@@ -119,8 +119,8 @@ void test_warping(const Scene& scene)
 ///////////////////////////////////////////////////////////////////////////////
 void draw_error_surface(const CameraStep& step)
 {
-    Warp::PlotRange range1(0, -1,1, 3);
-    Warp::PlotRange range2(1, -1,1, 3);
+    Warp::PlotRange range1(0, -1,1, 40);
+    Warp::PlotRange range2(1, -1,1, 40);
     //Warp::PlotRange range2(4,-.5,.5,40); // beta = yaw
 
 
@@ -230,7 +230,7 @@ void run_minimization(const Scene& scene)
                     // go to next frame
                     case sf::Keyboard::N:
                         index++;
-                        if (index > scene.getStepCount())
+                        if (index >= scene.getStepCount())
                             index = 0;
                         step = scene.getStep(index);
                         T = Transformation(0,0,0,0,0,0);
@@ -263,6 +263,20 @@ void run_minimization(const Scene& scene)
                         show_keyframe = !show_keyframe;
                         break;
 
+                    // half image size
+                    case sf::Keyboard::S:
+                        step.downsampleBy(1);
+                        break;
+
+                    // reset image to original size
+                    case sf::Keyboard::A:
+                        step = scene.getStep(index);
+                        break;
+
+                    case sf::Keyboard::F5:
+                        T = findTransformationWithPyramid(step, 4);
+                        break;
+
                     case sf::Keyboard::M:
                         {
                             int opt = 0;
@@ -272,6 +286,8 @@ void run_minimization(const Scene& scene)
                             cout << "3: downsample images by 2x" << endl;
                             cout << "4: enter new T (degrees)" << endl;
                             cout << "5: disturb T (degrees)" << endl;
+                            cout << "6: reload step" << endl;
+                            cout << "7: choose step number" << endl;
                             cout << "0: exit" << endl;
                             cin >> opt;
 
@@ -328,6 +344,19 @@ void run_minimization(const Scene& scene)
                                     }
                                     break;
 
+                                case 6:
+                                    step = scene.getStep(index);
+                                    cout << "OK" << endl;
+                                    break;
+
+                                case 7:
+                                    do {
+                                        cout << "enter scene number [0-" << (scene.getStepCount()-1) << "]: ";
+                                        cin >> index;
+                                    } while(index >= scene.getStepCount());
+                                    step = scene.getStep(index);
+                                    break;
+
                                 default:
                                     cout << "unknown command" << endl;
                                     break;
@@ -346,12 +375,24 @@ void run_minimization(const Scene& scene)
         window.clear();
 
         if (!min_paused) {
+            bool finished;
 #if 1
-            IterGaussNewton(step, T);
+            finished = IterGaussNewton(step, T) < 0.0001;
 #else
-            IterGradientDescent(step, T, step_size);
+            finished = IterGradientDescent(step, T, step_size) < 0.0001;
 #endif
             iter++;
+
+            if (finished) {
+                if (step.scale > 0) {
+                    // upscale image again
+                    unsigned s = step.scale-1;
+                    step = scene.getStep(index);
+                    step.downsampleBy(s);
+                } else {
+                    min_paused = true;
+                }
+            }
         }
 
         Warp::calcError(step, T, error_tmp, J_tmp, &window, &font);
@@ -390,7 +431,7 @@ int main()
 
     // choose one of these functions:
     //test_warping(testscene);
-    //draw_error_surface(testscene.getStep(0));
+    //draw_error_surface(testscene.getStep(22));
     //write_trajectory(testscene);
     run_minimization(testscene);
 
