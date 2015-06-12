@@ -27,9 +27,9 @@ public:
 
 
     // for convenience
-    const Transformation& ground_truth;
-    const unsigned int index;
-    const Scene * const scene;
+    Transformation ground_truth;
+    unsigned int index;
+    const Scene * scene;
 };
 
 #endif /* end of include guard: CAMERA_STEP_H_INCLUDED */

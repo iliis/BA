@@ -158,7 +158,7 @@ float Warp::calcError(const CameraStep& step, const Transformation& T, Eigen::Ve
         ostringstream str_T_gt; str_T_gt << step.ground_truth;
         t.setString("truth:   "+str_T_gt.str());      t.setPosition(2,H+H+8+3*t.getCharacterSize()); plotTarget->draw(t);
         string r = boost::lexical_cast<string>((T.value-step.ground_truth.value).norm());
-        t.setString("error: "+r);      t.setPosition(2,H+H+10+4*t.getCharacterSize()); plotTarget->draw(t);
+        t.setString("T error: "+r);      t.setPosition(2,H+H+10+4*t.getCharacterSize()); plotTarget->draw(t);
     }
 
     //cout << "total error: " << total_error << "  =  " << sqrt(total_error) << endl;

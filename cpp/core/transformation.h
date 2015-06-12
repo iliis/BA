@@ -7,8 +7,12 @@
 #include <string>
 #include <Eigen/Dense>
 #include <Eigen/Geometry>
+#include <SFML/System.hpp>
 
 #include "../utils/csv.h"
+
+float rad2deg(float rad);
+float deg2rad(float deg);
 
 class Transformation
 {

@@ -15,6 +15,7 @@ using namespace Eigen;
 
 sf::Font font;
 //sf::RenderWindow window(sf::VideoMode(1280, 768), "dense odometry");
+//sf::RenderWindow window(sf::VideoMode(256*4+2, 128*5), "dense odometry");
 sf::RenderWindow window(sf::VideoMode(256*2+2, 128*3), "dense odometry");
 
 inline sf::Vector2f toSF(Eigen::Vector2f v)
@@ -184,11 +185,18 @@ void write_trajectory(const Scene& scene)
 }
 ///////////////////////////////////////////////////////////////////////////////
 bool min_paused = true; // start in paused state, global to keep value :P
-void run_minimization(const CameraStep& step, const Transformation& T_init)
+void run_minimization(const Scene& scene)
 {
-    Transformation T = T_init;
+    unsigned int index = 0;
+    CameraStep step = scene.getStep(index);
 
-    cout << step.ground_truth << " <<-- ground truth (The Solution)" << endl;
+//    while (window.isOpen()) {
+
+ //       index++;
+  //      if (index >= testscene.getStepCount())
+   //         index = 0;
+
+    Transformation T(0,0,0,0,0,0);
 
     Eigen::Matrix<float,6,1> step_size;
     step_size << 1, 1, 1, 0.05, 0.05, 0.05;
@@ -210,9 +218,23 @@ void run_minimization(const CameraStep& step, const Transformation& T_init)
             if (event.type == sf::Event::KeyPressed) {
 
                 switch (event.key.code) {
+                    // go to prev frame
+                    case sf::Keyboard::B:
+                        if (index == 0)
+                            index = scene.getStepCount();
+                        index--;
+                        step = scene.getStep(index);
+                        T = Transformation(0,0,0,0,0,0);
+                        break;
+
                     // go to next frame
                     case sf::Keyboard::N:
-                        return;
+                        index++;
+                        if (index > scene.getStepCount())
+                            index = 0;
+                        step = scene.getStep(index);
+                        T = Transformation(0,0,0,0,0,0);
+                        break;
 
                     // distrub
                     case sf::Keyboard::D:
@@ -222,7 +244,12 @@ void run_minimization(const CameraStep& step, const Transformation& T_init)
 
                     // reset
                     case sf::Keyboard::R:
-                        T = T_init;
+                        T = Transformation(0,0,0,0,0,0);
+                        break;
+
+                    // set to ground truth
+                    case sf::Keyboard::E:
+                        T = step.ground_truth;
                         break;
 
                     // [un]pause minimization
@@ -236,7 +263,78 @@ void run_minimization(const CameraStep& step, const Transformation& T_init)
                         show_keyframe = !show_keyframe;
                         break;
 
-                    // go to previous frame
+                    case sf::Keyboard::M:
+                        {
+                            int opt = 0;
+                            cout << "choose an option:" << endl;
+                            cout << "1: show T (radians)" << endl;
+                            cout << "2: show T (degrees)" << endl;
+                            cout << "3: downsample images by 2x" << endl;
+                            cout << "4: enter new T (degrees)" << endl;
+                            cout << "5: disturb T (degrees)" << endl;
+                            cout << "0: exit" << endl;
+                            cin >> opt;
+
+                            switch (opt) {
+                                case 0:
+                                    break;
+
+                                case 1:
+                                    T.printCSV(cout) << endl;
+                                    break;
+
+                                case 2:
+                                    cout << T << endl;
+                                    break;
+
+                                case 3:
+                                    step.downsampleBy(1);
+                                    cout << "OK" << endl;
+                                    break;
+
+                                case 4:
+                                    cout << "x [m]: "; cin >> T.value(0);
+                                    cout << "y [m]: "; cin >> T.value(1);
+                                    cout << "z [m]: "; cin >> T.value(2);
+                                    cout << "alpha / pitch [degrees]: "; cin >> T.value(3);
+                                    cout << "beta / yaw    [degrees]: "; cin >> T.value(4);
+                                    cout << "gamma / roll  [degrees]: "; cin >> T.value(5);
+                                    // convert to radians
+                                    T.value(3) = deg2rad(T.value(3));
+                                    T.value(4) = deg2rad(T.value(4));
+                                    T.value(5) = deg2rad(T.value(5));
+                                    T.updateRotationMatrix();
+                                    cout << "new T: " << T << endl;
+                                    break;
+
+                                case 5:
+                                    {
+                                        Transformation tmp;
+                                        cout << "x [m]: "; cin >> tmp.value(0);
+                                        cout << "y [m]: "; cin >> tmp.value(1);
+                                        cout << "z [m]: "; cin >> tmp.value(2);
+                                        cout << "alpha / pitch [degrees]: "; cin >> tmp.value(3);
+                                        cout << "beta / yaw    [degrees]: "; cin >> tmp.value(4);
+                                        cout << "gamma / roll  [degrees]: "; cin >> tmp.value(5);
+                                        // convert to radians
+                                        tmp.value(3) = deg2rad(tmp.value(3));
+                                        tmp.value(4) = deg2rad(tmp.value(4));
+                                        tmp.value(5) = deg2rad(tmp.value(5));
+                                        tmp.updateRotationMatrix();
+                                        T = T + tmp;
+                                        T.updateRotationMatrix();
+                                        cout << "delta: " << tmp << endl;
+                                        cout << "new T: " << T << endl;
+                                    }
+                                    break;
+
+                                default:
+                                    cout << "unknown command" << endl;
+                                    break;
+                            }
+                        }
+                        break;
+
 
 
                     default:
@@ -288,35 +386,14 @@ int main()
     //testscene.loadFromSceneDirectory("../matlab/input/trajectory1");
     //testscene.loadFromSceneDirectory("../matlab/input/testscene1");
     //testscene.loadFromSceneDirectory("../matlab/input/courtyard/lux");
-    testscene.loadFromSceneDirectory("../matlab/input/courtyard"); // step 22 is nice!
+    testscene.loadFromSceneDirectory("../matlab/input/courtyard/normal"); // step 22 is nice!
 
     // choose one of these functions:
     //test_warping(testscene);
     //draw_error_surface(testscene.getStep(0));
     //write_trajectory(testscene);
+    run_minimization(testscene);
 
-#if 0
-    CameraStep teststep = testscene.getStep(5);
-    run_minimization(teststep, Transformation(0.1,-0.1,0,0.1,0.1,0));
-#else
-
-    unsigned int i = 0;
-    while (window.isOpen()) {
-        CameraStep teststep = testscene.getStep(i);
-
-        cout << "downsampling ... " << endl;
-        //teststep.downsampleBy(3);
-        cout << "running minimization" << endl;
-
-        run_minimization(teststep, Transformation(0,0,0,0,0,0));
-        //run_minimization(teststep, teststep.ground_truth + Transformation(0.4,0,0.2,0.05,0,0));
-        //run_minimization(teststep, teststep.ground_truth + Transformation(0.4,0,0.2,0.02,-0.02,0));
-
-        i++;
-        if (i >= testscene.getStepCount())
-            i = 0;
-    }
-#endif
 
     return EXIT_SUCCESS;
 }

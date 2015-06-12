@@ -189,8 +189,6 @@ Eigen::Matrix<float, 1, 2> ImageData::sampleDiff(Eigen::Vector2f pos) const
 ///////////////////////////////////////////////////////////////////////////////
 void ImageData::downsample2(const Colormap::Colormap& colormap)
 {
-    cout << data.size() << endl;
-
     for (int r = 0; r < data.rows()/2; r++) {
         for (int c = 0; c < data.cols()/2; c++) {
             data(r,c) = (data(2*r,   2*c)
