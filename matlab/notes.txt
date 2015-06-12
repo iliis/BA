@@ -104,3 +104,19 @@ IDEAS
 
 
 - numerical derivation!
+
+
+- bigger images
+- add 'play with min' modus:
+    - choose algo?
+    - press 'm' or something to enter menu on command line
+        - choose scene step
+        - scale down scene
+        - choose T
+        - choose delta T
+        - reset T
+        - T = ground_truth
+        - render cost surface (including ground truth)
+- auto pyramid scheme
+    -> measure convergence speed
+- profile everything

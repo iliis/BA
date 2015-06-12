@@ -288,7 +288,7 @@ int main()
     //testscene.loadFromSceneDirectory("../matlab/input/trajectory1");
     //testscene.loadFromSceneDirectory("../matlab/input/testscene1");
     //testscene.loadFromSceneDirectory("../matlab/input/courtyard/lux");
-    testscene.loadFromSceneDirectory("../matlab/input/courtyard");
+    testscene.loadFromSceneDirectory("../matlab/input/courtyard"); // step 22 is nice!
 
     // choose one of these functions:
     //test_warping(testscene);
