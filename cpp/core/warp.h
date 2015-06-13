@@ -9,6 +9,7 @@
 #include "camera_step.h"
 #include "scene.h"
 #include "../utils/progress.h"
+#include "weight_functions.h"
 
 namespace Warp {
 
@@ -25,7 +26,7 @@ namespace Warp {
     Eigen::Matrix<float, 1, 2> sampleJacobian   (const Pixel& pixel, const CameraImage& image);
 
     //float drawError(sf::RenderTarget& target, const CameraStep& step, const Transformation& T);
-    float calcError(const CameraStep& step, const Transformation& T, Eigen::VectorXf& error_out, Eigen::Matrix<float, Eigen::Dynamic, 6>& J_out, sf::RenderTarget* plotTarget = NULL, sf::Font* font = NULL);
+    float calcError(const CameraStep& step, const Transformation& T, Eigen::VectorXf& error_out, Eigen::Matrix<float, Eigen::Dynamic, 6>& J_out, sf::RenderTarget* plotTarget = NULL, sf::Font* font = NULL, ErrorWeightFunction* weight_function = NULL);
 
     struct PlotRange {
 

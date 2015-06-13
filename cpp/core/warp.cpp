@@ -61,7 +61,7 @@ Eigen::Matrix<float, 1, 2> Warp::sampleJacobian(const Pixel& pixel, const Camera
     return image.getIntensityData().sampleDiff(pixel.pos);
 }
 ///////////////////////////////////////////////////////////////////////////////
-float Warp::calcError(const CameraStep& step, const Transformation& T, Eigen::VectorXf& error_out, Eigen::Matrix<float, Eigen::Dynamic, 6>& J_out, sf::RenderTarget* plotTarget, sf::Font* font)
+float Warp::calcError(const CameraStep& step, const Transformation& T, Eigen::VectorXf& error_out, Eigen::Matrix<float, Eigen::Dynamic, 6>& J_out, sf::RenderTarget* plotTarget, sf::Font* font, ErrorWeightFunction* weight_function)
 {
     const unsigned int W = step.intrinsics.getCameraWidth();
     const unsigned int H = step.intrinsics.getCameraHeight();
@@ -71,9 +71,15 @@ float Warp::calcError(const CameraStep& step, const Transformation& T, Eigen::Ve
     float total_error = 0;
 
     sf::Image img_c, img_k;
+    Eigen::MatrixXf img_errs_weighted;
     if (plotTarget) {
         img_c.create(W,H, sf::Color(0,0,255));
         img_k.create(W,H, sf::Color(0,0,255));
+
+        if (weight_function) {
+            img_errs_weighted.resize(H,W);
+            img_errs_weighted.setZero();
+        }
     }
 
     //Matrix3f R = T.getRotationMatrix();
@@ -124,6 +130,10 @@ float Warp::calcError(const CameraStep& step, const Transformation& T, Eigen::Ve
                 img_c.setPixel(x,y, sf::Color(error*255, (1-error)*255, 0));
                 //img_k.setPixel(pixel_in_keyframe.pos.x(),pixel_in_keyframe.pos.y(), sf::Color(error*255, (1-error)*255, 0));
                 img_k.setPixel(pixel_in_keyframe.pos.x()+0.5,pixel_in_keyframe.pos.y()+0.5, sf::Color(255*pixel_in_keyframe.intensity, 255*pixel_in_keyframe.intensity, 255*pixel_in_keyframe.intensity));
+
+                if (weight_function) {
+                    img_errs_weighted(y,x) = (*weight_function)(error) * error;
+                }
             }
         }
     }
@@ -136,6 +146,12 @@ float Warp::calcError(const CameraStep& step, const Transformation& T, Eigen::Ve
         drawImageAt(img_k, sf::Vector2f(0,H+2), *plotTarget);
         step.frame_second.getIntensityData().drawAt( *plotTarget, sf::Vector2f(W+2,0));
         step.frame_first .getIntensityData().drawAt( *plotTarget, sf::Vector2f(W+2,H+2));
+
+        if (weight_function) {
+            ImageData i;
+            i.loadFromMatrix(img_errs_weighted, Colormap::RedToGreen());
+            i.drawAt(*plotTarget, sf::Vector2f(2*W+4, 0));
+        }
 
         assert(font);
 

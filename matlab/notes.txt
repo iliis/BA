@@ -133,3 +133,14 @@ IDEAS
     use vector::asDiagonal() ;)
     http://eigen.tuxfamily.org/dox/classEigen_1_1MatrixBase.html#adaf22d3a2069ec2c0df912cb87329e9c
 4. use real(tm) data
+
+
+
+lux/25 has quite a strong bias
+lux/16 doesn't converge (on level 3)
+lux/37 doesn't converge on scale 3 (2x halbiert) -> jitters too much
+
+
+64ms / 16 FPS
+190ms / 5 FPS
+491ms / 2 FPS

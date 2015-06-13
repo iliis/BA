@@ -16,7 +16,7 @@ using namespace Eigen;
 sf::Font font;
 //sf::RenderWindow window(sf::VideoMode(1280, 768), "dense odometry");
 //sf::RenderWindow window(sf::VideoMode(256*4+2, 128*5), "dense odometry");
-sf::RenderWindow window(sf::VideoMode(256*2+2, 128*3), "dense odometry");
+sf::RenderWindow window(sf::VideoMode(256*3+4, 128*3), "dense odometry");
 
 inline sf::Vector2f toSF(Eigen::Vector2f v)
 {
@@ -199,7 +199,11 @@ void run_minimization(const Scene& scene)
     Eigen::VectorXf error_tmp;
     Eigen::Matrix<float, Eigen::Dynamic, 6> J_tmp;
 
-    int iter = 0;
+    //ErrorWeightFunction* weight_function = new ErrorWeightHuber(0.1);
+    ErrorWeightFunction* weight_function = new ErrorWeightNone();
+
+    unsigned int pyramid_levels = 3;
+
     bool show_keyframe = false;
     while (window.isOpen())
     {
@@ -226,11 +230,17 @@ void run_minimization(const Scene& scene)
                         T = Transformation(0,0,0,0,0,0);
                         break;
 
-                    // go to next frame
+                    // go to next (prev) frame
                     case sf::Keyboard::N:
-                        index++;
-                        if (index >= scene.getStepCount())
-                            index = 0;
+                        if (event.key.shift) {
+                            if (index == 0)
+                                index = scene.getStepCount();
+                            index--;
+                        } else {
+                            index++;
+                            if (index >= scene.getStepCount())
+                                index = 0;
+                        }
                         step = scene.getStep(index);
                         T = Transformation(0,0,0,0,0,0);
                         break;
@@ -273,10 +283,9 @@ void run_minimization(const Scene& scene)
                         break;
 
                     case sf::Keyboard::F5:
-                        T = findTransformationWithPyramid(step, 4);
+                        T = findTransformationWithPyramid(step, pyramid_levels, *weight_function);
                         break;
 
-                    case sf::Keyboard::Num4:
                     case sf::Keyboard::Numpad4:
                         if (event.key.control) {
                             T.value(4) -= deg2rad(1);
@@ -286,7 +295,6 @@ void run_minimization(const Scene& scene)
                         }
                         break;
 
-                    case sf::Keyboard::Num6:
                     case sf::Keyboard::Numpad6:
                         if (event.key.control) {
                             T.value(4) += deg2rad(1);
@@ -296,7 +304,6 @@ void run_minimization(const Scene& scene)
                         }
                         break;
 
-                    case sf::Keyboard::Num8:
                     case sf::Keyboard::Numpad8:
                         if (event.key.control) {
                             T.value(3) += deg2rad(1);
@@ -306,7 +313,6 @@ void run_minimization(const Scene& scene)
                         }
                         break;
 
-                    case sf::Keyboard::Num5:
                     case sf::Keyboard::Numpad5:
                         if (event.key.control) {
                             T.value(3) -= deg2rad(1);
@@ -316,7 +322,6 @@ void run_minimization(const Scene& scene)
                         }
                         break;
 
-                    case sf::Keyboard::Num7:
                     case sf::Keyboard::Numpad7:
                         if (event.key.control) {
                             T.value(5) -= deg2rad(1);
@@ -326,12 +331,10 @@ void run_minimization(const Scene& scene)
                         }
                         break;
 
-                    case sf::Keyboard::Num1:
                     case sf::Keyboard::Numpad1:
                         T.value(2) += 0.1;
                         break;
 
-                    case sf::Keyboard::Num9:
                     case sf::Keyboard::Numpad9:
                         if (event.key.control) {
                             T.value(5) += deg2rad(1);
@@ -339,7 +342,22 @@ void run_minimization(const Scene& scene)
                         }
                         break;
 
+
+                    // some error weighting function presets
+                    case sf::Keyboard::Num0:
+                        delete weight_function;
+                        weight_function = new ErrorWeightNone();
+                        break;
+
+                    case sf::Keyboard::Num1: delete weight_function; weight_function = new ErrorWeightHuber(0.0001); break;
+                    case sf::Keyboard::Num2: delete weight_function; weight_function = new ErrorWeightHuber(0.001); break;
+                    case sf::Keyboard::Num3: delete weight_function; weight_function = new ErrorWeightHuber(0.01); break;
+                    case sf::Keyboard::Num4: delete weight_function; weight_function = new ErrorWeightHuber(0.1); break;
+                    case sf::Keyboard::Num5: delete weight_function; weight_function = new ErrorWeightHuber(1); break;
+                    case sf::Keyboard::Num6: delete weight_function; weight_function = new ErrorWeightHuber(10); break;
+
                     case sf::Keyboard::M:
+                        window.setVisible(false);
                         {
                             int opt = 0;
                             cout << "choose an option:" << endl;
@@ -350,6 +368,8 @@ void run_minimization(const Scene& scene)
                             cout << "5: disturb T (degrees)" << endl;
                             cout << "6: reload step" << endl;
                             cout << "7: choose step number" << endl;
+                            cout << "8: choose weight function" << endl;
+                            cout << "9: choose number of pyramid levels" << endl;
                             cout << "0: exit" << endl;
                             cin >> opt;
 
@@ -419,11 +439,49 @@ void run_minimization(const Scene& scene)
                                     step = scene.getStep(index);
                                     break;
 
+                                case 8:
+                                    do {
+                                        cout << "choose:" << endl;
+                                        cout << "1: None" << endl;
+                                        cout << "2: Huber" << endl;
+                                        cout << "0: cancel" << endl;
+                                        cin >> opt;
+                                    } while (opt < 0 || opt > 2);
+
+                                    switch (opt) {
+                                        case 1:
+                                            delete weight_function;
+                                            weight_function = new ErrorWeightNone();
+                                            break;
+
+                                        case 2:
+                                            {
+                                                float d = 0;
+                                                cout << "delta? ";
+                                                cin >> d;
+                                                delete weight_function;
+                                                weight_function = new ErrorWeightHuber(d);
+                                            }
+                                            break;
+
+                                        default:
+                                            break;
+                                    }
+                                    break;
+
+                                case 9:
+                                    do {
+                                        cout << "number of levels [>=1] (current: " << pyramid_levels << "): ";
+                                        cin >> pyramid_levels;
+                                    } while (pyramid_levels < 1);
+                                    break;
+
                                 default:
                                     cout << "unknown command" << endl;
                                     break;
                             }
                         }
+                        window.setVisible(true);
                         break;
 
 
@@ -439,12 +497,10 @@ void run_minimization(const Scene& scene)
         if (!min_paused) {
             bool finished;
 #if 1
-            finished = IterGaussNewton(step, T) < 0.0001;
+            finished = IterGaussNewton(step, T, *weight_function) < 0.0001;
 #else
-            finished = IterGradientDescent(step, T, step_size) < 0.0001;
+            finished = IterGradientDescent(step, T, step_size, *weight_function) < 0.0001;
 #endif
-            iter++;
-
             if (finished) {
                 if (step.scale > 0) {
                     // upscale image again
@@ -457,10 +513,16 @@ void run_minimization(const Scene& scene)
             }
         }
 
-        Warp::calcError(step, T, error_tmp, J_tmp, &window, &font);
+        Warp::calcError(step, T, error_tmp, J_tmp, &window, &font, weight_function);
 
         if (show_keyframe)
             step.frame_first.getIntensityData().drawAt(window, sf::Vector2f(0,step.frame_second.getHeight()+2));
+
+
+        sf::Text t;
+        t.setFont(font);
+        t.setCharacterSize(12);
+        t.setString("Error weighting function: " + weight_function->toString() + "\npyramid levels: " + boost::lexical_cast<string>(pyramid_levels)); t.setPosition(2,128*3-2*14); window.draw(t);
 
         window.display();
 
@@ -478,6 +540,7 @@ void run_minimization(const Scene& scene)
         //sf::sleep(sf::seconds(0.01));
     }
 
+    delete weight_function;
 }
 ///////////////////////////////////////////////////////////////////////////////
 int main()
@@ -488,8 +551,8 @@ int main()
     //testscene.loadFromSceneDirectory("../matlab/input/test_wide");
     //testscene.loadFromSceneDirectory("../matlab/input/trajectory1");
     //testscene.loadFromSceneDirectory("../matlab/input/testscene1");
-    //testscene.loadFromSceneDirectory("../matlab/input/courtyard/lux");
-    testscene.loadFromSceneDirectory("../matlab/input/courtyard/normal"); // step 22 is nice!
+    testscene.loadFromSceneDirectory("../matlab/input/courtyard/lux");
+    //testscene.loadFromSceneDirectory("../matlab/input/courtyard/normal"); // step 22 is nice!
 
     // choose one of these functions:
     //test_warping(testscene);
