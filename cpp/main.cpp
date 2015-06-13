@@ -190,12 +190,6 @@ void run_minimization(const Scene& scene)
     unsigned int index = 0;
     CameraStep step = scene.getStep(index);
 
-//    while (window.isOpen()) {
-
- //       index++;
-  //      if (index >= testscene.getStepCount())
-   //         index = 0;
-
     Transformation T(0,0,0,0,0,0);
 
     Eigen::Matrix<float,6,1> step_size;
@@ -218,6 +212,11 @@ void run_minimization(const Scene& scene)
             if (event.type == sf::Event::KeyPressed) {
 
                 switch (event.key.code) {
+                    // exit
+                    case sf::Keyboard::Escape:
+                        exit(0);
+                        return;
+
                     // go to prev frame
                     case sf::Keyboard::B:
                         if (index == 0)
@@ -275,6 +274,69 @@ void run_minimization(const Scene& scene)
 
                     case sf::Keyboard::F5:
                         T = findTransformationWithPyramid(step, 4);
+                        break;
+
+                    case sf::Keyboard::Num4:
+                    case sf::Keyboard::Numpad4:
+                        if (event.key.control) {
+                            T.value(4) -= deg2rad(1);
+                            T.updateRotationMatrix();
+                        } else {
+                            T.value(0) -= 0.1;
+                        }
+                        break;
+
+                    case sf::Keyboard::Num6:
+                    case sf::Keyboard::Numpad6:
+                        if (event.key.control) {
+                            T.value(4) += deg2rad(1);
+                            T.updateRotationMatrix();
+                        } else {
+                            T.value(0) += 0.1;
+                        }
+                        break;
+
+                    case sf::Keyboard::Num8:
+                    case sf::Keyboard::Numpad8:
+                        if (event.key.control) {
+                            T.value(3) += deg2rad(1);
+                            T.updateRotationMatrix();
+                        } else {
+                            T.value(1) -= 0.1;
+                        }
+                        break;
+
+                    case sf::Keyboard::Num5:
+                    case sf::Keyboard::Numpad5:
+                        if (event.key.control) {
+                            T.value(3) -= deg2rad(1);
+                            T.updateRotationMatrix();
+                        } else {
+                            T.value(1) += 0.1;
+                        }
+                        break;
+
+                    case sf::Keyboard::Num7:
+                    case sf::Keyboard::Numpad7:
+                        if (event.key.control) {
+                            T.value(5) -= deg2rad(1);
+                            T.updateRotationMatrix();
+                        } else {
+                            T.value(2) -= 0.1;
+                        }
+                        break;
+
+                    case sf::Keyboard::Num1:
+                    case sf::Keyboard::Numpad1:
+                        T.value(2) += 0.1;
+                        break;
+
+                    case sf::Keyboard::Num9:
+                    case sf::Keyboard::Numpad9:
+                        if (event.key.control) {
+                            T.value(5) += deg2rad(1);
+                            T.updateRotationMatrix();
+                        }
                         break;
 
                     case sf::Keyboard::M:

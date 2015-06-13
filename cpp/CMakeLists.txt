@@ -10,7 +10,10 @@
 cmake_minimum_required (VERSION 2.8)
 project (dense_odometry)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic -Wextra")
+#set(EXTRA_FLAGS "-pg -fprofile-arcs -ftest-coverage")
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic -Wextra ${EXTRA_FLAGS}")
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${EXTRA_FLAGS}")
 
 set(SOURCES
     "core/image_data.cpp"
@@ -70,5 +73,6 @@ if (Boost_FOUND)
 endif()
 
 
+# unit tests
 enable_testing()
 add_subdirectory(tests)

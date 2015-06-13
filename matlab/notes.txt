@@ -110,24 +110,26 @@ IDEAS
 - bigger images
 - add 'play with min' modus:
     - choose algo?
-    - key for downsampling
-    - press 'm' or something to enter menu on command line
-        - choose scene step
-        - scale down scene
-        - choose T
-        - choose delta T
-        - reset T
-        - T = ground_truth
+    [done] - key for downsampling
+    [done] - press 'm' or something to enter menu on command line
+        [done] - choose scene step
+        [done] - scale down scene
+        [done] - choose T
+        [done] - choose delta T
+        [done] - reset T
+        [done] - T = ground_truth
         - render cost surface (including ground truth)
-- auto pyramid scheme
+[done] - auto pyramid scheme
     -> measure convergence speed
 - profile everything
 
 
-1. pyramidenstufen
+[done] 1. pyramidenstufen
 2. mask only interesting pixels
     - strong gradients
         comport: direct iterative closest point
         enge (?), TUM: semidense visual odometry
 3. fehler gewichtung
+    use vector::asDiagonal() ;)
+    http://eigen.tuxfamily.org/dox/classEigen_1_1MatrixBase.html#adaf22d3a2069ec2c0df912cb87329e9c
 4. use real(tm) data
