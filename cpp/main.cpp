@@ -16,7 +16,7 @@ using namespace Eigen;
 sf::Font font;
 //sf::RenderWindow window(sf::VideoMode(1280, 768), "dense odometry");
 //sf::RenderWindow window(sf::VideoMode(256*4+2, 128*5), "dense odometry");
-sf::RenderWindow window(sf::VideoMode(256*3+4, 128*3+4), "dense odometry");
+sf::RenderWindow window(sf::VideoMode(256*3+4, 128*4+4), "dense odometry");
 
 inline sf::Vector2f toSF(Eigen::Vector2f v)
 {
@@ -51,16 +51,8 @@ void drawArrow(sf::RenderTarget& target, float x, float y, float vect_x, float v
     target.draw(line, sizeof(line)/sizeof(sf::Vertex), sf::Lines);
 }
 ///////////////////////////////////////////////////////////////////////////////
-void draw_error_surface(const CameraStep& step)
+void draw_error_surface(const CameraStep& step, const Warp::PlotRange& range1, const Warp::PlotRange& range2, const Warp::Parameters params)
 {
-    Warp::PlotRange range1(0, -1,1, 40);
-    Warp::PlotRange range2(1, -1,1, 40);
-    //Warp::PlotRange range2(4,-.5,.5,40); // beta = yaw
-
-
-    Warp::Parameters params(new ErrorWeightNone());
-
-
     Eigen::MatrixXf errorsurface(range1.steps, range2.steps);
     Eigen::Matrix<float, Dynamic, 6> errorgradients(range1.steps*range2.steps, 6);
 
@@ -73,25 +65,34 @@ void draw_error_surface(const CameraStep& step)
 
     cout << "rendered surface in " << ms << "ms (" << ((float) ms) / (errorsurface.rows() * errorsurface.cols()) << "ms per point)" << endl;
 
+    window.setVisible(true);
+
+
+    float TILE_SIZE = window.getSize().y / range2.steps;
+
+    bool run = true;
     ImageData errorplot;
     errorplot.loadFromMatrix(errorsurface, Colormap::Hot());
-    while (window.isOpen())
+    while (window.isOpen() && run)
     {
         sf::Event event;
         while (window.pollEvent(event))
         {
             if (event.type == sf::Event::Closed)
                 window.close();
+
+            if (event.type == sf::Event::KeyPressed && (event.key.code == sf::Keyboard::Escape || event.key.code == sf::Keyboard::Q))
+                run = false;
         }
 
         window.clear();
-        errorplot.drawAt(window, sf::Vector2f(0,0), 16);
+        errorplot.drawAt(window, sf::Vector2f(0,0), TILE_SIZE);
 
         for (unsigned int y = 0; y < errorplot.getHeight(); ++y) {
             for (unsigned int x = 0; x < errorplot.getWidth(); ++x) {
                 unsigned int idx = y*errorplot.getWidth()+x;
                 float factor = -0.004; // point *down*
-                drawArrow(window, x*16+8, y*16+8, errorgradients(idx, range1.dim)*factor, errorgradients(idx, range2.dim)*factor);
+                drawArrow(window, x*TILE_SIZE+TILE_SIZE/2, y*TILE_SIZE+TILE_SIZE/2, errorgradients(idx, range1.dim)*factor, errorgradients(idx, range2.dim)*factor);
             }
         }
 
@@ -100,8 +101,7 @@ void draw_error_surface(const CameraStep& step)
 
         sf::sleep(sf::milliseconds(100));
     }
-
-    delete params.weight_function;
+    cout << "closing error surface plot" << endl;
 }
 ///////////////////////////////////////////////////////////////////////////////
 void write_trajectory(const Scene& scene, const Warp::Parameters& params)
@@ -215,10 +215,12 @@ void run_minimization(const Scene& scene)
                         step = scene.getStep(index);
                         break;
 
+                    // run minimization algorithm at full speed (without visualization and starting at T = [0 0 0 0 0 0])
                     case sf::Keyboard::F5:
                         T = findTransformationWithPyramid(step, params);
                         break;
 
+                    // move virtual camera / modify T
                     case sf::Keyboard::Numpad4:
                         if (event.key.control) {
                             T.value(4) -= deg2rad(1);
@@ -303,6 +305,7 @@ void run_minimization(const Scene& scene)
                             cout << "[  8 ]: choose weight function" << endl;
                             cout << "[  9 ]: choose number of pyramid levels" << endl;
                             cout << "[ 10 ]: set gradient norm threshold" << endl;
+                            cout << "[ 11 ]: render error surface" << endl;
                             cout << "[  0 ]: exit" << endl;
                             cin >> opt;
 
@@ -412,6 +415,25 @@ void run_minimization(const Scene& scene)
                                     cin >> params.gradient_norm_threshold;
                                     break;
 
+                                case 11:
+                                    {
+                                        bool around_T = false;
+                                        Warp::PlotRange range1(0,0,1,1), range2(1,0,1,1);
+                                        cout << "around current Transformation? [0/1] ";
+                                        cin >> around_T;
+                                        cout << around_T;
+                                        cout << " >>> range 1:" << endl;
+                                        range1.readFromStdin();
+                                        cout << " >>> range 2:" << endl;
+                                        range2.readFromStdin();
+                                        if (around_T) {
+                                            range1.from += T.value(range1.dim); range1.to += T.value(range1.dim);
+                                            range2.from += T.value(range2.dim); range2.to += T.value(range2.dim);
+                                        }
+                                        draw_error_surface(step, range1, range2, params);
+                                    }
+                                    break;
+
                                 default:
                                     cout << "unknown command" << endl;
                                     break;
@@ -490,9 +512,8 @@ int main()
     testscene.loadFromSceneDirectory("../matlab/input/courtyard/lux");
     //testscene.loadFromSceneDirectory("../matlab/input/courtyard/normal"); // step 22 is nice!
 
-    // choose one of these functions:
-    //draw_error_surface(testscene.getStep(22));
     //write_trajectory(testscene, params);
+
     run_minimization(testscene);
 
 

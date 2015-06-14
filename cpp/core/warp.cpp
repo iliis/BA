@@ -242,3 +242,24 @@ void Warp::renderErrorSurface(MatrixXf& target_out, Matrix<float,Dynamic,6>& gra
     }
 }
 ///////////////////////////////////////////////////////////////////////////////
+void Warp::PlotRange::readFromStdin()
+{
+    do {
+        cout << "dimension [0-5]? ";
+        cin >> this->dim;
+    } while (this->dim > 5);
+
+    cout << "from? ";
+    cin >> this->from;
+
+    do {
+        cout << "to (>from)? ";
+        cin >> this->to;
+    } while (to <= from);
+
+    do {
+        cout << "steps? ";
+        cin >> this->steps;
+    } while (steps < 1);
+}
+///////////////////////////////////////////////////////////////////////////////

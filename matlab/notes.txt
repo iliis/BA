@@ -145,3 +145,18 @@ lux/37 doesn't converge on scale 3 (2x halbiert) -> jitters too much
 64ms / 16 FPS
 190ms / 5 FPS
 491ms / 2 FPS
+
+- tool to render error surface
+    - keep range1,range2
+    - use mouse to draw rect to zoom in
+    - zoom in / out with +/-
+    - press <F5> or <Enter> to render
+
+- write some error / convergence speed measurement code with different
+    - error weight functions
+    - gradient norm threshold
+    - pyramid levels
+    measure:
+    - time (ms and iterations) until convergence
+    - error vs. iterations / time
+    - average perturbation from ground truth for convergence
