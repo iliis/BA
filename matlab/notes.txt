@@ -125,11 +125,12 @@ IDEAS
 
 
 [done] 1. pyramidenstufen
-2. mask only interesting pixels
+[done] 2. mask only interesting pixels
     - strong gradients
         comport: direct iterative closest point
         enge (?), TUM: semidense visual odometry
-3. fehler gewichtung
+    - use dynamic threshold!
+[done?] 3. fehler gewichtung
     use vector::asDiagonal() ;)
     http://eigen.tuxfamily.org/dox/classEigen_1_1MatrixBase.html#adaf22d3a2069ec2c0df912cb87329e9c
 4. use real(tm) data

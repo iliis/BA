@@ -16,7 +16,7 @@ using namespace Eigen;
 sf::Font font;
 //sf::RenderWindow window(sf::VideoMode(1280, 768), "dense odometry");
 //sf::RenderWindow window(sf::VideoMode(256*4+2, 128*5), "dense odometry");
-sf::RenderWindow window(sf::VideoMode(256*3+4, 128*3), "dense odometry");
+sf::RenderWindow window(sf::VideoMode(256*3+4, 128*3+4), "dense odometry");
 
 inline sf::Vector2f toSF(Eigen::Vector2f v)
 {
@@ -51,72 +51,6 @@ void drawArrow(sf::RenderTarget& target, float x, float y, float vect_x, float v
     target.draw(line, sizeof(line)/sizeof(sf::Vertex), sf::Lines);
 }
 ///////////////////////////////////////////////////////////////////////////////
-void test_warping(const Scene& scene)
-{
-    Eigen::VectorXf error_tmp;
-    Eigen::Matrix<float, Eigen::Dynamic, 6> J_tmp;
-
-    int i = 0;
-    bool paused = false;
-    bool show_keyframe_over_errors = false;
-    while (window.isOpen())
-    {
-        sf::Event event;
-        while (window.pollEvent(event))
-        {
-            if (event.type == sf::Event::Closed)
-                window.close();
-
-            if (event.type == sf::Event::KeyPressed) {
-                switch (event.key.code) {
-                    // pause/play all frames
-                    case sf::Keyboard::Space:
-                        paused = !paused;
-                        break;
-
-                    // manually step trough frames
-                    case sf::Keyboard::Right:
-                        i++;
-                        break;
-
-                    case sf::Keyboard::Left:
-                        i--;
-                        break;
-
-                    // overlay warped current image with keyframe
-                    case sf::Keyboard::K:
-                        show_keyframe_over_errors = !show_keyframe_over_errors;
-                        break;
-
-                    default:
-                        break;
-                }
-            }
-        }
-
-        window.clear();
-
-        if (!paused)
-            i++;
-
-        if (i < 0)
-            i = scene.getStepCount()-1;
-
-        if (i >= (int) scene.getStepCount())
-            i = 0;
-
-        CameraStep step = scene.getStep(i);
-        Warp::calcError(step, step.ground_truth, error_tmp, J_tmp, &window, &font);
-
-        if (show_keyframe_over_errors)
-            step.frame_first.getIntensityData().drawAt(window, sf::Vector2f(0,step.frame_first.getHeight()+2));
-
-        window.display();
-
-        sf::sleep(sf::milliseconds(100));
-    }
-}
-///////////////////////////////////////////////////////////////////////////////
 void draw_error_surface(const CameraStep& step)
 {
     Warp::PlotRange range1(0, -1,1, 40);
@@ -124,7 +58,7 @@ void draw_error_surface(const CameraStep& step)
     //Warp::PlotRange range2(4,-.5,.5,40); // beta = yaw
 
 
-
+    Warp::Parameters params(new ErrorWeightNone());
 
 
     Eigen::MatrixXf errorsurface(range1.steps, range2.steps);
@@ -134,7 +68,7 @@ void draw_error_surface(const CameraStep& step)
 
     sf::Clock clock;
     clock.restart();
-    Warp::renderErrorSurface(errorsurface, errorgradients, step, step.ground_truth, range1, range2);
+    Warp::renderErrorSurface(errorsurface, errorgradients, step, step.ground_truth, range1, range2, params);
     sf::Int32 ms = clock.getElapsedTime().asMilliseconds();
 
     cout << "rendered surface in " << ms << "ms (" << ((float) ms) / (errorsurface.rows() * errorsurface.cols()) << "ms per point)" << endl;
@@ -166,11 +100,13 @@ void draw_error_surface(const CameraStep& step)
 
         sf::sleep(sf::milliseconds(100));
     }
+
+    delete params.weight_function;
 }
 ///////////////////////////////////////////////////////////////////////////////
-void write_trajectory(const Scene& scene)
+void write_trajectory(const Scene& scene, const Warp::Parameters& params)
 {
-    std::vector<Transformation> traj = findTrajectory(scene);
+    std::vector<Transformation> traj = findTrajectory(scene, params);
 
     string path = scene.getSourceDirectory() + "/measured_trajectory.csv";
     ofstream outfile(path.c_str());
@@ -192,17 +128,14 @@ void run_minimization(const Scene& scene)
 
     Transformation T(0,0,0,0,0,0);
 
-    Eigen::Matrix<float,6,1> step_size;
-    step_size << 1, 1, 1, 0.05, 0.05, 0.05;
-    step_size /= 30000;
-
     Eigen::VectorXf error_tmp;
     Eigen::Matrix<float, Eigen::Dynamic, 6> J_tmp;
 
-    //ErrorWeightFunction* weight_function = new ErrorWeightHuber(0.1);
-    ErrorWeightFunction* weight_function = new ErrorWeightNone();
-
-    unsigned int pyramid_levels = 3;
+    Warp::Parameters params(new ErrorWeightNone());
+    params.pyramid_levels = 3;
+    params.max_iterations = 1000;
+    params.T_init = Transformation(0,0,0,0,0,0);
+    params.gradient_norm_threshold = 0.1;
 
     bool show_keyframe = false;
     while (window.isOpen())
@@ -283,7 +216,7 @@ void run_minimization(const Scene& scene)
                         break;
 
                     case sf::Keyboard::F5:
-                        T = findTransformationWithPyramid(step, pyramid_levels, *weight_function);
+                        T = findTransformationWithPyramid(step, params);
                         break;
 
                     case sf::Keyboard::Numpad4:
@@ -345,32 +278,32 @@ void run_minimization(const Scene& scene)
 
                     // some error weighting function presets
                     case sf::Keyboard::Num0:
-                        delete weight_function;
-                        weight_function = new ErrorWeightNone();
+                        params.setWeightFunction(new ErrorWeightNone());
                         break;
 
-                    case sf::Keyboard::Num1: delete weight_function; weight_function = new ErrorWeightHuber(0.0001); break;
-                    case sf::Keyboard::Num2: delete weight_function; weight_function = new ErrorWeightHuber(0.001); break;
-                    case sf::Keyboard::Num3: delete weight_function; weight_function = new ErrorWeightHuber(0.01); break;
-                    case sf::Keyboard::Num4: delete weight_function; weight_function = new ErrorWeightHuber(0.1); break;
-                    case sf::Keyboard::Num5: delete weight_function; weight_function = new ErrorWeightHuber(1); break;
-                    case sf::Keyboard::Num6: delete weight_function; weight_function = new ErrorWeightHuber(10); break;
+                    case sf::Keyboard::Num1: params.setWeightFunction(new ErrorWeightHuber(0.0001)); break;
+                    case sf::Keyboard::Num2: params.setWeightFunction(new ErrorWeightHuber(0.001)); break;
+                    case sf::Keyboard::Num3: params.setWeightFunction(new ErrorWeightHuber(0.01)); break;
+                    case sf::Keyboard::Num4: params.setWeightFunction(new ErrorWeightHuber(0.1)); break;
+                    case sf::Keyboard::Num5: params.setWeightFunction(new ErrorWeightHuber(1)); break;
+                    case sf::Keyboard::Num6: params.setWeightFunction(new ErrorWeightHuber(10)); break;
 
                     case sf::Keyboard::M:
                         window.setVisible(false);
                         {
                             int opt = 0;
                             cout << "choose an option:" << endl;
-                            cout << "1: show T (radians)" << endl;
-                            cout << "2: show T (degrees)" << endl;
-                            cout << "3: downsample images by 2x" << endl;
-                            cout << "4: enter new T (degrees)" << endl;
-                            cout << "5: disturb T (degrees)" << endl;
-                            cout << "6: reload step" << endl;
-                            cout << "7: choose step number" << endl;
-                            cout << "8: choose weight function" << endl;
-                            cout << "9: choose number of pyramid levels" << endl;
-                            cout << "0: exit" << endl;
+                            cout << "[  1 ]: show T (radians)" << endl;
+                            cout << "[  2 ]: show T (degrees)" << endl;
+                            cout << "[  3 ]: downsample images by 2x" << endl;
+                            cout << "[  4 ]: enter new T (degrees)" << endl;
+                            cout << "[  5 ]: disturb T (degrees)" << endl;
+                            cout << "[  6 ]: reload step" << endl;
+                            cout << "[  7 ]: choose step number" << endl;
+                            cout << "[  8 ]: choose weight function" << endl;
+                            cout << "[  9 ]: choose number of pyramid levels" << endl;
+                            cout << "[ 10 ]: set gradient norm threshold" << endl;
+                            cout << "[  0 ]: exit" << endl;
                             cin >> opt;
 
                             switch (opt) {
@@ -450,8 +383,7 @@ void run_minimization(const Scene& scene)
 
                                     switch (opt) {
                                         case 1:
-                                            delete weight_function;
-                                            weight_function = new ErrorWeightNone();
+                                            params.setWeightFunction(new ErrorWeightNone());
                                             break;
 
                                         case 2:
@@ -459,8 +391,7 @@ void run_minimization(const Scene& scene)
                                                 float d = 0;
                                                 cout << "delta? ";
                                                 cin >> d;
-                                                delete weight_function;
-                                                weight_function = new ErrorWeightHuber(d);
+                                                params.setWeightFunction(new ErrorWeightHuber(d));
                                             }
                                             break;
 
@@ -471,9 +402,14 @@ void run_minimization(const Scene& scene)
 
                                 case 9:
                                     do {
-                                        cout << "number of levels [>=1] (current: " << pyramid_levels << "): ";
-                                        cin >> pyramid_levels;
-                                    } while (pyramid_levels < 1);
+                                        cout << "number of levels [>=1] (current: " << params.pyramid_levels << "): ";
+                                        cin >> params.pyramid_levels;
+                                    } while (params.pyramid_levels < 1);
+                                    break;
+
+                                case 10:
+                                    cout << "new gradient norm threshold [0-1] (current: " << params.gradient_norm_threshold << "): ";
+                                    cin >> params.gradient_norm_threshold;
                                     break;
 
                                 default:
@@ -497,7 +433,7 @@ void run_minimization(const Scene& scene)
         if (!min_paused) {
             bool finished;
 #if 1
-            finished = IterGaussNewton(step, T, *weight_function) < 0.0001;
+            finished = IterGaussNewton(step, T, params) < 0.0001;
 #else
             finished = IterGradientDescent(step, T, step_size, *weight_function) < 0.0001;
 #endif
@@ -513,7 +449,7 @@ void run_minimization(const Scene& scene)
             }
         }
 
-        Warp::calcError(step, T, error_tmp, J_tmp, &window, &font, weight_function);
+        Warp::calcError(step, T, error_tmp, J_tmp, params, &window, &font);
 
         if (show_keyframe)
             step.frame_first.getIntensityData().drawAt(window, sf::Vector2f(0,step.frame_second.getHeight()+2));
@@ -522,7 +458,7 @@ void run_minimization(const Scene& scene)
         sf::Text t;
         t.setFont(font);
         t.setCharacterSize(12);
-        t.setString("Error weighting function: " + weight_function->toString() + "\npyramid levels: " + boost::lexical_cast<string>(pyramid_levels)); t.setPosition(2,128*3-2*14); window.draw(t);
+        t.setString(params.toString()); t.setPosition(2,128*3-3*14); window.draw(t);
 
         window.display();
 
@@ -540,7 +476,7 @@ void run_minimization(const Scene& scene)
         //sf::sleep(sf::seconds(0.01));
     }
 
-    delete weight_function;
+    delete params.weight_function;
 }
 ///////////////////////////////////////////////////////////////////////////////
 int main()
@@ -555,9 +491,8 @@ int main()
     //testscene.loadFromSceneDirectory("../matlab/input/courtyard/normal"); // step 22 is nice!
 
     // choose one of these functions:
-    //test_warping(testscene);
     //draw_error_surface(testscene.getStep(22));
-    //write_trajectory(testscene);
+    //write_trajectory(testscene, params);
     run_minimization(testscene);
 
 

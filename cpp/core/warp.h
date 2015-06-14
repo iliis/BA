@@ -17,6 +17,29 @@ namespace Warp {
      * contains all the interesting math!
      */
 
+    struct Parameters {
+        ErrorWeightFunction* weight_function;
+        float gradient_norm_threshold; // keep only pixels with gradient >= this value
+        unsigned int pyramid_levels;
+        Transformation T_init;
+        unsigned int max_iterations;
+
+        Parameters(ErrorWeightFunction* weight_function,
+                float gradient_norm_threshold = 0,
+                unsigned int pyramid_levels = 3,
+                const Transformation& T_init = Transformation(0,0,0,0,0,0),
+                unsigned int max_iterations = 1000)
+          : weight_function(weight_function),
+            gradient_norm_threshold(gradient_norm_threshold),
+            pyramid_levels(pyramid_levels),
+            T_init(T_init),
+            max_iterations(max_iterations) {}
+
+        void setWeightFunction(ErrorWeightFunction* func) { if (weight_function) { delete weight_function; } weight_function = func; }
+
+        std::string toString();
+    };
+
     WorldPoint projectInv(const Pixel& pixel,      const CameraIntrinsics& intrinsics);
     Pixel      project   (const WorldPoint& point, const CameraIntrinsics& intrinsics);
     WorldPoint transform (const WorldPoint& point, const Transformation& transformation);
@@ -26,7 +49,7 @@ namespace Warp {
     Eigen::Matrix<float, 1, 2> sampleJacobian   (const Pixel& pixel, const CameraImage& image);
 
     //float drawError(sf::RenderTarget& target, const CameraStep& step, const Transformation& T);
-    float calcError(const CameraStep& step, const Transformation& T, Eigen::VectorXf& error_out, Eigen::Matrix<float, Eigen::Dynamic, 6>& J_out, sf::RenderTarget* plotTarget = NULL, sf::Font* font = NULL, ErrorWeightFunction* weight_function = NULL);
+    float calcError(const CameraStep& step, const Transformation& T, Eigen::VectorXf& error_out, Eigen::Matrix<float, Eigen::Dynamic, 6>& J_out, const Parameters& params, sf::RenderTarget* plotTarget = NULL, sf::Font* font = NULL);
 
     struct PlotRange {
 
@@ -41,7 +64,7 @@ namespace Warp {
         unsigned int steps;
     };
 
-    void renderErrorSurface(Eigen::MatrixXf& target_out, Eigen::Matrix<float,Eigen::Dynamic,6>& gradients_out, const CameraStep& step, const Transformation& Tcenter, const PlotRange& range1, const PlotRange& range2);
+    void renderErrorSurface(Eigen::MatrixXf& target_out, Eigen::Matrix<float,Eigen::Dynamic,6>& gradients_out, const CameraStep& step, const Transformation& Tcenter, const PlotRange& range1, const PlotRange& range2, const Parameters& params);
 
 }
 

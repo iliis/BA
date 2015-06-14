@@ -4,6 +4,16 @@ using namespace std;
 using namespace Eigen;
 
 ///////////////////////////////////////////////////////////////////////////////
+std::string Warp::Parameters::toString()
+{
+    return "Error weighting function: " + weight_function->toString()
+       + "\npyramid levels: " + boost::lexical_cast<string>(pyramid_levels)
+       + "\ngradient norm threshold: " + boost::lexical_cast<string>(gradient_norm_threshold);
+       //+ "\nmax. iterations: " + boost::lexical_cast<string>(max_iterations);
+}
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 WorldPoint Warp::projectInv(const Pixel& pixel, const CameraIntrinsics& intrinsics)
 {
     WorldPoint p;
@@ -61,7 +71,7 @@ Eigen::Matrix<float, 1, 2> Warp::sampleJacobian(const Pixel& pixel, const Camera
     return image.getIntensityData().sampleDiff(pixel.pos);
 }
 ///////////////////////////////////////////////////////////////////////////////
-float Warp::calcError(const CameraStep& step, const Transformation& T, Eigen::VectorXf& error_out, Eigen::Matrix<float, Eigen::Dynamic, 6>& J_out, sf::RenderTarget* plotTarget, sf::Font* font, ErrorWeightFunction* weight_function)
+float Warp::calcError(const CameraStep& step, const Transformation& T, Eigen::VectorXf& error_out, Eigen::Matrix<float, Eigen::Dynamic, 6>& J_out, const Parameters& params, sf::RenderTarget* plotTarget, sf::Font* font)
 {
     const unsigned int W = step.intrinsics.getCameraWidth();
     const unsigned int H = step.intrinsics.getCameraHeight();
@@ -71,15 +81,17 @@ float Warp::calcError(const CameraStep& step, const Transformation& T, Eigen::Ve
     float total_error = 0;
 
     sf::Image img_c, img_k;
-    Eigen::MatrixXf img_errs_weighted;
+    Eigen::MatrixXf img_errs_weighted, img_J_norm, img_selection_heuristic;
     if (plotTarget) {
         img_c.create(W,H, sf::Color(0,0,255));
         img_k.create(W,H, sf::Color(0,0,255));
+        img_J_norm.resize(H,W);
+        img_J_norm.setZero();
+        img_selection_heuristic.resize(H,W);
+        img_selection_heuristic.setZero();
 
-        if (weight_function) {
-            img_errs_weighted.resize(H,W);
-            img_errs_weighted.setZero();
-        }
+        img_errs_weighted.resize(H,W);
+        img_errs_weighted.setZero();
     }
 
     //Matrix3f R = T.getRotationMatrix();
@@ -106,6 +118,12 @@ float Warp::calcError(const CameraStep& step, const Transformation& T, Eigen::Ve
             if (!step.frame_first.isValidPixel(pixel_in_keyframe.pos))
                 continue;
 
+            Matrix<float, 1, 2> J_I = Warp::sampleJacobian(pixel_in_keyframe, step.frame_first);
+
+            // skip pixels that don't provide a good gradient
+            if (J_I.norm() < params.gradient_norm_threshold)
+                continue;
+
             float intensity_keyframe = step.frame_first.samplePixel(pixel_in_keyframe.pos);
 
             float error = (intensity_keyframe - pixel_current.intensity);
@@ -113,7 +131,6 @@ float Warp::calcError(const CameraStep& step, const Transformation& T, Eigen::Ve
             // calculate Jacobian
             Matrix<float, 3, 6> J_T = Warp::transformJacobian(point, T);
             Matrix<float, 2, 3> J_P = Warp::projectJacobian(point_transformed, step.intrinsics);
-            Matrix<float, 1, 2> J_I = Warp::sampleJacobian(pixel_in_keyframe, step.frame_first);
             J_out.row(pixel_count) = J_I * J_P * J_T;
 
             // store in output values
@@ -121,47 +138,48 @@ float Warp::calcError(const CameraStep& step, const Transformation& T, Eigen::Ve
 
 
             total_error += error * error;
-            ++pixel_count;
 
 
             if (plotTarget) {
                 //error = error * error;
                 error = abs(error);
-                img_c.setPixel(x,y, sf::Color(error*255, (1-error)*255, 0));
+                //img_c.setPixel(x,y, sf::Color(error*255, (1-error)*255, 0));
+                Colormap::Jet m;
+                img_c.setPixel(x,y, m(error, 0, 1));
                 //img_k.setPixel(pixel_in_keyframe.pos.x(),pixel_in_keyframe.pos.y(), sf::Color(error*255, (1-error)*255, 0));
                 img_k.setPixel(pixel_in_keyframe.pos.x()+0.5,pixel_in_keyframe.pos.y()+0.5, sf::Color(255*pixel_in_keyframe.intensity, 255*pixel_in_keyframe.intensity, 255*pixel_in_keyframe.intensity));
 
-                if (weight_function) {
-                    img_errs_weighted(y,x) = (*weight_function)(error) * error;
-                }
+                img_J_norm(y,x) = J_out.row(pixel_count).norm();
+
+                img_selection_heuristic(y,x) = J_I.norm();
+
+                img_errs_weighted(y,x) = (*params.weight_function)(error) * error;
             }
+
+            ++pixel_count;
         }
     }
 
     error_out.conservativeResize(pixel_count);
     J_out.conservativeResize(pixel_count, Eigen::NoChange);
 
-    if (plotTarget) {
-        drawImageAt(img_c, sf::Vector2f(0,0),   *plotTarget);
-        drawImageAt(img_k, sf::Vector2f(0,H+2), *plotTarget);
+    if (plotTarget && font) {
+        drawImageAt(img_c, sf::Vector2f(0,0),   *plotTarget, "errors in current", font);
+        drawImageAt(img_k, sf::Vector2f(0,H+2), *plotTarget, "warped current frame", font);
         step.frame_second.getIntensityData().drawAt( *plotTarget, sf::Vector2f(W+2,0));
         step.frame_first .getIntensityData().drawAt( *plotTarget, sf::Vector2f(W+2,H+2));
 
-        if (weight_function) {
-            ImageData i;
-            i.loadFromMatrix(img_errs_weighted, Colormap::RedToGreen());
-            i.drawAt(*plotTarget, sf::Vector2f(2*W+4, 0));
-        }
+        drawMatrixAt(img_errs_weighted, sf::Vector2f(2*W+4, 0), *plotTarget, Colormap::Jet(), "weighted errors", font);
 
-        assert(font);
+        drawMatrixAt(img_J_norm,              sf::Vector2f(2*W+4, H+2),   *plotTarget, Colormap::Jet(), "norm(J) [max: " + boost::lexical_cast<string>(img_J_norm.maxCoeff()) + "]", font);
+        drawMatrixAt(img_selection_heuristic, sf::Vector2f(2*W+4, 2*H+4), *plotTarget, Colormap::Jet(), "image gradient [max: " + boost::lexical_cast<string>(img_selection_heuristic.maxCoeff()) + "]", font);
+
 
         sf::Text t;
         t.setFont(*font);
         t.setCharacterSize(12);
         t.setString("current frame"); t.setPosition(W+4,H-t.getCharacterSize()-2);     plotTarget->draw(t);
         t.setString("keyframe");      t.setPosition(W+4,H-t.getCharacterSize()-2+H+2); plotTarget->draw(t);
-        t.setString("errors in current");  t.setPosition(2,H-t.getCharacterSize()-2);     plotTarget->draw(t);
-        t.setString("warped current frame"); t.setPosition(2,H-t.getCharacterSize()-2+H+2); plotTarget->draw(t);
 
         string s = "total error: " + boost::lexical_cast<string>(sqrt(total_error))
                 //+ "\nabs min: " + boost::lexical_cast<string>(error_out.array().abs().minCoeff())
@@ -182,7 +200,7 @@ float Warp::calcError(const CameraStep& step, const Transformation& T, Eigen::Ve
     return sqrt(total_error);
 }
 ///////////////////////////////////////////////////////////////////////////////
-void Warp::renderErrorSurface(MatrixXf& target_out, Matrix<float,Dynamic,6>& gradients_out, const CameraStep& step, const Transformation& Tcenter, const PlotRange& range1, const PlotRange& range2)
+void Warp::renderErrorSurface(MatrixXf& target_out, Matrix<float,Dynamic,6>& gradients_out, const CameraStep& step, const Transformation& Tcenter, const PlotRange& range1, const PlotRange& range2, const Warp::Parameters& params)
 {
     assert(range1.dim <  6);
     assert(range2.dim <  6);
@@ -206,7 +224,7 @@ void Warp::renderErrorSurface(MatrixXf& target_out, Matrix<float,Dynamic,6>& gra
             Matrix<float, Eigen::Dynamic, 6> J;
             VectorXf errs;
 
-            float error = calcError(step, T, errs, J);
+            float error = calcError(step, T, errs, J, params);
 
             //Matrix<float, 1, 6> gradient = J.transpose() * errs;
             gradients_out.row(y*range1.steps +x) = J.transpose() * errs;

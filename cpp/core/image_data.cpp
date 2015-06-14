@@ -208,7 +208,7 @@ void ImageData::downsample2(const Colormap::Colormap& colormap)
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
-void drawImageAt(const sf::Image& img, const sf::Vector2f& pos, sf::RenderTarget& target, sf::RenderStates states)
+void drawImageAt(const sf::Image& img, const sf::Vector2f& pos, sf::RenderTarget& target, const std::string& label, const sf::Font* font)
 {
     sf::Texture t;
     t.loadFromImage(img);
@@ -217,6 +217,32 @@ void drawImageAt(const sf::Image& img, const sf::Vector2f& pos, sf::RenderTarget
     s.setTexture(t);
     s.setPosition(pos.x, pos.y);
 
-    target.draw(s, states);
+    target.draw(s);
+
+    if (!label.empty() && font) {
+        sf::Text t;
+        t.setFont(*font);
+        t.setCharacterSize(12);
+        t.setString(label);
+        t.setPosition(pos.x+2, pos.y+img.getSize().y-t.getCharacterSize()-2);
+        target.draw(t);
+    }
+}
+///////////////////////////////////////////////////////////////////////////////
+void drawMatrixAt(const Eigen::MatrixXf& mat, const sf::Vector2f& pos, sf::RenderTarget& target, const Colormap::Colormap& colormap, const std::string& label, const sf::Font* font)
+{
+    ImageData i;
+    i.loadFromMatrix(mat, colormap);
+
+    i.drawAt(target, pos);
+
+    if (!label.empty() && font) {
+        sf::Text t;
+        t.setFont(*font);
+        t.setCharacterSize(12);
+        t.setString(label);
+        t.setPosition(pos.x+2, pos.y+i.getHeight()-t.getCharacterSize()-2);
+        target.draw(t);
+    }
 }
 ///////////////////////////////////////////////////////////////////////////////

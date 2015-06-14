@@ -10,21 +10,23 @@ int iteration_count = 0;
 //#define PRINT_DEBUG_MESSAGES
 
 ///////////////////////////////////////////////////////////////////////////////
-float IterGaussNewton(const CameraStep& step, Transformation& T, const ErrorWeightFunction& weight_func)
+float IterGaussNewton(const CameraStep& step, Transformation& T, const Warp::Parameters& params)
 {
     ++iteration_count;
 
     VectorXf errors;
     Matrix<float, Dynamic, 6> J;
 
-    float total_error = Warp::calcError(step, T, errors, J);
 
 #ifdef PRINT_DEBUG_MESSAGES
+    float total_error = Warp::calcError(step, T, errors, J, params);
     cout << "[GN] " << T << " --> err: " << total_error;
+#else
+    Warp::calcError(step, T, errors, J, params);
 #endif
 
     // step = - (J'*W*J) \ J' * W * err';
-    VectorXf weights = weight_func(errors);
+    VectorXf weights = (*params.weight_function)(errors);
 
     Matrix<float, 6, 1> delta = - (J.transpose() * weights.asDiagonal() * J).fullPivLu().solve(
             J.transpose() * weights.asDiagonal() * errors );
@@ -42,21 +44,22 @@ float IterGaussNewton(const CameraStep& step, Transformation& T, const ErrorWeig
     return delta.norm();
 }
 ///////////////////////////////////////////////////////////////////////////////
-float IterGradientDescent(const CameraStep& step, Transformation& T, const Matrix<float,6,1>& stepSize, const ErrorWeightFunction& weight_func)
+float IterGradientDescent(const CameraStep& step, Transformation& T, const Matrix<float,6,1>& stepSize, const Warp::Parameters& params)
 {
     ++iteration_count;
 
     VectorXf errors;
     Matrix<float, Dynamic, 6> J;
 
-    float total_error = Warp::calcError(step, T, errors, J);
-
 #ifdef PRINT_DEBUG_MESSAGES
+    float total_error = Warp::calcError(step, T, errors, J, params);
     cout << "[GD] " << T << " --> err: " << total_error;
+#else
+    Warp::calcError(step, T, errors, J, params);
 #endif
 
     // step = - step_size .* (J' * (w.^2 .* err)');
-    VectorXf weights = weight_func(errors);
+    VectorXf weights = (*params.weight_function)(errors);
 
     // there is probably a better way than using two diagonal matrices ;) (asArray() or something)
     Matrix<float, 6, 1> delta = -stepSize.array() * (J.transpose() * weights.asDiagonal() * weights.asDiagonal() * errors).array();
@@ -74,18 +77,18 @@ float IterGradientDescent(const CameraStep& step, Transformation& T, const Matri
     return delta.norm();
 }
 ///////////////////////////////////////////////////////////////////////////////
-Transformation findTransformation(const CameraStep& step, Transformation T_init, const ErrorWeightFunction& weight_func)
+Transformation findTransformation(const CameraStep& step, const Warp::Parameters& params)
 {
-    Transformation T = T_init;
+    Transformation T = params.T_init;
 
     float prev_delta = 0;
     float delta = 0;
 
-    int max_iterations = 1000;
+    unsigned int iterations = 0;
 
-    while (max_iterations-- > 0) {
+    while (iterations++ < params.max_iterations) {
         prev_delta = delta;
-        delta = IterGaussNewton(step, T, weight_func);
+        delta = IterGaussNewton(step, T, params);
 
         if (delta < 0.0001) // found good enough solution
             break;
@@ -103,7 +106,7 @@ Transformation findTransformation(const CameraStep& step, Transformation T_init,
     return T;
 }
 ///////////////////////////////////////////////////////////////////////////////
-Transformation findTransformationWithPyramid(const CameraStep& step, const unsigned int pyramid_levels, const ErrorWeightFunction& weight_func)
+Transformation findTransformationWithPyramid(const CameraStep& step, const Warp::Parameters& params)
 {
     // downsample images
     CameraStep s = step;
@@ -113,7 +116,7 @@ Transformation findTransformationWithPyramid(const CameraStep& step, const unsig
     sf::Clock clock;
     clock.restart();
 
-    for (unsigned int i = 1; i < pyramid_levels; i++) {
+    for (unsigned int i = 1; i < params.pyramid_levels; i++) {
         s.downsampleBy(1);
         pyramid.push_back(s);
     }
@@ -121,25 +124,25 @@ Transformation findTransformationWithPyramid(const CameraStep& step, const unsig
     iteration_count = 0;
 
     // actually process them
-    Transformation T;
+    Warp::Parameters p = params;
     for (std::vector<CameraStep>::const_reverse_iterator it = pyramid.rbegin(); it != pyramid.rend(); ++it) {
-        T = findTransformation(*it, T, weight_func);
+        p.T_init = findTransformation(*it, p);
     }
 
     sf::Time t = clock.getElapsedTime();
     cout << " >>>>> found solution in " << iteration_count << " iterations and " << ((double) t.asMicroseconds())/1000 << "ms ( " << 1000*1000/((double)t.asMicroseconds()) << " FPS)" << endl;
-    cout << " >>>>> this is " << t.asMicroseconds() / ((double) iteration_count * 1000) << "ms per Iteration (on average, with " << pyramid_levels << " pyramid levels)" << endl;
+    cout << " >>>>> this is " << t.asMicroseconds() / ((double) iteration_count * 1000) << "ms per Iteration (on average, with " << params.pyramid_levels << " pyramid levels)" << endl;
 
 
-    return T;
+    return p.T_init;
 }
 ///////////////////////////////////////////////////////////////////////////////
-std::vector<Transformation> findTrajectory(const Scene& scene)
+std::vector<Transformation> findTrajectory(const Scene& scene, const Warp::Parameters& params)
 {
     std::vector<Transformation> traj(scene.getStepCount());
 
     for (size_t i = 0; i < scene.getStepCount(); i++) {
-        traj[i] = findTransformation(scene.getStep(i));
+        traj[i] = findTransformationWithPyramid(scene.getStep(i), params);
     }
 
     return traj;

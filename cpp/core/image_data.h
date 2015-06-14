@@ -74,6 +74,7 @@ private:
 
 };
 
-void drawImageAt(const sf::Image& img, const sf::Vector2f& pos, sf::RenderTarget& target, sf::RenderStates states = sf::RenderStates());
+void drawImageAt(const sf::Image& img, const sf::Vector2f& pos, sf::RenderTarget& target, const std::string& label = "", const sf::Font* font = NULL);
+void drawMatrixAt(const Eigen::MatrixXf& mat, const sf::Vector2f& pos, sf::RenderTarget& target, const Colormap::Colormap& colormap = Colormap::Colormap(), const std::string& label = "", const sf::Font* font = NULL);
 
 #endif /* end of include guard: IMAGE_DATA_H_INCLUDED */

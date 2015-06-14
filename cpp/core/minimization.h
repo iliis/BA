@@ -11,12 +11,12 @@
 #include "weight_functions.h"
 
 // perform a single Gauss-Newton step
-float IterGaussNewton    (const CameraStep& step, Transformation& T, const ErrorWeightFunction& weight_func = ErrorWeightNone());
-float IterGradientDescent(const CameraStep& step, Transformation& T, const Eigen::Matrix<float,6,1>& stepSize, const ErrorWeightFunction& weight_func = ErrorWeightNone());
+float IterGaussNewton    (const CameraStep& step, Transformation& T,                                           const Warp::Parameters& params);
+float IterGradientDescent(const CameraStep& step, Transformation& T, const Eigen::Matrix<float,6,1>& stepSize, const Warp::Parameters& params);
 
-Transformation findTransformation(const CameraStep& step, Transformation T_init = Transformation(), const ErrorWeightFunction& weight_func = ErrorWeightNone());
-Transformation findTransformationWithPyramid(const CameraStep& step, const unsigned int pyramid_levels, const ErrorWeightFunction& weight_func = ErrorWeightNone());
+Transformation findTransformation           (const CameraStep& step, const Warp::Parameters& params);
+Transformation findTransformationWithPyramid(const CameraStep& step, const Warp::Parameters& params);
 
-std::vector<Transformation> findTrajectory(const Scene& scene);
+std::vector<Transformation> findTrajectory(const Scene& scene, const Warp::Parameters& params);
 
 #endif /* end of include guard: MINIMIZATION_H_INCLUDED */
