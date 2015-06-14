@@ -13,32 +13,39 @@ float Colormap::calcValue(const float& value, const float& min, const float& max
     return (value - min) / (max - min);
 }
 ///////////////////////////////////////////////////////////////////////////////
+sf::Color Colormap::getColor(const float& value) const
+{
+    return sf::Color(255*value, 255*value, 255*value);
+}
+///////////////////////////////////////////////////////////////////////////////
 sf::Color Colormap::operator()(const float& value, const float& min, const float& max) const
 {
-    float v = this->calcValue(value, min, max);
-    return sf::Color(255*v, 255*v, 255*v);
+    if (this->isValid(value))
+        return this->getColor(this->calcValue(value, min, max));
+    else
+        return this->invalidValue();
 }
 ///////////////////////////////////////////////////////////////////////////////
 float Logarithmic::calcValue(const float& value, const float& min, const float& max) const
 {
-    return log2( Colormap::calcValue(value, min, max) );
+    return log2( Colormap::calcValue(value,min,max) );
 }
 ///////////////////////////////////////////////////////////////////////////////
-sf::Color RedToGreen::operator()(const float& value, const float& min, const float& max) const
+sf::Color RedToGreen::getColor(const float& value) const
 {
-    float v = this->calcValue(value, min, max);
+    const float& v = value;
     return sf::Color(255 * (1-v), 255 * v, 0);
 }
 ///////////////////////////////////////////////////////////////////////////////
-sf::Color Autumn::operator()(const float& value, const float& min, const float& max) const
+sf::Color Autumn::getColor(const float& value) const
 {
-    float v = this->calcValue(value, min, max);
+    const float& v = value;
     return sf::Color(255, 255 * v, 0);
 }
 ///////////////////////////////////////////////////////////////////////////////
-sf::Color Hot::operator()(const float& value, const float& min, const float& max) const
+sf::Color Hot::getColor(const float& value) const
 {
-    float v = this->calcValue(value, min, max);
+    const float& v = value;
 
     if (v < 1/3.0f) {
         return sf::Color(255*v*3, 0, 0);
@@ -49,9 +56,9 @@ sf::Color Hot::operator()(const float& value, const float& min, const float& max
     }
 }
 ///////////////////////////////////////////////////////////////////////////////
-sf::Color Jet::operator()(const float& value, const float& min, const float& max) const
+sf::Color Jet::getColor(const float& value) const
 {
-    float v = this->calcValue(value, min, max);
+    const float& v = value;
 
     // black
     // blue

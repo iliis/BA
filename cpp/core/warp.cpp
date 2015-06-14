@@ -107,6 +107,10 @@ float Warp::calcError(const CameraStep& step, const Transformation& T, Eigen::Ve
         for (unsigned int x = 0; x < W; ++x) {
             Pixel pixel_current  = step.frame_second.getPixel(Vector2i(x,y));
 
+            // skip pixels without depth value
+            if (isnan(pixel_current.depth))
+                continue;
+
             WorldPoint point = projectInv(pixel_current, step.intrinsics);
 
             WorldPoint point_transformed = transform(point, T); // 6.2ms per point, 3.7ms with cached rotation matrix
@@ -160,17 +164,29 @@ float Warp::calcError(const CameraStep& step, const Transformation& T, Eigen::Ve
         }
     }
 
-    error_out.conservativeResize(pixel_count);
-    J_out.conservativeResize(pixel_count, Eigen::NoChange);
+    // catch the border case where pixels are warped so that *none* actually falls on to the other image
+    if (pixel_count == 0) {
+        error_out.resize(1);
+        J_out.resize(1, Eigen::NoChange);
+
+        error_out.setZero();
+        J_out.setZero();
+    } else {
+        error_out.conservativeResize(pixel_count);
+        J_out.conservativeResize(pixel_count, Eigen::NoChange);
+    }
+
 
     if (plotTarget && font) {
         drawImageAt(img_c, sf::Vector2f(0,0),   *plotTarget, "errors in current", font);
         drawImageAt(img_k, sf::Vector2f(0,H+2), *plotTarget, "warped current frame", font);
         step.frame_second.getIntensityData().drawAt( *plotTarget, sf::Vector2f(W+2,0));
         step.frame_first .getIntensityData().drawAt( *plotTarget, sf::Vector2f(W+2,H+2));
+        //step.frame_second.getDepthData().drawAt( *plotTarget, sf::Vector2f(2*W+4,0));
+        //step.frame_first .getDepthData().drawAt( *plotTarget, sf::Vector2f(2*W+4,H+2));
 
-        drawMatrixAt(img_errs_weighted, sf::Vector2f(2*W+4, 0), *plotTarget, Colormap::Jet(), "weighted errors", font);
 
+        drawMatrixAt(img_errs_weighted,       sf::Vector2f(2*W+4, 0), *plotTarget, Colormap::Jet(), "weighted errors", font);
         drawMatrixAt(img_J_norm,              sf::Vector2f(2*W+4, H+2),   *plotTarget, Colormap::Jet(), "norm(J) [max: " + boost::lexical_cast<string>(img_J_norm.maxCoeff()) + "]", font);
         drawMatrixAt(img_selection_heuristic, sf::Vector2f(2*W+4, 2*H+4), *plotTarget, Colormap::Jet(), "image gradient [max: " + boost::lexical_cast<string>(img_selection_heuristic.maxCoeff()) + "]", font);
 

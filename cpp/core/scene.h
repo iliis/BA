@@ -5,7 +5,12 @@
 #include <string>
 #include <sstream>
 #include <Eigen/Dense>
+#include <sensor_msgs/Image.h>
+#include <stereo_msgs/DisparityImage.h>
+#include <rosbag/bag.h>
+#include <rosbag/view.h>
 
+#include "../utils/progress.h"
 #include "camera_intrinsics.h"
 #include "image_data.h"
 #include "camera_step.h"
@@ -21,6 +26,7 @@ class Scene
 {
 public:
     void loadFromSceneDirectory(const std::string& scene_path);
+    void loadFromBagFile(const std::string& bag_path);
 
     inline unsigned int getFrameCount() const { return frames.size(); }
     inline unsigned int getStepCount()  const { return getFrameCount() - 1; }

@@ -4,6 +4,8 @@
 #include <cmath>
 #include <string>
 #include <iostream>
+#include <limits>
+#include <sensor_msgs/Image.h>
 #include <SFML/Graphics.hpp>
 #include <Eigen/Dense>
 
@@ -28,6 +30,8 @@ public:
 
     // load data
     void loadFromMatrix(const Eigen::MatrixXf& source_data, const Colormap::Colormap& colormap = Colormap::Colormap());
+    void loadFromROSgrayscale(const sensor_msgs::Image& source_data, const Colormap::Colormap& colormap = Colormap::Colormap());
+    void loadFromROSdepthmap(const sensor_msgs::Image& source_data, const Colormap::Colormap& colormap = Colormap::Colormap());
     void loadFromImage(const sf::Image& source_data);
     void loadFromFile(const std::string source_file);
 

@@ -1,7 +1,12 @@
 #include <stdlib.h>
 #include <iostream>
 #include <fstream>
+#include <boost/foreach.hpp>
 #include <SFML/Graphics.hpp>
+#include <sensor_msgs/Image.h>
+#include <stereo_msgs/DisparityImage.h>
+#include <rosbag/bag.h>
+#include <rosbag/view.h>
 
 #include "core/scene.h"
 #include "core/image_data.h"
@@ -14,9 +19,10 @@ using namespace std;
 using namespace Eigen;
 
 sf::Font font;
-//sf::RenderWindow window(sf::VideoMode(1280, 768), "dense odometry");
+sf::RenderWindow window(sf::VideoMode(1280, 768), "dense odometry");
+//sf::RenderWindow window(sf::VideoMode(4*752+6, 3*480), "dense odometry");
 //sf::RenderWindow window(sf::VideoMode(256*4+2, 128*5), "dense odometry");
-sf::RenderWindow window(sf::VideoMode(256*3+4, 128*4+4), "dense odometry");
+//sf::RenderWindow window(sf::VideoMode(256*3+4, 128*4+4), "dense odometry");
 
 inline sf::Vector2f toSF(Eigen::Vector2f v)
 {
@@ -136,6 +142,8 @@ void run_minimization(const Scene& scene)
     params.max_iterations = 1000;
     params.T_init = Transformation(0,0,0,0,0,0);
     params.gradient_norm_threshold = 0.1;
+
+    cout << "starting main loop" << endl;
 
     bool show_keyframe = false;
     while (window.isOpen())
@@ -459,7 +467,10 @@ void run_minimization(const Scene& scene)
 #else
             finished = IterGradientDescent(step, T, step_size, *weight_function) < 0.0001;
 #endif
+
+// auto upscale / pause when converged
             if (finished) {
+#if 0
                 if (step.scale > 0) {
                     // upscale image again
                     unsigned s = step.scale-1;
@@ -468,6 +479,7 @@ void run_minimization(const Scene& scene)
                 } else {
                     min_paused = true;
                 }
+#endif
             }
         }
 
@@ -501,6 +513,82 @@ void run_minimization(const Scene& scene)
     delete params.weight_function;
 }
 ///////////////////////////////////////////////////////////////////////////////
+void run_on_real_data()
+{
+    rosbag::Bag bag;
+    bag.open("/home/samuel/data/2015-06-11-16-30-01.bag", rosbag::bagmode::Read);
+
+    cout << "bag is " << bag.getSize() << " bytes (?) big." << endl;
+
+    vector<string> topics;
+    topics.push_back("/stereo_dense_reconstruction/image_fused");
+    topics.push_back("/stereo_dense_reconstruction/disparity");
+
+    //rosbag::View view(bag, rosbag::TopicQuery("/stereo_dense_reconstruction/image_fused"));
+    //rosbag::View view(bag, rosbag::TopicQuery("/stereo_dense_reconstruction/disparity"));
+    rosbag::View view(bag, rosbag::TopicQuery(topics));
+
+    cout << "it has " << view.size() << " views." << endl;
+
+
+    BOOST_FOREACH(rosbag::MessageInstance const m, view) {
+
+        //cout << "time: " << m.getTime() << endl;
+        //cout << "topic: " << m.getTopic() << endl;
+        //cout << "data type: " << m.getDataType() << endl;
+        //cout << "caller ID: " << m.getCallerId() << endl;
+        //cout << "connection header: " << m.getConnectionHeader() << endl;
+        //cout << " //////////////////////////////////////////////// " << endl;
+        //cout << "message def: " << m.getMessageDefinition() << endl;
+
+        window.clear();
+
+        stereo_msgs::DisparityImage::Ptr image = m.instantiate<stereo_msgs::DisparityImage>();
+
+        if (image) {
+            //cout << "OK" << endl;
+            //cout << image->image.width << " x " << image->image.height << endl;
+            //cout << "encoding: " << image->image.encoding << endl;
+
+            ImageData i;
+            //i.loadFromROSgrayscale(image->image);
+            i.loadFromROSdepthmap(image->image, Colormap::Jet());
+            window.draw(i);
+        }
+
+        sensor_msgs::Image::Ptr intensities = m.instantiate<sensor_msgs::Image>();
+        if (intensities) {
+            ImageData i;
+            i.loadFromROSgrayscale(*intensities);
+            window.draw(i);
+        }
+
+        window.display();
+
+        //getchar();
+
+    }
+
+    bool run = false;
+    while (window.isOpen() && run)
+    {
+        sf::Event event;
+        while (window.pollEvent(event))
+        {
+            if (event.type == sf::Event::Closed)
+                window.close();
+
+            if (event.type == sf::Event::KeyPressed && (event.key.code == sf::Keyboard::Escape || event.key.code == sf::Keyboard::Q))
+                run = false;
+        }
+
+        window.clear();
+        window.display();
+    }
+
+    bag.close();
+}
+///////////////////////////////////////////////////////////////////////////////
 int main()
 {
     font.loadFromFile("resources/fonts/default.otf");
@@ -509,12 +597,17 @@ int main()
     //testscene.loadFromSceneDirectory("../matlab/input/test_wide");
     //testscene.loadFromSceneDirectory("../matlab/input/trajectory1");
     //testscene.loadFromSceneDirectory("../matlab/input/testscene1");
-    testscene.loadFromSceneDirectory("../matlab/input/courtyard/lux");
+    //testscene.loadFromSceneDirectory("../matlab/input/courtyard/lux");
     //testscene.loadFromSceneDirectory("../matlab/input/courtyard/normal"); // step 22 is nice!
+    testscene.loadFromBagFile("/home/samuel/data/2015-06-11-16-30-01.bag");
+
+    cout << testscene.getIntrinsics() << endl;
 
     //write_trajectory(testscene, params);
 
     run_minimization(testscene);
+
+    //run_on_real_data();
 
 
     return EXIT_SUCCESS;

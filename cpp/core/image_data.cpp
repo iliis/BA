@@ -22,7 +22,52 @@ void ImageData::loadFromMatrix(const Eigen::MatrixXf& source_data, const Colorma
     data   = source_data;
     updateImageFromMatrix(colormap);
 
-    // cout << "loaded image from matrix " << width << " x " << height << endl;
+    //cout << "loaded image from matrix " << width << " x " << height << " (" << data.cols() << " x " << data.rows() << ")" << endl;
+}
+///////////////////////////////////////////////////////////////////////////////
+void ImageData::loadFromROSgrayscale(const sensor_msgs::Image& source_data, const Colormap::Colormap& colormap)
+{
+    width  = source_data.width;
+    height = source_data.height;
+
+    data.resize(height, width);
+
+    // copy data
+    for (unsigned int y = 0; y < height; y++) {
+        for (unsigned int x = 0; x < width; x++) {
+            data(y, x) = source_data.data[(y*width+x)*3] / 255.0f;
+        }
+    }
+
+    updateImageFromMatrix(colormap);
+}
+///////////////////////////////////////////////////////////////////////////////
+void ImageData::loadFromROSdepthmap(const sensor_msgs::Image& source_data, const Colormap::Colormap& colormap)
+{
+    width  = source_data.width;
+    height = source_data.height;
+
+    data.resize(height, width);
+
+    // copy data
+    const float* fdata = reinterpret_cast<const float*>(source_data.data.data());
+
+    for (unsigned int y = 0; y < height; y++) {
+        for (unsigned int x = 0; x < width; x++) {
+            //data(y, x) = source_data.data[(y*width+x)*3] / 255.0f;
+            unsigned int i = y*width+x;
+
+            // invalid data is exactly '1'
+            // these are disparity values, not actual depth data!
+            // TODO: use disparity value!
+            if (fdata[i] == 1.0f)
+                data(y, x) = std::numeric_limits<float>::quiet_NaN();
+            else
+                data(y, x) = 1.0f / fdata[i];
+        }
+    }
+
+    updateImageFromMatrix(colormap);
 }
 ///////////////////////////////////////////////////////////////////////////////
 void ImageData::loadFromImage(const sf::Image& source_data)
