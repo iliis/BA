@@ -133,7 +133,7 @@ IDEAS
 [done?] 3. fehler gewichtung
     use vector::asDiagonal() ;)
     http://eigen.tuxfamily.org/dox/classEigen_1_1MatrixBase.html#adaf22d3a2069ec2c0df912cb87329e9c
-4. use real(tm) data
+[done, test!] 4. use real(tm) data
 
 
 
@@ -160,3 +160,5 @@ lux/37 doesn't converge on scale 3 (2x halbiert) -> jitters too much
     - time (ms and iterations) until convergence
     - error vs. iterations / time
     - average perturbation from ground truth for convergence
+
+- choose steps that are further apart

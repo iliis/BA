@@ -59,11 +59,13 @@ void ImageData::loadFromROSdepthmap(const sensor_msgs::Image& source_data, const
 
             // invalid data is exactly '1'
             // these are disparity values, not actual depth data!
-            // TODO: use disparity value!
-            if (fdata[i] == 1.0f)
+            // TODO: use baseline value here!
+            if (fdata[i] == 1.0f) {
                 data(y, x) = std::numeric_limits<float>::quiet_NaN();
-            else
-                data(y, x) = 1.0f / fdata[i];
+            } else {
+                //data(y, x) = 1.0f / fdata[i];
+                data(y, x) = fdata[i];
+            }
         }
     }
 
@@ -142,13 +144,27 @@ void ImageData::image_to_matrix(const sf::Image& source, Eigen::MatrixXf& dest)
 ///////////////////////////////////////////////////////////////////////////////
 void ImageData::matrix_to_image(const Eigen::MatrixXf& source, sf::Image& dest, const Colormap::Colormap& colormap)
 {
-    // cout << "converting matrix to image ...";
-
     // initialize and clear image
     dest.create(source.cols(), source.rows());
 
     float near = source.minCoeff();
     float far  = source.maxCoeff();
+
+    // matrix might contain NaNs
+    if (!isfinite(near) || !isfinite(far)) {
+        near =  std::numeric_limits<float>::infinity();
+        far  = -std::numeric_limits<float>::infinity();
+
+        for (unsigned int r = 0; r < source.rows(); r++) {
+            for (unsigned int c = 0; c < source.cols(); c++) {
+                if (near > source(r,c))
+                    near = source(r,c);
+
+                if (far < source(r,c))
+                    far = source(r,c);
+            }
+        }
+    }
 
     // convert matrix data into grayscale image
     for (unsigned int y = 0; y < source.rows(); y++) {

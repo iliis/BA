@@ -32,6 +32,7 @@ public:
     inline unsigned int getStepCount()  const { return getFrameCount() - 1; }
 
           CameraStep   getStep(unsigned int index) const;
+          CameraStep   getStep(unsigned int indexA, unsigned int indexB) const;
     const CameraImage& getFrame(unsigned int index) const;
     inline const CameraIntrinsics& getIntrinsics() const { return intrinsics; }
 

@@ -40,7 +40,7 @@ void Scene::loadFromBagFile(const std::string& bag_path)
     rosbag::View::const_iterator it_depth     = view_depth    .begin();
 
     //const unsigned int N = view_intensity.size();
-    const unsigned int N = 40; // just load the beginning of the recording
+    const unsigned int N = 100; // just load the beginning of the recording
 
     this->frames.resize(N);
     this->ground_truth.resize(N);
@@ -67,7 +67,13 @@ void Scene::loadFromBagFile(const std::string& bag_path)
         ground_truth[i] = Transformation(0,0,0,0,0,0);
 
         // TODO: depths values are actually disparity values!
-        this->intrinsics = CameraIntrinsics(p_intensities->width, p_intensities->height, 1.0f / 480); //(p_depths->f * p_depths->T));
+        //this->intrinsics = CameraIntrinsics(p_intensities->width, p_intensities->height, 1.0f / 480); //(p_depths->f * p_depths->T));
+        this->intrinsics = CameraIntrinsics(p_intensities->width, p_intensities->height, 480); //(p_depths->f * p_depths->T));
+
+#if 1
+        frames[i].downsample2();
+        intrinsics.downsample2();
+#endif
 
         printfProgress(i, 0, N);
 
@@ -83,9 +89,17 @@ void Scene::loadFromBagFile(const std::string& bag_path)
 ///////////////////////////////////////////////////////////////////////////////
 CameraStep Scene::getStep(unsigned int index) const
 {
-    assert(index < this->getStepCount());
+    return this->getStep(index, index+1);
+}
+///////////////////////////////////////////////////////////////////////////////
+CameraStep Scene::getStep(unsigned int indexA, unsigned int indexB) const
+{
+    assert(indexA < this->getStepCount());
+    assert(indexB < this->getStepCount());
 
-    return CameraStep(frames[index], frames[index+1], ground_truth[index+1], this, index);
+    // TODO: calculate correct ground truth...
+
+    return CameraStep(frames[indexA], frames[indexB], ground_truth[indexB], this, indexA);
 }
 ///////////////////////////////////////////////////////////////////////////////
 const CameraImage& Scene::getFrame(unsigned int index) const

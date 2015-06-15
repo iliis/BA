@@ -19,11 +19,20 @@ WorldPoint Warp::projectInv(const Pixel& pixel, const CameraIntrinsics& intrinsi
     WorldPoint p;
     p.pixel = pixel;
 
+#if 0
     // project into 3D space
     Vector2f pxy = (pixel.pos - intrinsics.getPrincipalPoint()) * pixel.depth / intrinsics.getFocalLength();
     p.pos(0) = pxy(0);
     p.pos(1) = pxy(1);
     p.pos(2) = pixel.depth;
+#else
+    // TODO: implement this the correct way :P
+    // quick hack to use disparity images
+    Vector2f pxy = (pixel.pos - intrinsics.getPrincipalPoint()) * 0.011 / pixel.depth;
+    p.pos(0) = pxy(0);
+    p.pos(1) = pxy(1);
+    p.pos(2) = 0.011 * intrinsics.getFocalLength() / pixel.depth;
+#endif
 
     return p;
 }
@@ -151,7 +160,7 @@ float Warp::calcError(const CameraStep& step, const Transformation& T, Eigen::Ve
                 Colormap::Jet m;
                 img_c.setPixel(x,y, m(error, 0, 1));
                 //img_k.setPixel(pixel_in_keyframe.pos.x(),pixel_in_keyframe.pos.y(), sf::Color(error*255, (1-error)*255, 0));
-                img_k.setPixel(pixel_in_keyframe.pos.x()+0.5,pixel_in_keyframe.pos.y()+0.5, sf::Color(255*pixel_in_keyframe.intensity, 255*pixel_in_keyframe.intensity, 255*pixel_in_keyframe.intensity));
+                img_k.setPixel(pixel_in_keyframe.pos.x()+0.5,pixel_in_keyframe.pos.y()+0.5, sf::Color(255*pixel_current.intensity, 255*pixel_current.intensity, 255*pixel_current.intensity));
 
                 img_J_norm(y,x) = J_out.row(pixel_count).norm();
 
@@ -182,8 +191,8 @@ float Warp::calcError(const CameraStep& step, const Transformation& T, Eigen::Ve
         drawImageAt(img_k, sf::Vector2f(0,H+2), *plotTarget, "warped current frame", font);
         step.frame_second.getIntensityData().drawAt( *plotTarget, sf::Vector2f(W+2,0));
         step.frame_first .getIntensityData().drawAt( *plotTarget, sf::Vector2f(W+2,H+2));
-        //step.frame_second.getDepthData().drawAt( *plotTarget, sf::Vector2f(2*W+4,0));
-        //step.frame_first .getDepthData().drawAt( *plotTarget, sf::Vector2f(2*W+4,H+2));
+        //step.frame_second.getDepthData().drawAt( *plotTarget, sf::Vector2f(0,0));
+        //step.frame_first .getDepthData().drawAt( *plotTarget, sf::Vector2f(0,H+2));
 
 
         drawMatrixAt(img_errs_weighted,       sf::Vector2f(2*W+4, 0), *plotTarget, Colormap::Jet(), "weighted errors", font);

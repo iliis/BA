@@ -129,6 +129,8 @@ void write_trajectory(const Scene& scene, const Warp::Parameters& params)
 bool min_paused = true; // start in paused state, global to keep value :P
 void run_minimization(const Scene& scene)
 {
+    const sf::Vector2u window_size = window.getSize();
+
     unsigned int index = 0;
     CameraStep step = scene.getStep(index);
 
@@ -310,10 +312,11 @@ void run_minimization(const Scene& scene)
                             cout << "[  5 ]: disturb T (degrees)" << endl;
                             cout << "[  6 ]: reload step" << endl;
                             cout << "[  7 ]: choose step number" << endl;
-                            cout << "[  8 ]: choose weight function" << endl;
-                            cout << "[  9 ]: choose number of pyramid levels" << endl;
-                            cout << "[ 10 ]: set gradient norm threshold" << endl;
-                            cout << "[ 11 ]: render error surface" << endl;
+                            cout << "[  8 ]: load step from two frames" << endl;
+                            cout << "[  9 ]: choose weight function" << endl;
+                            cout << "[ 10 ]: choose number of pyramid levels" << endl;
+                            cout << "[ 11 ]: set gradient norm threshold" << endl;
+                            cout << "[ 12 ]: render error surface" << endl;
                             cout << "[  0 ]: exit" << endl;
                             cin >> opt;
 
@@ -384,6 +387,23 @@ void run_minimization(const Scene& scene)
                                     break;
 
                                 case 8:
+                                    {
+                                        unsigned int indexA, indexB;
+                                        do {
+                                            cout << "enter frame number [0-" << (scene.getFrameCount()-1) << "] for first frame: ";
+                                            cin >> indexA;
+                                        } while(indexA >= scene.getFrameCount());
+
+                                        do {
+                                            cout << "enter frame number [0-" << (scene.getFrameCount()-1) << "] for second frame: ";
+                                            cin >> indexB;
+                                        } while(indexB >= scene.getFrameCount());
+
+                                        step = scene.getStep(indexA, indexB);
+                                    }
+                                    break;
+
+                                case 9:
                                     do {
                                         cout << "choose:" << endl;
                                         cout << "1: None" << endl;
@@ -411,19 +431,19 @@ void run_minimization(const Scene& scene)
                                     }
                                     break;
 
-                                case 9:
+                                case 10:
                                     do {
                                         cout << "number of levels [>=1] (current: " << params.pyramid_levels << "): ";
                                         cin >> params.pyramid_levels;
                                     } while (params.pyramid_levels < 1);
                                     break;
 
-                                case 10:
+                                case 11:
                                     cout << "new gradient norm threshold [0-1] (current: " << params.gradient_norm_threshold << "): ";
                                     cin >> params.gradient_norm_threshold;
                                     break;
 
-                                case 11:
+                                case 12:
                                     {
                                         bool around_T = false;
                                         Warp::PlotRange range1(0,0,1,1), range2(1,0,1,1);
@@ -492,7 +512,7 @@ void run_minimization(const Scene& scene)
         sf::Text t;
         t.setFont(font);
         t.setCharacterSize(12);
-        t.setString(params.toString()); t.setPosition(2,128*3-3*14); window.draw(t);
+        t.setString(params.toString()); t.setPosition(2,window_size.y-3*14); window.draw(t);
 
         window.display();
 
