@@ -133,7 +133,7 @@ IDEAS
 [done?] 3. fehler gewichtung
     use vector::asDiagonal() ;)
     http://eigen.tuxfamily.org/dox/classEigen_1_1MatrixBase.html#adaf22d3a2069ec2c0df912cb87329e9c
-[done, test!] 4. use real(tm) data
+[done] 4. use real(tm) data
 
 
 
@@ -161,4 +161,23 @@ lux/37 doesn't converge on scale 3 (2x halbiert) -> jitters too much
     - error vs. iterations / time
     - average perturbation from ground truth for convergence
 
-- choose steps that are further apart
+[done] - choose steps that are further apart
+
+- measure longer trajectory
+
+1. measure gradient for pixel filtering on original / current frame
+2. portiere auf sensor
+
+[- levenberg marquart]
+
+- separate SFML code from math
+
+Intrinsic Parameter Matrix K (von original camera 0 und rektifiezierter Kamera):
+
+471.988       0              370.105
+      0            471.302   226.664
+      0            0              1
+
+Baseline:
+
+0.110174 m

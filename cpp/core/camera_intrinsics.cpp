@@ -17,15 +17,25 @@ using namespace boost;
 CameraIntrinsics::CameraIntrinsics()
   : camera_width(0), camera_height(0),
     principal_point_x(0), principal_point_y(0),
-    focal_length(0), near_clipping(0), far_clipping(0)
+    focal_length(0), baseline(0), is_disparity(false),
+    near_clipping(0), far_clipping(0)
 {
 }
 ///////////////////////////////////////////////////////////////////////////////
 CameraIntrinsics::CameraIntrinsics(unsigned int W, unsigned int H, float focal, float near, float far)
   : camera_width(W), camera_height(H),
-    focal_length(focal), near_clipping(near), far_clipping(far)
+    focal_length(focal), baseline(0), is_disparity(false),
+    near_clipping(near), far_clipping(far)
 {
     this->updatePrincipalPoint();
+}
+///////////////////////////////////////////////////////////////////////////////
+CameraIntrinsics::CameraIntrinsics(const Eigen::Vector2f& camera_size, const Eigen::Vector2f& principal_point, float focal_length, float baseline)
+  : camera_width(camera_size.x()), camera_height(camera_size.y()),
+    principal_point_x(principal_point.x()), principal_point_y(principal_point.y()),
+    focal_length(focal_length), baseline(baseline), is_disparity(true),
+    near_clipping(0), far_clipping(0)
+{
 }
 ///////////////////////////////////////////////////////////////////////////////
 void CameraIntrinsics::loadFromCSV(const std::string& filename)

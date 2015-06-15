@@ -110,11 +110,15 @@ void draw_error_surface(const CameraStep& step, const Warp::PlotRange& range1, c
     cout << "closing error surface plot" << endl;
 }
 ///////////////////////////////////////////////////////////////////////////////
-void write_trajectory(const Scene& scene, const Warp::Parameters& params)
+void write_trajectory(const Scene& scene, const Warp::Parameters& params, string output_dir = "")
 {
     std::vector<Transformation> traj = findTrajectory(scene, params);
 
-    string path = scene.getSourceDirectory() + "/measured_trajectory.csv";
+    if (output_dir.empty()) {
+        output_dir = scene.getSourceDirectory();
+    }
+
+    string path = output_dir + "/measured_trajectory.csv";
     ofstream outfile(path.c_str());
 
     outfile << "x, y, z, alpha, beta, gamma" << endl;
@@ -623,7 +627,13 @@ int main()
 
     cout << testscene.getIntrinsics() << endl;
 
-    //write_trajectory(testscene, params);
+    Warp::Parameters params(new ErrorWeightNone());
+    params.pyramid_levels = 3;
+    params.max_iterations = 100;
+    params.T_init = Transformation(0,0,0,0,0,0);
+    params.gradient_norm_threshold = 0.1;
+
+    //write_trajectory(testscene, params, ".");
 
     run_minimization(testscene);
 

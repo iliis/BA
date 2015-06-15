@@ -19,20 +19,19 @@ WorldPoint Warp::projectInv(const Pixel& pixel, const CameraIntrinsics& intrinsi
     WorldPoint p;
     p.pixel = pixel;
 
-#if 0
     // project into 3D space
-    Vector2f pxy = (pixel.pos - intrinsics.getPrincipalPoint()) * pixel.depth / intrinsics.getFocalLength();
-    p.pos(0) = pxy(0);
-    p.pos(1) = pxy(1);
-    p.pos(2) = pixel.depth;
-#else
-    // TODO: implement this the correct way :P
-    // quick hack to use disparity images
-    Vector2f pxy = (pixel.pos - intrinsics.getPrincipalPoint()) * 0.011 / pixel.depth;
-    p.pos(0) = pxy(0);
-    p.pos(1) = pxy(1);
-    p.pos(2) = 0.011 * intrinsics.getFocalLength() / pixel.depth;
-#endif
+    if (intrinsics.isDisparityCamera()) {
+        // quick hack to use disparity images
+        Vector2f pxy = (pixel.pos - intrinsics.getPrincipalPoint()) * intrinsics.getBaseline() / pixel.depth;
+        p.pos(0) = pxy(0);
+        p.pos(1) = pxy(1);
+        p.pos(2) = intrinsics.getBaseline() * intrinsics.getFocalLength() / pixel.depth;
+    } else {
+        Vector2f pxy = (pixel.pos - intrinsics.getPrincipalPoint()) * pixel.depth / intrinsics.getFocalLength();
+        p.pos(0) = pxy(0);
+        p.pos(1) = pxy(1);
+        p.pos(2) = pixel.depth;
+    }
 
     return p;
 }

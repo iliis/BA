@@ -33,6 +33,16 @@ void Scene::loadFromBagFile(const std::string& bag_path)
 
     cout << "bag is " << bag.getSize() << " bytes (?) big." << endl;
 
+
+    rosbag::View view(bag, rosbag::TopicQuery("/aslam/aslam_odometry"));
+
+    BOOST_FOREACH(const rosbag::MessageInstance m, view) {
+        // TODO: display ground truth data
+    }
+
+
+
+
     rosbag::View view_intensity(bag, rosbag::TopicQuery("/stereo_dense_reconstruction/image_fused"));
     rosbag::View view_depth    (bag, rosbag::TopicQuery("/stereo_dense_reconstruction/disparity"));
 
@@ -40,7 +50,7 @@ void Scene::loadFromBagFile(const std::string& bag_path)
     rosbag::View::const_iterator it_depth     = view_depth    .begin();
 
     //const unsigned int N = view_intensity.size();
-    const unsigned int N = 100; // just load the beginning of the recording
+    const unsigned int N = 4; // just load the beginning of the recording
 
     this->frames.resize(N);
     this->ground_truth.resize(N);
@@ -66,9 +76,8 @@ void Scene::loadFromBagFile(const std::string& bag_path)
         // TODO: load ground truth from bag
         ground_truth[i] = Transformation(0,0,0,0,0,0);
 
-        // TODO: depths values are actually disparity values!
-        //this->intrinsics = CameraIntrinsics(p_intensities->width, p_intensities->height, 1.0f / 480); //(p_depths->f * p_depths->T));
-        this->intrinsics = CameraIntrinsics(p_intensities->width, p_intensities->height, 480); //(p_depths->f * p_depths->T));
+        // real sensor produces disparity data, not directly depth values
+        this->intrinsics = CameraIntrinsics(Eigen::Vector2f(p_intensities->width, p_intensities->height), Eigen::Vector2f(370.105, 226.664), 471.7, 0.110174);
 
 #if 1
         frames[i].downsample2();
