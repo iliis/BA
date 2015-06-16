@@ -4,9 +4,11 @@
 #include <vector>
 #include <string>
 #include <sstream>
+#include <boost/foreach.hpp>
 #include <Eigen/Dense>
 #include <sensor_msgs/Image.h>
 #include <stereo_msgs/DisparityImage.h>
+#include <nav_msgs/Odometry.h>
 #include <rosbag/bag.h>
 #include <rosbag/view.h>
 

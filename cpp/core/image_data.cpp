@@ -248,6 +248,39 @@ Eigen::Matrix<float, 1, 2> ImageData::sampleDiff(Eigen::Vector2f pos) const
     return J;
 }
 ///////////////////////////////////////////////////////////////////////////////
+// samples the image gradient at the exact pixel center, using a -1,0,1 kernel (or -1 1 on the edge)
+Eigen::Matrix<float, 1, 2> ImageData::getDiff(Eigen::Vector2i pos) const
+{
+    float diffx = 0, diffy = 0;
+
+    if (pos.x() <= 0) {
+        // no pixel on the left, just use gradient from this to the one on the right
+        diffx = getValue(pos+Eigen::Vector2i(1,0)) - getValue(pos);
+    } else if (pos.x() >= (float) width-1) {
+        // no pixel on the right, just use gradient from the one on the left to this pixel
+        diffx = getValue(pos) - getValue(pos+Eigen::Vector2i(-1,0));
+    } else {
+        diffx = (getValue(pos + Eigen::Vector2i( 1,0))
+                -getValue(pos + Eigen::Vector2i(-1,0))) / 2;
+    }
+
+    if (pos.y() <= 0) {
+        diffy = getValue(pos+Eigen::Vector2i(0,1)) - getValue(pos);
+    } else if (pos.y() >= (float) height-1) {
+        diffy = getValue(pos) - getValue(pos+Eigen::Vector2i(0,-1));
+    } else {
+        diffy = (getValue(pos + Eigen::Vector2i(0,1))
+                -getValue(pos + Eigen::Vector2i(0,-1))) / 2;
+    }
+
+    Eigen::Matrix<float, 1, 2> J;
+
+    J(0) = diffx;
+    J(1) = diffy;
+
+    return J;
+}
+///////////////////////////////////////////////////////////////////////////////
 void ImageData::downsample2(const Colormap::Colormap& colormap)
 {
     for (int r = 0; r < data.rows()/2; r++) {

@@ -18,5 +18,6 @@ Transformation findTransformation           (const CameraStep& step, const Warp:
 Transformation findTransformationWithPyramid(const CameraStep& step, const Warp::Parameters& params);
 
 std::vector<Transformation> findTrajectory(const Scene& scene, const Warp::Parameters& params);
+std::vector<Transformation> findTrajectoryFromRosbag(const std::string& rosbag_path, const Warp::Parameters& params);
 
 #endif /* end of include guard: MINIMIZATION_H_INCLUDED */

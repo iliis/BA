@@ -14,6 +14,7 @@ class CameraStep
 {
 public:
     CameraStep(const CameraImage& first, const CameraImage& second, const Transformation& ground_truth, const Scene* scene, unsigned int index = 0);
+    CameraStep(const CameraImage& first, const CameraImage& second, const Transformation& ground_truth, const CameraIntrinsics& intrinsics);
 
     CameraImage frame_first;
     CameraImage frame_second;

@@ -61,6 +61,7 @@ public:
 
     float sampleValue(Eigen::Vector2f pos) const;
     Eigen::Matrix<float, 1, 2> sampleDiff(Eigen::Vector2f pos) const;
+    Eigen::Matrix<float, 1, 2> getDiff(Eigen::Vector2i pos) const;
 
 
     // halve image size

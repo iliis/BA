@@ -163,7 +163,7 @@ lux/37 doesn't converge on scale 3 (2x halbiert) -> jitters too much
 
 [done] - choose steps that are further apart
 
-- measure longer trajectory
+[done] - measure longer trajectory
 
 1. measure gradient for pixel filtering on original / current frame
 2. portiere auf sensor

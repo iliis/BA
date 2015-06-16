@@ -34,12 +34,35 @@ void Scene::loadFromBagFile(const std::string& bag_path)
     cout << "bag is " << bag.getSize() << " bytes (?) big." << endl;
 
 
+#if 0
+    ofstream outfile("./ground_truth_trajectory.csv");
+
+    outfile << "x, y, z, X, Y, Z, W" << endl;
+
     rosbag::View view(bag, rosbag::TopicQuery("/aslam/aslam_odometry"));
 
     BOOST_FOREACH(const rosbag::MessageInstance m, view) {
         // TODO: display ground truth data
+
+        nav_msgs::Odometry::Ptr p_odometry = m.instantiate<nav_msgs::Odometry>();
+
+        if (p_odometry) {
+            outfile << p_odometry->pose.pose.position.x << ", ";
+            outfile << p_odometry->pose.pose.position.y << ", ";
+            outfile << p_odometry->pose.pose.position.z << ", ";
+            outfile << p_odometry->pose.pose.orientation.x << ", ";
+            outfile << p_odometry->pose.pose.orientation.y << ", ";
+            outfile << p_odometry->pose.pose.orientation.z << ", ";
+            outfile << p_odometry->pose.pose.orientation.w << endl;
+        } else {
+            cerr << "couldn't get pose" << endl;
+        }
     }
 
+    outfile.close();
+
+    cout << "wrote ground truth trajectory to CSV" << endl;
+#endif
 
 
 
@@ -50,13 +73,18 @@ void Scene::loadFromBagFile(const std::string& bag_path)
     rosbag::View::const_iterator it_depth     = view_depth    .begin();
 
     //const unsigned int N = view_intensity.size();
-    const unsigned int N = 4; // just load the beginning of the recording
+    int START = 250;
+    const unsigned int N = 100; // don't load the whole scene (would need a bit too much RAM)
 
     this->frames.resize(N);
     this->ground_truth.resize(N);
 
     unsigned int i = 0;
     while (it_intensity++ != view_intensity.end() && it_depth++ != view_depth.end()) {
+
+        // skip the first few frames
+        if (START-- > 0)
+            continue;
 
 
         sensor_msgs::Image::Ptr          p_intensities = it_intensity->instantiate<sensor_msgs::Image>();

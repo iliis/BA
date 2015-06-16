@@ -10,6 +10,14 @@ CameraStep::CameraStep(const CameraImage& first, const CameraImage& second, cons
 {
 }
 ///////////////////////////////////////////////////////////////////////////////
+CameraStep::CameraStep(const CameraImage& first, const CameraImage& second, const Transformation& ground_truth, const CameraIntrinsics& intrinsics)
+  : frame_first(first), frame_second(second),
+    scale(0), intrinsics(intrinsics),
+    ground_truth(ground_truth),
+    index(0), scene(NULL)
+{
+}
+///////////////////////////////////////////////////////////////////////////////
 void CameraStep::downsampleBy(unsigned int s)
 {
     this->scale += s;

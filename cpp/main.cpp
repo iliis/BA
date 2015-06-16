@@ -130,26 +130,36 @@ void write_trajectory(const Scene& scene, const Warp::Parameters& params, string
     outfile.close();
 }
 ///////////////////////////////////////////////////////////////////////////////
+void write_trajectory_rosbag(const string& rosbag_path, const Warp::Parameters& params, string output_dir = ".")
+{
+    std::vector<Transformation> traj = findTrajectoryFromRosbag(rosbag_path, params);
+
+    string path = output_dir + "/measured_trajectory.csv";
+    ofstream outfile(path.c_str());
+
+    outfile << "x, y, z, alpha, beta, gamma" << endl;
+
+    for(size_t i = 0; i < traj.size(); i++) {
+        traj[i].printCSV(outfile) << endl;
+    }
+
+    outfile.close();
+
+    cout << "wrote trajectory to disk" << endl;
+}
+///////////////////////////////////////////////////////////////////////////////
 bool min_paused = true; // start in paused state, global to keep value :P
-void run_minimization(const Scene& scene)
+void run_minimization(const Scene& scene, Warp::Parameters params)
 {
     const sf::Vector2u window_size = window.getSize();
 
     unsigned int index = 0;
     CameraStep step = scene.getStep(index);
 
-    Transformation T(0,0,0,0,0,0);
+    Transformation T = params.T_init;
 
     Eigen::VectorXf error_tmp;
     Eigen::Matrix<float, Eigen::Dynamic, 6> J_tmp;
-
-    Warp::Parameters params(new ErrorWeightNone());
-    params.pyramid_levels = 3;
-    params.max_iterations = 1000;
-    params.T_init = Transformation(0,0,0,0,0,0);
-    params.gradient_norm_threshold = 0.1;
-
-    cout << "starting main loop" << endl;
 
     bool show_keyframe = false;
     while (window.isOpen())
@@ -625,17 +635,18 @@ int main()
     //testscene.loadFromSceneDirectory("../matlab/input/courtyard/normal"); // step 22 is nice!
     testscene.loadFromBagFile("/home/samuel/data/2015-06-11-16-30-01.bag");
 
-    cout << testscene.getIntrinsics() << endl;
+    //cout << testscene.getIntrinsics() << endl;
 
     Warp::Parameters params(new ErrorWeightNone());
     params.pyramid_levels = 3;
     params.max_iterations = 100;
     params.T_init = Transformation(0,0,0,0,0,0);
-    params.gradient_norm_threshold = 0.1;
+    params.gradient_norm_threshold = 0.02;
 
     //write_trajectory(testscene, params, ".");
+    //write_trajectory_rosbag("/home/samuel/data/2015-06-11-16-30-01.bag", params, ".");
 
-    run_minimization(testscene);
+    run_minimization(testscene, params);
 
     //run_on_real_data();
 
