@@ -4,7 +4,6 @@
 #include <Eigen/Dense>
 #include <math.h>
 #include <vector>
-#include <SFML/System.hpp> // for timing measurements
 
 #include "transformation.h"
 #include "camera_step.h"

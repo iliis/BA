@@ -81,6 +81,7 @@ find_package(Eigen3 REQUIRED)
 
 if(EIGEN3_FOUND)
     include_directories(${EIGEN3_INCLUDE_DIR})
+    message(STATUS "including Eigen3 from '${EIGEN3_INCLUDE_DIR}'")
 endif()
 
 

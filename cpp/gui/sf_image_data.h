@@ -3,6 +3,7 @@
 
 #include <math.h>
 #include <SFML/Graphics.hpp>
+#include <sensor_msgs/Image.h>
 
 #include "colormap.h"
 #include "../core/image_data.h"

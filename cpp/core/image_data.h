@@ -5,7 +5,6 @@
 #include <string>
 #include <iostream>
 #include <limits>
-#include <sensor_msgs/Image.h>
 #include <Eigen/Dense>
 
 

@@ -21,6 +21,11 @@ visensor-srv project (Xilinx SDK)
 
 - Uncomment everything with CAM4-7 and DENSE_MATCHER1-3
 
+- run configuration:
+    - remote ARM Linux Application
+        - connection: ssh to $IP
+        - application: choose the binary
+        - remote abs. path: "/home/root/visensor-srv"
 
 
 ROS on Fedora 21
