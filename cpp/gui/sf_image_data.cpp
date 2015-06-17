@@ -133,7 +133,7 @@ void drawImageAt(sf::RenderTarget& target, const sf::Image& img, const sf::Vecto
         t.setFont(*font);
         t.setCharacterSize(12);
         t.setString(label);
-        t.setPosition(pos.x+2, pos.y+img.getSize().y-t.getLocalBounds().height-4);
+        t.setPosition(pos.x+2, pos.y+img.getSize().y*scale-t.getLocalBounds().height-4);
         target.draw(t);
     }
 }
