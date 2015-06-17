@@ -331,6 +331,7 @@ void run_minimization(const Scene& scene, Warp::Parameters params)
                             cout << "[ 10 ]: choose number of pyramid levels" << endl;
                             cout << "[ 11 ]: set gradient norm threshold" << endl;
                             cout << "[ 12 ]: render error surface" << endl;
+                            cout << "[ 13 ]: toggle pixel gradient filter (before or after warping)" << endl;
                             cout << "[  0 ]: exit" << endl;
                             cin >> opt;
 
@@ -476,6 +477,10 @@ void run_minimization(const Scene& scene, Warp::Parameters params)
                                     }
                                     break;
 
+                                case 13:
+                                    params.filter_on_unwarped_gradient = ! params.filter_on_unwarped_gradient;
+                                    break;
+
                                 default:
                                     cout << "unknown command" << endl;
                                     break;
@@ -526,7 +531,7 @@ void run_minimization(const Scene& scene, Warp::Parameters params)
         sf::Text t;
         t.setFont(font);
         t.setCharacterSize(12);
-        t.setString(params.toString()); t.setPosition(2,window_size.y-3*14); window.draw(t);
+        t.setString(params.toString()); t.setPosition(2,window_size.y-4*14); window.draw(t);
 
         window.display();
 
@@ -631,9 +636,9 @@ int main()
     //testscene.loadFromSceneDirectory("../matlab/input/test_wide");
     //testscene.loadFromSceneDirectory("../matlab/input/trajectory1");
     //testscene.loadFromSceneDirectory("../matlab/input/testscene1");
-    //testscene.loadFromSceneDirectory("../matlab/input/courtyard/lux");
+    testscene.loadFromSceneDirectory("../matlab/input/courtyard/lux");
     //testscene.loadFromSceneDirectory("../matlab/input/courtyard/normal"); // step 22 is nice!
-    testscene.loadFromBagFile("/home/samuel/data/2015-06-11-16-30-01.bag");
+    //testscene.loadFromBagFile("/home/samuel/data/2015-06-11-16-30-01.bag");
 
     //cout << testscene.getIntrinsics() << endl;
 
@@ -641,7 +646,7 @@ int main()
     params.pyramid_levels = 3;
     params.max_iterations = 100;
     params.T_init = Transformation(0,0,0,0,0,0);
-    params.gradient_norm_threshold = 0.02;
+    params.gradient_norm_threshold = 0.1;
 
     //write_trajectory(testscene, params, ".");
     //write_trajectory_rosbag("/home/samuel/data/2015-06-11-16-30-01.bag", params, ".");

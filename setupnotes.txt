@@ -62,7 +62,7 @@ $ rosrun dynamic_reconfigure dynparam set /visensor_node "{'cam1_agc_enable': 0,
 $ rosrun image_view image_view image:=/dense/image_raw
 
 
-
+Parameter GUI:
 $ rosrun rqt_reconfigure rqt_reconfigure 
 
 

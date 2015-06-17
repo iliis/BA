@@ -20,17 +20,20 @@ namespace Warp {
     struct Parameters {
         ErrorWeightFunction* weight_function;
         float gradient_norm_threshold; // keep only pixels with gradient >= this value
+        bool filter_on_unwarped_gradient; // use gradient of image-to-be-warped instead of keyframe at warped points
         unsigned int pyramid_levels;
         Transformation T_init;
         unsigned int max_iterations;
 
         Parameters(ErrorWeightFunction* weight_function,
                 float gradient_norm_threshold = 0,
+                bool filter_on_unwarped_gradient = false,
                 unsigned int pyramid_levels = 3,
                 const Transformation& T_init = Transformation(0,0,0,0,0,0),
                 unsigned int max_iterations = 1000)
           : weight_function(weight_function),
             gradient_norm_threshold(gradient_norm_threshold),
+            filter_on_unwarped_gradient(filter_on_unwarped_gradient),
             pyramid_levels(pyramid_levels),
             T_init(T_init),
             max_iterations(max_iterations) {}

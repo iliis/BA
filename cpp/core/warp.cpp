@@ -8,7 +8,8 @@ std::string Warp::Parameters::toString()
 {
     return "Error weighting function: " + weight_function->toString()
        + "\npyramid levels: " + boost::lexical_cast<string>(pyramid_levels)
-       + "\ngradient norm threshold: " + boost::lexical_cast<string>(gradient_norm_threshold);
+       + "\ngradient norm threshold: " + boost::lexical_cast<string>(gradient_norm_threshold)
+       + "\nmeasure gradient on image-to-be-warped: " + boost::lexical_cast<string>(this->filter_on_unwarped_gradient);
        //+ "\nmax. iterations: " + boost::lexical_cast<string>(max_iterations);
 }
 ///////////////////////////////////////////////////////////////////////////////
@@ -113,6 +114,14 @@ float Warp::calcError(const CameraStep& step, const Transformation& T, Eigen::Ve
 
     for (unsigned int y = 0; y < H; ++y) {
         for (unsigned int x = 0; x < W; ++x) {
+            float pixel_current_gradient_norm = step.frame_second.getIntensityData().getDiff(Vector2i(x,y)).norm();
+
+            // skip pixels with weak gradient (approximate keyframe gradient with gradient from current frame)
+            if (params.filter_on_unwarped_gradient) {
+                if (pixel_current_gradient_norm < params.gradient_norm_threshold)
+                    continue;
+            }
+
             Pixel pixel_current  = step.frame_second.getPixel(Vector2i(x,y));
 
             // skip pixels without depth value
@@ -133,8 +142,10 @@ float Warp::calcError(const CameraStep& step, const Transformation& T, Eigen::Ve
             Matrix<float, 1, 2> J_I = Warp::sampleJacobian(pixel_in_keyframe, step.frame_first);
 
             // skip pixels that don't provide a good gradient
-            if (J_I.norm() < params.gradient_norm_threshold)
-                continue;
+            if (!params.filter_on_unwarped_gradient) {
+                if (J_I.norm() < params.gradient_norm_threshold)
+                    continue;
+            }
 
             float intensity_keyframe = step.frame_first.samplePixel(pixel_in_keyframe.pos);
 
@@ -163,7 +174,11 @@ float Warp::calcError(const CameraStep& step, const Transformation& T, Eigen::Ve
 
                 img_J_norm(y,x) = J_out.row(pixel_count).norm();
 
-                img_selection_heuristic(y,x) = J_I.norm();
+                if (params.filter_on_unwarped_gradient) {
+                    img_selection_heuristic(y,x) = step.frame_second.getIntensityData().getDiff(Vector2i(x,y)).norm();
+                } else {
+                    img_selection_heuristic(y,x) = J_I.norm();
+                }
 
                 img_errs_weighted(y,x) = (*params.weight_function)(error) * error;
             }
