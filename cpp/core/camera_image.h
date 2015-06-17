@@ -2,11 +2,11 @@
 #define SCENE_IMAGE_H_INCLUDED
 
 #include <vector>
-#include <SFML/Graphics.hpp>
 #include <Eigen/Dense>
 
 #include "image_data.h"
-#include "camera_intrinsics.h"
+
+///////////////////////////////////////////////////////////////////////////////
 
 struct Pixel
 {
@@ -18,6 +18,8 @@ struct Pixel
     float depth;
 };
 
+///////////////////////////////////////////////////////////////////////////////
+
 struct WorldPoint
 {
     WorldPoint(float x = 0, float y = 0, float z = 0, Pixel p = Pixel())
@@ -27,15 +29,16 @@ struct WorldPoint
     Pixel pixel;
 };
 
+///////////////////////////////////////////////////////////////////////////////
+
 /*!
  * an image with its depth map
  * i.e. a single datapoint from the stereo camera
+ *
+ * TODO: rename to CameraFrame ?
  */
-class CameraImage : public sf::Drawable
+struct CameraImage
 {
-public:
-
-    void loadFromSceneDirectory(const std::string& scene_path, const unsigned int index, const CameraIntrinsics& intrinsics);
     void loadFromMatrices(const Eigen::MatrixXf& mat_intensities, const Eigen::MatrixXf& mat_depths);
 
     inline int getWidth()  const { return intensities.getWidth(); }
@@ -49,12 +52,11 @@ public:
     inline const ImageData& getIntensityData() const { return intensities; }
     inline const ImageData& getDepthData()     const { return depths; }
 
-    virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
-
     void downsample2() { intensities.downsample2(); depths.downsample2(); }
 
-private:
     ImageData intensities, depths;
 };
+
+///////////////////////////////////////////////////////////////////////////////
 
 #endif /* end of include guard: SCENE_IMAGE_H_INCLUDED */

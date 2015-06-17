@@ -4,11 +4,11 @@
 #include <iostream>
 #include <Eigen/Dense>
 
-#include "camera_image.h"
 #include "transformation.h"
 #include "camera_step.h"
-#include "scene.h"
+#include "camera_image.h"
 #include "../utils/progress.h"
+#include "../utils/matrix.h"
 #include "weight_functions.h"
 
 namespace Warp {
@@ -51,8 +51,15 @@ namespace Warp {
     Eigen::Matrix<float, 3, 6> transformJacobian(const WorldPoint& point, const Transformation& transformation);
     Eigen::Matrix<float, 1, 2> sampleJacobian   (const Pixel& pixel, const CameraImage& image);
 
-    //float drawError(sf::RenderTarget& target, const CameraStep& step, const Transformation& T);
-    float calcError(const CameraStep& step, const Transformation& T, Eigen::VectorXf& error_out, Eigen::Matrix<float, Eigen::Dynamic, 6>& J_out, const Parameters& params, sf::RenderTarget* plotTarget = NULL, sf::Font* font = NULL);
+    struct WarpDebugData {
+        Eigen::MatrixXf J_norm;
+        Eigen::MatrixXf selection_heuristic;
+        Eigen::MatrixXf warped_image;
+        Eigen::MatrixXf errors_in_current;
+        Eigen::MatrixXf weighted_errors;
+    };
+
+    float calcError(const CameraStep& step, const Transformation& T, Eigen::VectorXf& error_out, Eigen::Matrix<float, Eigen::Dynamic, 6>& J_out, const Parameters& params, WarpDebugData* debug_out = NULL);
 
     struct PlotRange {
 

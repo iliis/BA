@@ -1,20 +1,12 @@
 #include "camera_step.h"
-#include "scene.h"
 
 ///////////////////////////////////////////////////////////////////////////////
-CameraStep::CameraStep(const CameraImage& first, const CameraImage& second, const Transformation& ground_truth, const Scene* scene, unsigned int index)
-  : frame_first(first), frame_second(second),
-    scale(0), intrinsics(scene->getIntrinsics()),
-    ground_truth(ground_truth),
-    index(index), scene(scene)
-{
-}
-///////////////////////////////////////////////////////////////////////////////
-CameraStep::CameraStep(const CameraImage& first, const CameraImage& second, const Transformation& ground_truth, const CameraIntrinsics& intrinsics)
+CameraStep::CameraStep(const CameraImage& first, const CameraImage& second, const CameraIntrinsics& intrinsics, const Transformation& ground_truth, unsigned int index_first, unsigned int index_second)
   : frame_first(first), frame_second(second),
     scale(0), intrinsics(intrinsics),
     ground_truth(ground_truth),
-    index(0), scene(NULL)
+    index_first(index_first),
+    index_second(index_second)
 {
 }
 ///////////////////////////////////////////////////////////////////////////////

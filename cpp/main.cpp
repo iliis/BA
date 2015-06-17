@@ -8,7 +8,8 @@
 #include <rosbag/bag.h>
 #include <rosbag/view.h>
 
-#include "core/scene.h"
+#include "gui/scene.h"
+#include "gui/sf_image_data.h"
 #include "core/image_data.h"
 #include "core/transformation.h"
 #include "core/camera_intrinsics.h"
@@ -78,7 +79,8 @@ void draw_error_surface(const CameraStep& step, const Warp::PlotRange& range1, c
 
     bool run = true;
     ImageData errorplot;
-    errorplot.loadFromMatrix(errorsurface, Colormap::Hot());
+    errorplot.loadFromMatrix(errorsurface);
+
     while (window.isOpen() && run)
     {
         sf::Event event;
@@ -92,7 +94,8 @@ void draw_error_surface(const CameraStep& step, const Warp::PlotRange& range1, c
         }
 
         window.clear();
-        errorplot.drawAt(window, sf::Vector2f(0,0), TILE_SIZE);
+
+        drawMatrixAt(window, errorplot.data, sf::Vector2f(0,0), "", NULL, Colormap::Hot(), TILE_SIZE);
 
         for (unsigned int y = 0; y < errorplot.getHeight(); ++y) {
             for (unsigned int x = 0; x < errorplot.getWidth(); ++x) {
@@ -148,10 +151,31 @@ void write_trajectory_rosbag(const string& rosbag_path, const Warp::Parameters& 
     cout << "wrote trajectory to disk" << endl;
 }
 ///////////////////////////////////////////////////////////////////////////////
+void plot_warp_debug_data(const Warp::WarpDebugData& data, const CameraStep& step)
+{
+    const unsigned int W = step.intrinsics.getCameraWidth();
+    const unsigned int H = step.intrinsics.getCameraHeight();
+
+    drawMatrixAt(window, data.errors_in_current, sf::Vector2f(0,0),   "errors in current", &font, Colormap::Jet());
+    drawMatrixAt(window, data.warped_image     , sf::Vector2f(0,H+2), "warped current frame", &font, Colormap::Colormap());
+
+    drawMatrixAt(window, step.frame_second.getIntensityData().data, sf::Vector2f(W+2,0), "current frame", &font);
+    drawMatrixAt(window, step.frame_first .getIntensityData().data, sf::Vector2f(W+2,H+2), "keyframe", &font);
+    //step.frame_second.getDepthData().drawAt( *plotTarget, sf::Vector2f(0,0));
+    //step.frame_first .getDepthData().drawAt( *plotTarget, sf::Vector2f(0,H+2));
+
+
+    drawMatrixAt(window, data.weighted_errors,     sf::Vector2f(2*W+4, 0),     "weighted errors", &font, Colormap::Jet());
+    drawMatrixAt(window, data.J_norm,              sf::Vector2f(2*W+4, H+2),   "norm(J) [max: " + boost::lexical_cast<string>(data.J_norm.maxCoeff()) + "]", &font, Colormap::Jet());
+    drawMatrixAt(window, data.selection_heuristic, sf::Vector2f(2*W+4, 2*H+4), "image gradient [max: " + boost::lexical_cast<string>(data.selection_heuristic.maxCoeff()) + "]", &font, Colormap::Jet());
+}
+///////////////////////////////////////////////////////////////////////////////
 bool min_paused = true; // start in paused state, global to keep value :P
 void run_minimization(const Scene& scene, Warp::Parameters params)
 {
     const sf::Vector2u window_size = window.getSize();
+
+    Warp::WarpDebugData warpdebugdata;
 
     unsigned int index = 0;
     CameraStep step = scene.getStep(index);
@@ -522,16 +546,28 @@ void run_minimization(const Scene& scene, Warp::Parameters params)
             }
         }
 
-        Warp::calcError(step, T, error_tmp, J_tmp, params, &window, &font);
+        float total_error = Warp::calcError(step, T, error_tmp, J_tmp, params, &warpdebugdata);
+
+        plot_warp_debug_data(warpdebugdata, step);
 
         if (show_keyframe)
-            step.frame_first.getIntensityData().drawAt(window, sf::Vector2f(0,step.frame_second.getHeight()+2));
+            drawMatrixAt(window, step.frame_first.getIntensityData().data, sf::Vector2f(0,step.frame_second.getHeight()+2), "keyframe", &font);
 
 
         sf::Text t;
         t.setFont(font);
         t.setCharacterSize(12);
-        t.setString(params.toString()); t.setPosition(2,window_size.y-4*14); window.draw(t);
+
+        ostringstream s;
+        s << "frames: " << step.index_first << " " << step.index_second << endl;
+        s << "total error: " << sqrt(total_error) << endl;
+        s << "abs max: " << (error_tmp.array().abs().maxCoeff()) << endl;
+        s << "current: " << T << endl;
+        s << "truth:   " << step.ground_truth << endl;
+        s << "T error: " << (T.value-step.ground_truth.value).norm() << endl;
+        s << " --------- " << endl;
+        s << params.toString();
+        t.setString(s.str()); t.setPosition(2,window_size.y-t.getLocalBounds().height-4); window.draw(t);
 
         window.display();
 
@@ -549,83 +585,6 @@ void run_minimization(const Scene& scene, Warp::Parameters params)
         //sf::sleep(sf::seconds(0.01));
     }
 
-    delete params.weight_function;
-}
-///////////////////////////////////////////////////////////////////////////////
-void run_on_real_data()
-{
-    rosbag::Bag bag;
-    bag.open("/home/samuel/data/2015-06-11-16-30-01.bag", rosbag::bagmode::Read);
-
-    cout << "bag is " << bag.getSize() << " bytes (?) big." << endl;
-
-    vector<string> topics;
-    topics.push_back("/stereo_dense_reconstruction/image_fused");
-    topics.push_back("/stereo_dense_reconstruction/disparity");
-
-    //rosbag::View view(bag, rosbag::TopicQuery("/stereo_dense_reconstruction/image_fused"));
-    //rosbag::View view(bag, rosbag::TopicQuery("/stereo_dense_reconstruction/disparity"));
-    rosbag::View view(bag, rosbag::TopicQuery(topics));
-
-    cout << "it has " << view.size() << " views." << endl;
-
-
-    BOOST_FOREACH(rosbag::MessageInstance const m, view) {
-
-        //cout << "time: " << m.getTime() << endl;
-        //cout << "topic: " << m.getTopic() << endl;
-        //cout << "data type: " << m.getDataType() << endl;
-        //cout << "caller ID: " << m.getCallerId() << endl;
-        //cout << "connection header: " << m.getConnectionHeader() << endl;
-        //cout << " //////////////////////////////////////////////// " << endl;
-        //cout << "message def: " << m.getMessageDefinition() << endl;
-
-        window.clear();
-
-        stereo_msgs::DisparityImage::Ptr image = m.instantiate<stereo_msgs::DisparityImage>();
-
-        if (image) {
-            //cout << "OK" << endl;
-            //cout << image->image.width << " x " << image->image.height << endl;
-            //cout << "encoding: " << image->image.encoding << endl;
-
-            ImageData i;
-            //i.loadFromROSgrayscale(image->image);
-            i.loadFromROSdepthmap(image->image, Colormap::Jet());
-            window.draw(i);
-        }
-
-        sensor_msgs::Image::Ptr intensities = m.instantiate<sensor_msgs::Image>();
-        if (intensities) {
-            ImageData i;
-            i.loadFromROSgrayscale(*intensities);
-            window.draw(i);
-        }
-
-        window.display();
-
-        //getchar();
-
-    }
-
-    bool run = false;
-    while (window.isOpen() && run)
-    {
-        sf::Event event;
-        while (window.pollEvent(event))
-        {
-            if (event.type == sf::Event::Closed)
-                window.close();
-
-            if (event.type == sf::Event::KeyPressed && (event.key.code == sf::Keyboard::Escape || event.key.code == sf::Keyboard::Q))
-                run = false;
-        }
-
-        window.clear();
-        window.display();
-    }
-
-    bag.close();
 }
 ///////////////////////////////////////////////////////////////////////////////
 int main()
@@ -655,6 +614,8 @@ int main()
 
     //run_on_real_data();
 
+
+    delete params.weight_function;
 
     return EXIT_SUCCESS;
 }

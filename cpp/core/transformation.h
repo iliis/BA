@@ -7,7 +7,6 @@
 #include <string>
 #include <Eigen/Dense>
 #include <Eigen/Geometry>
-#include <SFML/System.hpp>
 
 #include "../utils/csv.h"
 

@@ -19,13 +19,14 @@ set(SOURCES
     "core/image_data.cpp"
     "core/camera_intrinsics.cpp"
     "core/transformation.cpp"
-    "core/scene.cpp"
     "core/camera_step.cpp"
     "core/camera_image.cpp"
     "core/warp.cpp"
     "core/minimization.cpp"
     "core/weight_functions.cpp"
-    "utils/colormap.cpp"
+    "gui/scene.cpp"
+    "gui/colormap.cpp"
+    "gui/sf_image_data.cpp"
     "utils/progress.cpp"
 )
 

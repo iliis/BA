@@ -4,6 +4,7 @@
 #include <Eigen/Dense>
 #include <math.h>
 #include <vector>
+#include <SFML/System.hpp> // for timing measurements
 
 #include "transformation.h"
 #include "camera_step.h"
@@ -16,8 +17,5 @@ float IterGradientDescent(const CameraStep& step, Transformation& T, const Eigen
 
 Transformation findTransformation           (const CameraStep& step, const Warp::Parameters& params);
 Transformation findTransformationWithPyramid(const CameraStep& step, const Warp::Parameters& params);
-
-std::vector<Transformation> findTrajectory(const Scene& scene, const Warp::Parameters& params);
-std::vector<Transformation> findTrajectoryFromRosbag(const std::string& rosbag_path, const Warp::Parameters& params);
 
 #endif /* end of include guard: MINIMIZATION_H_INCLUDED */

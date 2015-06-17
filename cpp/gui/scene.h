@@ -12,11 +12,15 @@
 #include <rosbag/bag.h>
 #include <rosbag/view.h>
 
+#include "sf_image_data.h"
 #include "../utils/progress.h"
-#include "camera_intrinsics.h"
-#include "image_data.h"
-#include "camera_step.h"
-#include "transformation.h"
+#include "../core/warp.h"
+#include "../core/camera_intrinsics.h"
+#include "../core/image_data.h"
+#include "../core/camera_step.h"
+#include "../core/transformation.h"
+#include "../core/minimization.h"
+
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -46,6 +50,13 @@ private:
     std::vector<Transformation> ground_truth;
     CameraIntrinsics intrinsics;
 };
+
+///////////////////////////////////////////////////////////////////////////////
+
+void loadCameraImageFromSceneDirectory(CameraImage& img, const std::string& scene_path, const unsigned int index, const CameraIntrinsics& intrinsics);
+
+std::vector<Transformation> findTrajectory(const Scene& scene, const Warp::Parameters& params);
+std::vector<Transformation> findTrajectoryFromRosbag(const std::string& rosbag_path, const Warp::Parameters& params);
 
 ///////////////////////////////////////////////////////////////////////////////
 

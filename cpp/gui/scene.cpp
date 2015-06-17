@@ -3,6 +3,14 @@
 using namespace std;
 
 ///////////////////////////////////////////////////////////////////////////////
+CameraIntrinsics visensor_intrinsics = CameraIntrinsics(
+        /* sensor size     */ Eigen::Vector2f(752, 480),
+        /* principal point */ Eigen::Vector2f(370.105, 226.664),
+        /* focal length    */ 471.7,
+        /* stereo baseline */ 0.110174);
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 void Scene::loadFromSceneDirectory(const std::string& scene_path)
 {
     assert(frames.empty());
@@ -15,7 +23,7 @@ void Scene::loadFromSceneDirectory(const std::string& scene_path)
     // use ground truth trajectory to determine how many frames this scene has
     this->frames.resize(ground_truth.size());
     for (unsigned int i = 0; i < ground_truth.size(); i++) {
-        this->frames[i].loadFromSceneDirectory(scene_path, i, intrinsics);
+        loadCameraImageFromSceneDirectory(frames[i], scene_path, i, intrinsics);
     }
 
     this->source_path = scene_path;
@@ -78,6 +86,7 @@ void Scene::loadFromBagFile(const std::string& bag_path)
 
     this->frames.resize(N);
     this->ground_truth.resize(N);
+    this->intrinsics = visensor_intrinsics;
 
     unsigned int i = 0;
     while (it_intensity++ != view_intensity.end() && it_depth++ != view_depth.end()) {
@@ -96,16 +105,13 @@ void Scene::loadFromBagFile(const std::string& bag_path)
         }
 
         ImageData intensities, depths;
-        intensities.loadFromROSgrayscale(*p_intensities);
-        depths     .loadFromROSdepthmap (p_depths->image);
+        loadImageDataFromROSgrayscale(intensities, *p_intensities);
+        loadImageDataFromROSdepthmap (intensities, p_depths->image);
 
         frames[i].loadFromMatrices(intensities.getData(), depths.getData());
 
         // TODO: load ground truth from bag
         ground_truth[i] = Transformation(0,0,0,0,0,0);
-
-        // real sensor produces disparity data, not directly depth values
-        this->intrinsics = CameraIntrinsics(Eigen::Vector2f(p_intensities->width, p_intensities->height), Eigen::Vector2f(370.105, 226.664), 471.7, 0.110174);
 
 #if 1
         frames[i].downsample2();
@@ -136,7 +142,7 @@ CameraStep Scene::getStep(unsigned int indexA, unsigned int indexB) const
 
     // TODO: calculate correct ground truth...
 
-    return CameraStep(frames[indexA], frames[indexB], ground_truth[indexB], this, indexA);
+    return CameraStep(frames[indexA], frames[indexB], intrinsics, ground_truth[indexB], indexA, indexB);
 }
 ///////////////////////////////////////////////////////////////////////////////
 const CameraImage& Scene::getFrame(unsigned int index) const
@@ -144,5 +150,95 @@ const CameraImage& Scene::getFrame(unsigned int index) const
     assert(index < this->getFrameCount());
 
     return frames[index];
+}
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+void loadCameraImageFromSceneDirectory(CameraImage& img, const std::string& scene_path, const unsigned int index, const CameraIntrinsics& intrinsics)
+{
+    //std::string index_string = "000001";
+    ostringstream index_string;
+    index_string.width(4);
+    index_string.fill('0');
+    index_string << (index + 1); // filenames start with 1
+
+    loadImageDataFromFile(img.intensities, scene_path + "/color" + index_string.str() + ".png");
+    loadImageDataFromFile(img.depths     , scene_path + "/depth" + index_string.str() + ".png");
+
+    img.depths.normalizeTo(intrinsics.getNearClipping(), intrinsics.getFarClipping());
+}
+///////////////////////////////////////////////////////////////////////////////
+std::vector<Transformation> findTrajectory(const Scene& scene, const Warp::Parameters& params)
+{
+    std::vector<Transformation> traj(scene.getStepCount());
+
+    for (size_t i = 0; i < scene.getStepCount(); i++) {
+        traj[i] = findTransformationWithPyramid(scene.getStep(i), params);
+    }
+
+    return traj;
+}
+///////////////////////////////////////////////////////////////////////////////
+std::vector<Transformation> findTrajectoryFromRosbag(const string& rosbag_path, const Warp::Parameters& params)
+{
+    std::vector<Transformation> traj;
+
+
+    rosbag::Bag bag;
+    bag.open(rosbag_path, rosbag::bagmode::Read);
+
+
+    rosbag::View view_intensity(bag, rosbag::TopicQuery("/stereo_dense_reconstruction/image_fused"));
+    rosbag::View view_depth    (bag, rosbag::TopicQuery("/stereo_dense_reconstruction/disparity"));
+
+    rosbag::View::const_iterator it_intensity = view_intensity.begin();
+    rosbag::View::const_iterator it_depth     = view_depth    .begin();
+
+    CameraImage prev_frame, current_frame;
+
+
+    unsigned int N = view_intensity.size()-10;
+
+    unsigned int i = 0;
+    while (it_intensity++ != view_intensity.end() && it_depth++ != view_depth.end()) {
+
+
+        sensor_msgs::Image::Ptr          p_intensities = it_intensity->instantiate<sensor_msgs::Image>();
+        stereo_msgs::DisparityImage::Ptr p_depths      = it_depth    ->instantiate<stereo_msgs::DisparityImage>();
+
+        if (!p_intensities || !p_depths) {
+            cerr << "failed to load data from bag file in frame " << i << endl;
+            return traj;
+        }
+
+        ImageData intensities, depths;
+        loadImageDataFromROSgrayscale(intensities, *p_intensities);
+        loadImageDataFromROSdepthmap (intensities, p_depths->image);
+
+        prev_frame = current_frame;
+        current_frame.loadFromMatrices(intensities.getData(), depths.getData());
+
+#if 0
+        frames[i].downsample2();
+        intrinsics.downsample2();
+#endif
+
+        if (i > 0) {
+
+            CameraStep step(prev_frame, current_frame, visensor_intrinsics, Transformation(0,0,0,0,0,0), i-1, i);
+
+            traj.push_back(findTransformationWithPyramid(step, params));
+        }
+
+        printfProgress(i, 0, N);
+
+        i++;
+
+        if (i >= N)
+            break;
+    }
+
+
+    return traj;
 }
 ///////////////////////////////////////////////////////////////////////////////

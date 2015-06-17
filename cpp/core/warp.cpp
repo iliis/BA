@@ -80,7 +80,7 @@ Eigen::Matrix<float, 1, 2> Warp::sampleJacobian(const Pixel& pixel, const Camera
     return image.getIntensityData().sampleDiff(pixel.pos);
 }
 ///////////////////////////////////////////////////////////////////////////////
-float Warp::calcError(const CameraStep& step, const Transformation& T, Eigen::VectorXf& error_out, Eigen::Matrix<float, Eigen::Dynamic, 6>& J_out, const Parameters& params, sf::RenderTarget* plotTarget, sf::Font* font)
+float Warp::calcError(const CameraStep& step, const Transformation& T, Eigen::VectorXf& error_out, Eigen::Matrix<float, Eigen::Dynamic, 6>& J_out, const Parameters& params, WarpDebugData* debug_out)
 {
     const unsigned int W = step.intrinsics.getCameraWidth();
     const unsigned int H = step.intrinsics.getCameraHeight();
@@ -89,18 +89,13 @@ float Warp::calcError(const CameraStep& step, const Transformation& T, Eigen::Ve
 
     float total_error = 0;
 
-    sf::Image img_c, img_k;
-    Eigen::MatrixXf img_errs_weighted, img_J_norm, img_selection_heuristic;
-    if (plotTarget) {
-        img_c.create(W,H, sf::Color(0,0,255));
-        img_k.create(W,H, sf::Color(0,0,255));
-        img_J_norm.resize(H,W);
-        img_J_norm.setZero();
-        img_selection_heuristic.resize(H,W);
-        img_selection_heuristic.setZero();
 
-        img_errs_weighted.resize(H,W);
-        img_errs_weighted.setZero();
+    if (debug_out) {
+        INIT_NAN(debug_out->J_norm, W, H);
+        INIT_NAN(debug_out->selection_heuristic, W, H);
+        INIT_NAN(debug_out->warped_image, W, H);
+        INIT_NAN(debug_out->errors_in_current, W, H);
+        INIT_NAN(debug_out->weighted_errors, W, H);
     }
 
     //Matrix3f R = T.getRotationMatrix();
@@ -163,24 +158,22 @@ float Warp::calcError(const CameraStep& step, const Transformation& T, Eigen::Ve
             total_error += error * error;
 
 
-            if (plotTarget) {
-                //error = error * error;
-                error = abs(error);
-                //img_c.setPixel(x,y, sf::Color(error*255, (1-error)*255, 0));
-                Colormap::Jet m;
-                img_c.setPixel(x,y, m(error, 0, 1));
-                //img_k.setPixel(pixel_in_keyframe.pos.x(),pixel_in_keyframe.pos.y(), sf::Color(error*255, (1-error)*255, 0));
-                img_k.setPixel(pixel_in_keyframe.pos.x()+0.5,pixel_in_keyframe.pos.y()+0.5, sf::Color(255*pixel_current.intensity, 255*pixel_current.intensity, 255*pixel_current.intensity));
+            if (debug_out) {
 
-                img_J_norm(y,x) = J_out.row(pixel_count).norm();
+                debug_out->errors_in_current(y,x) = abs(error);
+
+                Vector2i p(pixel_in_keyframe.pos.x()+0.5,pixel_in_keyframe.pos.y()+0.5);
+                debug_out->warped_image(p.y(), p.x()) = pixel_current.intensity;
+
+                debug_out->J_norm(y,x) = J_out.row(pixel_count).norm();
 
                 if (params.filter_on_unwarped_gradient) {
-                    img_selection_heuristic(y,x) = step.frame_second.getIntensityData().getDiff(Vector2i(x,y)).norm();
+                    debug_out->selection_heuristic(y,x) = step.frame_second.getIntensityData().getDiff(Vector2i(x,y)).norm();
                 } else {
-                    img_selection_heuristic(y,x) = J_I.norm();
+                    debug_out->selection_heuristic(y,x) = J_I.norm();
                 }
 
-                img_errs_weighted(y,x) = (*params.weight_function)(error) * error;
+                debug_out->weighted_errors(y,x) = (*params.weight_function)(error) * error;
             }
 
             ++pixel_count;
@@ -197,41 +190,6 @@ float Warp::calcError(const CameraStep& step, const Transformation& T, Eigen::Ve
     } else {
         error_out.conservativeResize(pixel_count);
         J_out.conservativeResize(pixel_count, Eigen::NoChange);
-    }
-
-
-    if (plotTarget && font) {
-        drawImageAt(img_c, sf::Vector2f(0,0),   *plotTarget, "errors in current", font);
-        drawImageAt(img_k, sf::Vector2f(0,H+2), *plotTarget, "warped current frame", font);
-        step.frame_second.getIntensityData().drawAt( *plotTarget, sf::Vector2f(W+2,0));
-        step.frame_first .getIntensityData().drawAt( *plotTarget, sf::Vector2f(W+2,H+2));
-        //step.frame_second.getDepthData().drawAt( *plotTarget, sf::Vector2f(0,0));
-        //step.frame_first .getDepthData().drawAt( *plotTarget, sf::Vector2f(0,H+2));
-
-
-        drawMatrixAt(img_errs_weighted,       sf::Vector2f(2*W+4, 0), *plotTarget, Colormap::Jet(), "weighted errors", font);
-        drawMatrixAt(img_J_norm,              sf::Vector2f(2*W+4, H+2),   *plotTarget, Colormap::Jet(), "norm(J) [max: " + boost::lexical_cast<string>(img_J_norm.maxCoeff()) + "]", font);
-        drawMatrixAt(img_selection_heuristic, sf::Vector2f(2*W+4, 2*H+4), *plotTarget, Colormap::Jet(), "image gradient [max: " + boost::lexical_cast<string>(img_selection_heuristic.maxCoeff()) + "]", font);
-
-
-        sf::Text t;
-        t.setFont(*font);
-        t.setCharacterSize(12);
-        t.setString("current frame"); t.setPosition(W+4,H-t.getCharacterSize()-2);     plotTarget->draw(t);
-        t.setString("keyframe");      t.setPosition(W+4,H-t.getCharacterSize()-2+H+2); plotTarget->draw(t);
-
-        string s = "total error: " + boost::lexical_cast<string>(sqrt(total_error))
-                //+ "\nabs min: " + boost::lexical_cast<string>(error_out.array().abs().minCoeff())
-                + "\nabs max: " + boost::lexical_cast<string>(error_out.array().abs().maxCoeff());
-        t.setString(s); t.setPosition(2,H+H+4); plotTarget->draw(t);
-        t.setString("step "+boost::lexical_cast<string>(step.index));      t.setPosition(W+4,H+H+4); plotTarget->draw(t);
-
-        ostringstream str_T_current; str_T_current << T;
-        t.setString("current: "+str_T_current.str());      t.setPosition(2,H+H+8+2*t.getCharacterSize()); plotTarget->draw(t);
-        ostringstream str_T_gt; str_T_gt << step.ground_truth;
-        t.setString("truth:   "+str_T_gt.str());      t.setPosition(2,H+H+8+3*t.getCharacterSize()); plotTarget->draw(t);
-        string r = boost::lexical_cast<string>((T.value-step.ground_truth.value).norm());
-        t.setString("T error: "+r);      t.setPosition(2,H+H+10+4*t.getCharacterSize()); plotTarget->draw(t);
     }
 
     //cout << "total error: " << total_error << "  =  " << sqrt(total_error) << endl;

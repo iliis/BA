@@ -113,8 +113,11 @@ Transformation findTransformationWithPyramid(const CameraStep& step, const Warp:
     std::vector<CameraStep> pyramid;
     pyramid.push_back(s);
 
+#if 0
+    // TODO: use time measurement thats availabe on ARM too
     sf::Clock clock;
     clock.restart();
+#endif
 
     for (unsigned int i = 1; i < params.pyramid_levels; i++) {
         s.downsampleBy(1);
@@ -129,91 +132,15 @@ Transformation findTransformationWithPyramid(const CameraStep& step, const Warp:
         p.T_init = findTransformation(*it, p);
     }
 
+#if 0
     sf::Time t = clock.getElapsedTime();
+
+    // TODO: put this in a debug struct or something
     cout << " >>>>> found solution in " << iteration_count << " iterations and " << ((double) t.asMicroseconds())/1000 << "ms ( " << 1000*1000/((double)t.asMicroseconds()) << " FPS)" << endl;
     cout << " >>>>> this is " << t.asMicroseconds() / ((double) iteration_count * 1000) << "ms per Iteration (on average, with " << params.pyramid_levels << " pyramid levels)" << endl;
+#endif
 
 
     return p.T_init;
-}
-///////////////////////////////////////////////////////////////////////////////
-std::vector<Transformation> findTrajectory(const Scene& scene, const Warp::Parameters& params)
-{
-    std::vector<Transformation> traj(scene.getStepCount());
-
-    for (size_t i = 0; i < scene.getStepCount(); i++) {
-        traj[i] = findTransformationWithPyramid(scene.getStep(i), params);
-    }
-
-    return traj;
-}
-///////////////////////////////////////////////////////////////////////////////
-std::vector<Transformation> findTrajectoryFromRosbag(const string& rosbag_path, const Warp::Parameters& params)
-{
-    std::vector<Transformation> traj;
-
-
-    rosbag::Bag bag;
-    bag.open(rosbag_path, rosbag::bagmode::Read);
-
-
-    rosbag::View view_intensity(bag, rosbag::TopicQuery("/stereo_dense_reconstruction/image_fused"));
-    rosbag::View view_depth    (bag, rosbag::TopicQuery("/stereo_dense_reconstruction/disparity"));
-
-    rosbag::View::const_iterator it_intensity = view_intensity.begin();
-    rosbag::View::const_iterator it_depth     = view_depth    .begin();
-
-    CameraIntrinsics intrinsics = CameraIntrinsics(
-            /* sensor size     */ Eigen::Vector2f(752, 480),
-            /* principal point */ Eigen::Vector2f(370.105, 226.664),
-            /* focal length    */ 471.7,
-            /* stereo baseline */ 0.110174);
-
-    CameraImage prev_frame, current_frame;
-
-
-    unsigned int N = view_intensity.size()-10;
-
-    unsigned int i = 0;
-    while (it_intensity++ != view_intensity.end() && it_depth++ != view_depth.end()) {
-
-
-        sensor_msgs::Image::Ptr          p_intensities = it_intensity->instantiate<sensor_msgs::Image>();
-        stereo_msgs::DisparityImage::Ptr p_depths      = it_depth    ->instantiate<stereo_msgs::DisparityImage>();
-
-        if (!p_intensities || !p_depths) {
-            cerr << "failed to load data from bag file in frame " << i << endl;
-            return traj;
-        }
-
-        ImageData intensities, depths;
-        intensities.loadFromROSgrayscale(*p_intensities);
-        depths     .loadFromROSdepthmap (p_depths->image);
-
-        prev_frame = current_frame;
-        current_frame.loadFromMatrices(intensities.getData(), depths.getData());
-
-#if 0
-        frames[i].downsample2();
-        intrinsics.downsample2();
-#endif
-
-        if (i > 0) {
-
-            CameraStep step(prev_frame, current_frame, Transformation(0,0,0,0,0,0), intrinsics);
-
-            traj.push_back(findTransformationWithPyramid(step, params));
-        }
-
-        printfProgress(i, 0, N);
-
-        i++;
-
-        if (i >= N)
-            break;
-    }
-
-
-    return traj;
 }
 ///////////////////////////////////////////////////////////////////////////////
