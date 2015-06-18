@@ -26,8 +26,10 @@ set(SOURCES
     "core/weight_functions.cpp"
     "gui/scene.cpp"
     "gui/colormap.cpp"
+    "gui/live.cpp"
     "gui/sf_image_data.cpp"
     "utils/progress.cpp"
+    "utils/matrix.cpp"
 )
 
 
@@ -51,9 +53,13 @@ set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
 #find_package(catkin REQUIRED)
 #catkin_package()
 
+find_package(roscpp REQUIRED)
 find_package(rosbag REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(stereo_msgs REQUIRED)
+
+include_directories(${roscpp_INCLUDE_DIRS})
+target_link_libraries(${EXECUTABLE_NAME} ${roscpp_LIBRARIES})
 
 include_directories(${rosbag_INCLUDE_DIRS})
 target_link_libraries(${EXECUTABLE_NAME} ${rosbag_LIBRARIES})

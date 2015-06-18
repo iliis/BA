@@ -63,6 +63,21 @@ void loadImageDataFromROSdepthmap (ImageData& dest, const sensor_msgs::Image& so
     }
 }
 ///////////////////////////////////////////////////////////////////////////////
+void loadImageDataFromROSraw(ImageData& dest, const sensor_msgs::Image& source_data)
+{
+    unsigned int width  = source_data.width;
+    unsigned int height = source_data.height;
+
+    dest.data.resize(height, width);
+
+    // copy data
+    for (unsigned int y = 0; y < height; y++) {
+        for (unsigned int x = 0; x < width; x++) {
+            dest.data(y, x) = source_data.data[(y*width+x)] / 255.0f;
+        }
+    }
+}
+///////////////////////////////////////////////////////////////////////////////
 void image_to_matrix(const sf::Image& source, Eigen::MatrixXf& dest)
 {
     // cout << "converting image to matrix ...";
@@ -84,6 +99,11 @@ void image_to_matrix(const sf::Image& source, Eigen::MatrixXf& dest)
 ///////////////////////////////////////////////////////////////////////////////
 void matrix_to_image(const Eigen::MatrixXf& source, sf::Image& dest, const Colormap::Colormap& colormap)
 {
+    if (source.rows() == 0 || source.cols() == 0) {
+        dest.create(100,100, sf::Color(0,0,255));
+        return;
+    }
+
     // initialize and clear image
     dest.create(source.cols(), source.rows());
 

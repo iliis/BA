@@ -181,3 +181,13 @@ Intrinsic Parameter Matrix K (von original camera 0 und rektifiezierter Kamera):
 Baseline:
 
 0.110174 m
+
+-> /root/calibration.xml
+
+- view raw data from sensor in pc app
+    -> run algo on live data
+- use calibration provider in arm code
+- insert new messages? or just overwrite existing channels?
+- check if images are read correctly in arm code
+- clamp depth data (0 or 240 --> NaN, cut out rectangle, mask with intensity = 255 or 0)
+- scale depth data (0-255 to ???)

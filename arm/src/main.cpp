@@ -287,8 +287,7 @@ int main(void) {
 		CalibrationStorage calib_provider("calibration.xml");
 
 		// handles config messages requests
-		ConfigServer config_server(io_service, TCP_CONFIG_PORT, sensors,
-				&calib_provider);
+		ConfigServer config_server(io_service, TCP_CONFIG_PORT, sensors, &calib_provider);
 		boost::thread ct(boost::bind(&ConfigServer::run, &config_server));
 
 		// handles clock sync messages
@@ -320,7 +319,8 @@ int main(void) {
 			///////////////////////////////////
 			// Check client connection
 			///////////////////////////////////
-			bool clientConnected = tcp_server.hasConnection()
+			bool clientConnected =
+					   tcp_server.hasConnection()
 					&& imu_server.hasConnection()
 					&& config_server.getHostInitialized();
 
@@ -329,6 +329,9 @@ int main(void) {
 				printf("power off all sensors due to client disconnect\n");
 				BOOST_FOREACH(const Sensor::Map::value_type& sensor_pair, sensors)
 					sensor_pair.second->off();
+
+				printf("exiting application\n");
+				break; // exit application
 			}
 
 			///////////////////////////////////
@@ -374,14 +377,11 @@ int main(void) {
 						//send over network if sensor is active and has a client
 						if (clientConnected && sensor->isActive()) {
 							IpComm::Header header;
-							header.timestamp =
-									sensor->data_mover()->current_timestamp();
-							header.data_size =
-									sensor->data_mover()->current_data_size();
-							header.data_id = sensor->id();
+							header.timestamp = sensor->data_mover()->current_timestamp();
+							header.data_size = sensor->data_mover()->current_data_size();
+							header.data_id   = sensor->id();
 
-							imu_server.sendNetworkData(
-									sensor->data_mover()->data(), header);
+							imu_server.sendNetworkData(sensor->data_mover()->data(), header);
 						}
 					}
 
@@ -395,12 +395,12 @@ int main(void) {
 					//check if the sensor has new data
 					if (sensor->data_mover()->newDataAvailable()) {
 						if (!clientConnected)
-							printf("movepointer without client: %u\n",
-									sensor->id());
+							printf("movepointer without client: %u\n", sensor->id());
 
 						//move shared buffer pointer (release the measurement)
 						sensor->data_mover()->movePointer();
 
+#if 0
 						printf("got new frame! %d bytes at %d ", sensor->data_mover()->current_data_size(), sensor->data_mover()->current_timestamp());
 
 						switch (sensor_type) {
@@ -422,8 +422,9 @@ int main(void) {
 						printf(" pixel[0,0] = %d ", (int) sensor->data_mover()->data()[10000]);
 
 						printf("\n");
+#endif
 
-						handleNewData(sensor);
+
 
 						//drop old frames (if network is too slow)
 //           while( sensor->data_mover()->newDataAvailable() )
@@ -444,6 +445,16 @@ int main(void) {
 							header.data_id   = sensor->id();
 
 							tcp_server.sendNetworkData(sensor->data_mover()->data(), header);
+
+							/*
+							Transformation t(42,1,0.123,12345,-9999,0.42);
+							header.data_size = sizeof(float) * 6;
+							header.data_id = 41;
+							tcp_server.sendNetworkData((char*) t.value.data(), header);
+							 */
+
+							// TODO: read intrinsics from calib_provider
+							//handleNewData(sensor, tcp_server);
 						}
 					}
 				} else if (sensor_type == visensor::SensorType::TIMING_BLOCK) {

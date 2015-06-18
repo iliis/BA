@@ -10,6 +10,7 @@
 
 #include "gui/scene.h"
 #include "gui/sf_image_data.h"
+#include "gui/live.h"
 #include "core/image_data.h"
 #include "core/transformation.h"
 #include "core/camera_intrinsics.h"
@@ -588,7 +589,7 @@ void run_minimization(const Scene& scene, Warp::Parameters params)
 
 }
 ///////////////////////////////////////////////////////////////////////////////
-int main()
+int main(int argc, char* argv[])
 {
     font.loadFromFile("resources/fonts/default.otf");
 
@@ -596,7 +597,7 @@ int main()
     //testscene.loadFromSceneDirectory("../matlab/input/test_wide");
     //testscene.loadFromSceneDirectory("../matlab/input/trajectory1");
     //testscene.loadFromSceneDirectory("../matlab/input/testscene1");
-    testscene.loadFromSceneDirectory("../matlab/input/courtyard/lux");
+    //testscene.loadFromSceneDirectory("../matlab/input/courtyard/lux");
     //testscene.loadFromSceneDirectory("../matlab/input/courtyard/normal"); // step 22 is nice!
     //testscene.loadFromBagFile("/home/samuel/data/2015-06-11-16-30-01.bag");
 
@@ -611,9 +612,9 @@ int main()
     //write_trajectory(testscene, params, ".");
     //write_trajectory_rosbag("/home/samuel/data/2015-06-11-16-30-01.bag", params, ".");
 
-    run_minimization(testscene, params);
+    //run_minimization(testscene, params);
 
-    //run_on_real_data();
+    show_live_data(window, font, argc, argv);
 
 
     delete params.weight_function;

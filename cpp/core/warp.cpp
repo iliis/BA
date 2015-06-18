@@ -109,6 +109,14 @@ float Warp::calcError(const CameraStep& step, const Transformation& T, Eigen::Ve
 
     for (unsigned int y = 0; y < H; ++y) {
         for (unsigned int x = 0; x < W; ++x) {
+
+
+            Pixel pixel_current  = step.frame_second.getPixel(Vector2i(x,y));
+
+            // skip pixels without depth or intensity value
+            if (isnan(pixel_current.depth) || isnan(pixel_current.intensity))
+                continue;
+
             float pixel_current_gradient_norm = step.frame_second.getIntensityData().getDiff(Vector2i(x,y)).norm();
 
             // skip pixels with weak gradient (approximate keyframe gradient with gradient from current frame)
@@ -116,12 +124,6 @@ float Warp::calcError(const CameraStep& step, const Transformation& T, Eigen::Ve
                 if (pixel_current_gradient_norm < params.gradient_norm_threshold)
                     continue;
             }
-
-            Pixel pixel_current  = step.frame_second.getPixel(Vector2i(x,y));
-
-            // skip pixels without depth value
-            if (isnan(pixel_current.depth))
-                continue;
 
             WorldPoint point = projectInv(pixel_current, step.intrinsics);
 
@@ -144,7 +146,13 @@ float Warp::calcError(const CameraStep& step, const Transformation& T, Eigen::Ve
 
             float intensity_keyframe = step.frame_first.samplePixel(pixel_in_keyframe.pos);
 
+            // skip pixels that map onto invalid color
+            if (isnan(intensity_keyframe) || isnan(J_I(0)) || isnan(J_I(1)))
+            	continue;
+
             float error = (intensity_keyframe - pixel_current.intensity);
+
+            assert(!isnan(error));
 
             // calculate Jacobian
             Matrix<float, 3, 6> J_T = Warp::transformJacobian(point, T);

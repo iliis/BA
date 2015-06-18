@@ -16,6 +16,7 @@ void loadImageDataFromFile (ImageData& dest, const std::string source_file);
 
 void loadImageDataFromROSgrayscale(ImageData& dest, const sensor_msgs::Image& source_data);
 void loadImageDataFromROSdepthmap (ImageData& dest, const sensor_msgs::Image& source_data);
+void loadImageDataFromROSraw      (ImageData& dest, const sensor_msgs::Image& source_data);
 
 void image_to_matrix(const sf::Image& source, Eigen::MatrixXf& dest);
 void matrix_to_image(const Eigen::MatrixXf& source, sf::Image& dest, const Colormap::Colormap& colormap = Colormap::Colormap()); // like imagesc()
