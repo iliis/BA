@@ -37,77 +37,77 @@ void initOdometry()
     minimization_parameters.pyramid_levels = 4;
     minimization_parameters.max_iterations = 100;
     minimization_parameters.T_init = Transformation(0,0,0,0,0,0);
-    minimization_parameters.gradient_norm_threshold = 0; //0.1;
+    minimization_parameters.gradient_norm_threshold = 0.01; //0.1;
 }
 ///////////////////////////////////////////////////////////////////////////////
 void shutdownOdometry()
 {
-	delete minimization_parameters.weight_function;
+    delete minimization_parameters.weight_function;
 }
 ///////////////////////////////////////////////////////////////////////////////
 void handleNewData(const Sensor::Ptr sensor, TcpServer& tcp_server)
 {
-	if(sensor->getSensorType() == visensor::SensorType::CAMERA_MT9V034) {
-		if (sensor->id() == 0) {
-			// take data from cam0 (the left? TODO: verify that this is the correct camera!)
+    if(sensor->getSensorType() == visensor::SensorType::CAMERA_MT9V034) {
+        if (sensor->id() == 0) {
+            // take data from cam0 (the left? TODO: verify that this is the correct camera!)
 
-						// TODO: do we get column- or row-major data?
-			intensity_data[current_frame].resize(FRAME_HEIGHT, FRAME_WIDTH);
+                        // TODO: do we get column- or row-major data?
+            intensity_data[current_frame].resize(FRAME_HEIGHT, FRAME_WIDTH);
 
 
 
-			memcpyCharToMatrix(intensity_data[current_frame], (const unsigned char*) sensor->data_mover()->data());
+            memcpyCharToMatrix(intensity_data[current_frame], (const unsigned char*) sensor->data_mover()->data());
 
-			intensity_timestamp[current_frame] = sensor->data_mover()->current_timestamp();
+            intensity_timestamp[current_frame] = sensor->data_mover()->current_timestamp();
 
-			//writeRawDataToFile((const char*) sensor->data_mover()->data(), sensor->data_mover()->data_size(), "intensity_raw.csv");
-			//writeMatrixToFile(intensity_data[current_frame], "intensity.csv");
-			//printf("got camera image\n");
+            //writeRawDataToFile((const char*) sensor->data_mover()->data(), sensor->data_mover()->data_size(), "intensity_raw.csv");
+            //writeMatrixToFile(intensity_data[current_frame], "intensity.csv");
+            //printf("got camera image\n");
 
-			handleFrame();
-		}
+            handleFrame();
+        }
 
-	} else if(sensor->getSensorType() == visensor::SensorType::DENSE_MATCHER) {
+    } else if(sensor->getSensorType() == visensor::SensorType::DENSE_MATCHER) {
 
-		depth_data[current_frame].resize(FRAME_HEIGHT, FRAME_WIDTH);
+        depth_data[current_frame].resize(FRAME_HEIGHT, FRAME_WIDTH);
 
-		memcpyCharToMatrix(depth_data[current_frame], (const unsigned char*) sensor->data_mover()->data());
+        memcpyCharToMatrix(depth_data[current_frame], (const unsigned char*) sensor->data_mover()->data());
 
-		depth_timestamp[current_frame] = sensor->data_mover()->current_timestamp();
+        depth_timestamp[current_frame] = sensor->data_mover()->current_timestamp();
 
-		//writeRawDataToFile((const char*) sensor->data_mover()->data(), sensor->data_mover()->data_size(), "depth_raw.csv");
-		//writeMatrixToFile(depth_data[current_frame], "depth.csv");
-		//printf("got depth image\n");
+        //writeRawDataToFile((const char*) sensor->data_mover()->data(), sensor->data_mover()->data_size(), "depth_raw.csv");
+        //writeMatrixToFile(depth_data[current_frame], "depth.csv");
+        //printf("got depth image\n");
 
-		handleFrame();
+        handleFrame();
 
-	} else {
-		printf("WARNING: unknown sensor type\n");
-	}
+    } else {
+        printf("WARNING: unknown sensor type\n");
+    }
 }
 ///////////////////////////////////////////////////////////////////////////////
 void handleFrame()
 {
-	if (intensity_timestamp[current_frame] == depth_timestamp[current_frame]) {
-		// got two matching images
-		if (intensity_timestamp[1-current_frame] > 0) {
-			// actually got two frames
+    if (intensity_timestamp[current_frame] == depth_timestamp[current_frame]) {
+        // got two matching images
+        if (intensity_timestamp[1-current_frame] > 0) {
+            // actually got two frames
 
-			//printf(" >>>>> PROCESSING STEP [ %d -> %d ] <<<<<< \n", intensity_timestamp[1-current_frame], intensity_timestamp[current_frame]);
+            //printf(" >>>>> PROCESSING STEP [ %d -> %d ] <<<<<< \n", intensity_timestamp[1-current_frame], intensity_timestamp[current_frame]);
 
-			CameraImage frame_current, frame_prev;
+            CameraImage frame_current, frame_prev;
 
-			frame_current.loadFromMatrices(intensity_data[  current_frame], depth_data[  current_frame]);
-			frame_prev   .loadFromMatrices(intensity_data[1-current_frame], depth_data[1-current_frame]);
+            frame_current.loadFromMatrices(intensity_data[  current_frame], depth_data[  current_frame]);
+            frame_prev   .loadFromMatrices(intensity_data[1-current_frame], depth_data[1-current_frame]);
 
-			CameraStep step(frame_prev, frame_current, visensor_intrinsics);
+            CameraStep step(frame_prev, frame_current, visensor_intrinsics);
 
-			findTransformationWithPyramid(step, minimization_parameters);
-		}
+            findTransformationWithPyramid(step, minimization_parameters);
+        }
 
 
-		// copy current to prev
-		current_frame = 1-current_frame;
-	}
+        // copy current to prev
+        current_frame = 1-current_frame;
+    }
 }
 ///////////////////////////////////////////////////////////////////////////////

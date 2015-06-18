@@ -34,6 +34,9 @@ public:
     void loadFromSceneDirectory(const std::string& scene_path);
     void loadFromBagFile(const std::string& bag_path);
 
+    inline void setIntrinsics(const CameraIntrinsics& i) { this->intrinsics = i; }
+    void addFrames(const std::vector<CameraImage>& fs);
+
     inline unsigned int getFrameCount() const { return frames.size(); }
     inline unsigned int getStepCount()  const { return getFrameCount() - 1; }
 

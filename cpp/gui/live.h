@@ -8,7 +8,10 @@
 #include <stereo_msgs/DisparityImage.h>
 #include <ros/ros.h>
 
+#include "scene.h"
 #include "sf_image_data.h"
+#include "../core/camera_image.h"
+#include "minimization_gui.h"
 
 void show_live_data(sf::RenderWindow& window, sf::Font& font, int argc, char* argv[]);
 

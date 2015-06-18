@@ -27,6 +27,7 @@ set(SOURCES
     "gui/scene.cpp"
     "gui/colormap.cpp"
     "gui/live.cpp"
+    "gui/minimization_gui.cpp"
     "gui/sf_image_data.cpp"
     "utils/progress.cpp"
     "utils/matrix.cpp"

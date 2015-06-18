@@ -130,15 +130,24 @@ void Scene::loadFromBagFile(const std::string& bag_path)
     cout << "loaded scene with " << this->getFrameCount() << " frames from ROS bag." << endl;
 }
 ///////////////////////////////////////////////////////////////////////////////
+void Scene::addFrames(const std::vector<CameraImage>& fs)
+{
+    this->frames.insert(frames.end(), fs.begin(), fs.end());
+
+    for (unsigned int i = 0; i < fs.size(); i++)
+        ground_truth.push_back(Transformation(0,0,0,0,0,0));
+}
+///////////////////////////////////////////////////////////////////////////////
 CameraStep Scene::getStep(unsigned int index) const
 {
+    assert(index < this->getStepCount());
     return this->getStep(index, index+1);
 }
 ///////////////////////////////////////////////////////////////////////////////
 CameraStep Scene::getStep(unsigned int indexA, unsigned int indexB) const
 {
-    assert(indexA < this->getStepCount());
-    assert(indexB < this->getStepCount());
+    assert(indexA < this->getFrameCount());
+    assert(indexB < this->getFrameCount());
 
     // TODO: calculate correct ground truth...
 
