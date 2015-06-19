@@ -191,3 +191,8 @@ Baseline:
 - check if images are read correctly in arm code
 - clamp depth data (0 or 240 --> NaN, cut out rectangle, mask with intensity = 255 or 0)
 - scale depth data (0-255 to ???)
+- params for FPGA: more sparse output?
+
+- don't downscale depth data
+- dynamic pyramid levels & gradient threshold (so that we have enough pixels!)
+- better stopping criterion (run a bit longer)

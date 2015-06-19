@@ -107,8 +107,16 @@ float Warp::calcError(const CameraStep& step, const Transformation& T, Eigen::Ve
     error_out.resize(W*H);
     J_out.resize(W*H, 6);
 
-    for (unsigned int y = 40; y < H-15; ++y) {
-        for (unsigned int x = 0; x < W; ++x) {
+    const float s = pow(2,step.scale);
+
+    const unsigned int X_START = params.cutout_left / s;
+    const unsigned int X_END   = W - (params.cutout_right / s);
+
+    const unsigned int Y_START = params.cutout_top / s;
+    const unsigned int Y_END   = H - (params.cutout_bottom / s);
+
+    for (unsigned int y = Y_START; y < Y_END; ++y) {
+        for (unsigned int x = X_START; x < X_END; ++x) {
 
 
             Pixel pixel_current  = step.frame_second.getPixel(Vector2i(x,y));

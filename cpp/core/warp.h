@@ -25,6 +25,9 @@ namespace Warp {
         Transformation T_init;
         unsigned int max_iterations;
 
+        // area of pixels to use, everything outside will be ignored
+        unsigned int cutout_left, cutout_right, cutout_top, cutout_bottom;
+
         Parameters(ErrorWeightFunction* weight_function,
                 float gradient_norm_threshold = 0,
                 bool filter_on_unwarped_gradient = false,
@@ -36,7 +39,9 @@ namespace Warp {
             filter_on_unwarped_gradient(filter_on_unwarped_gradient),
             pyramid_levels(pyramid_levels),
             T_init(T_init),
-            max_iterations(max_iterations) {}
+            max_iterations(max_iterations),
+            cutout_left(0), cutout_right(0), cutout_top(0), cutout_bottom(0)
+            {}
 
         void setWeightFunction(ErrorWeightFunction* func) { if (weight_function) { delete weight_function; } weight_function = func; }
 

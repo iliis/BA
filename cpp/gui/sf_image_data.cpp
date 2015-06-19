@@ -73,7 +73,11 @@ void loadImageDataFromROSraw(ImageData& dest, const sensor_msgs::Image& source_d
     // copy data
     for (unsigned int y = 0; y < height; y++) {
         for (unsigned int x = 0; x < width; x++) {
-            dest.data(y, x) = source_data.data[(y*width+x)] / 255.0f;
+            unsigned const char v = source_data.data[(y*width+x)];
+            if (v > 0 && v < 240)
+                dest.data(y, x) = (float) v;
+            else
+                dest.data(y, x) = std::numeric_limits<float>::quiet_NaN();
         }
     }
 }
@@ -107,24 +111,9 @@ void matrix_to_image(const Eigen::MatrixXf& source, sf::Image& dest, const Color
     // initialize and clear image
     dest.create(source.cols(), source.rows());
 
-    float near = source.minCoeff();
-    float far  = source.maxCoeff();
-
     // matrix might contain NaNs
-    if (!isfinite(near) || !isfinite(far)) {
-        near =  std::numeric_limits<float>::infinity();
-        far  = -std::numeric_limits<float>::infinity();
-
-        for (unsigned int r = 0; r < source.rows(); r++) {
-            for (unsigned int c = 0; c < source.cols(); c++) {
-                if (near > source(r,c))
-                    near = source(r,c);
-
-                if (far < source(r,c))
-                    far = source(r,c);
-            }
-        }
-    }
+    float near = minNoNaN(source);
+    float far  = maxNoNaN(source);
 
     // convert matrix data into grayscale image
     for (unsigned int y = 0; y < source.rows(); y++) {

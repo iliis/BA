@@ -16,6 +16,9 @@
     } \
 } while (0)
 
+float maxNoNaN(const Eigen::MatrixXf& mat);
+float minNoNaN(const Eigen::MatrixXf& mat);
+
 void memcpyCharToMatrix(Eigen::MatrixXf& mat, const unsigned char* source);
 void writeMatrixToFile(const Eigen::MatrixXf& mat, const char* path);
 void writeRawDataToFile(const char* data, unsigned int size, const char* path);

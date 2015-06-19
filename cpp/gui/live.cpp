@@ -19,7 +19,7 @@ void image1_callback(const sensor_msgs::Image::ConstPtr& m)
 void depth_callback(const sensor_msgs::Image::ConstPtr& m)
 {
     loadImageDataFromROSraw(depth, *m);
-    depth.data *= 255;
+    //depth.data *= 255;
 }
 ///////////////////////////////////////////////////////////////////////////////
 void set_coarse_shutter_width(int w)
@@ -47,10 +47,10 @@ void show_live_data(sf::RenderWindow& window, sf::Font& font, int argc, char* ar
         'individual_cam_config': 0, \
         'cam_agc_enable': 0, \
         'cam_aec_enable': 0,  \
-        'cam_coarse_shutter_width': 150 \
+        'cam_coarse_shutter_width': 10 \
     }\"");
 
-    int shutter = 150;
+    int shutter = 10;
 
     std::vector<CameraImage> recorded_frames;
 
@@ -104,6 +104,10 @@ void show_live_data(sf::RenderWindow& window, sf::Font& font, int argc, char* ar
                             params.max_iterations = 100;
                             params.T_init = Transformation(0,0,0,0,0,0);
                             params.gradient_norm_threshold = 0.01;
+                            params.cutout_left   = 20;
+                            params.cutout_right  = 20;
+                            params.cutout_top    = 50;
+                            params.cutout_bottom = 20;
 
                             // TODO: read this from ROS messages
                             CameraIntrinsics visensor_intrinsics = CameraIntrinsics(

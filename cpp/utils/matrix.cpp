@@ -11,36 +11,64 @@ using namespace std;
 using namespace Eigen;
 
 ///////////////////////////////////////////////////////////////////////////////
+float maxNoNaN(const Eigen::MatrixXf& mat)
+{
+    float far = -std::numeric_limits<float>::infinity();
+
+    for (unsigned int r = 0; r < mat.rows(); r++) {
+        for (unsigned int c = 0; c < mat.cols(); c++) {
+            if (far < mat(r,c))
+                far = mat(r,c);
+        }
+    }
+
+    return far;
+}
+///////////////////////////////////////////////////////////////////////////////
+float minNoNaN(const Eigen::MatrixXf& mat)
+{
+    float near =  std::numeric_limits<float>::infinity();
+
+    for (unsigned int r = 0; r < mat.rows(); r++) {
+        for (unsigned int c = 0; c < mat.cols(); c++) {
+            if (near > mat(r,c))
+                near = mat(r,c);
+        }
+    }
+
+    return near;
+}
+///////////////////////////////////////////////////////////////////////////////
 void memcpyCharToMatrix(MatrixXf& mat, const unsigned char* source)
 {
 
-	for (int r = 0; r < mat.rows(); r++) {
-		for (int c = 0; c < mat.cols(); c++) {
-			const unsigned char v = *source++;
-			if (v > 0 && v < 240)
-				mat(r,c) = (float) v;
-			else
-				mat(r,c) = std::numeric_limits<float>::quiet_NaN();
-		}
-	}
+    for (int r = 0; r < mat.rows(); r++) {
+        for (int c = 0; c < mat.cols(); c++) {
+            const unsigned char v = *source++;
+            if (v > 0 && v < 240)
+                mat(r,c) = (float) v;
+            else
+                mat(r,c) = std::numeric_limits<float>::quiet_NaN();
+        }
+    }
 }
 ///////////////////////////////////////////////////////////////////////////////
 void writeMatrixToFile(const MatrixXf& mat, const char* path)
 {
     ofstream outfile(path);
 
-	for (int r = 0; r < mat.rows(); r++) {
-		for (int c = 0; c < mat.cols(); c++) {
+    for (int r = 0; r < mat.rows(); r++) {
+        for (int c = 0; c < mat.cols(); c++) {
 
-			outfile << mat(r,c);
+            outfile << mat(r,c);
 
-			if (c < mat.cols()-1)
-				outfile << ", ";
-		}
-		outfile << endl;
-	}
+            if (c < mat.cols()-1)
+                outfile << ", ";
+        }
+        outfile << endl;
+    }
 
-	outfile.close();
+    outfile.close();
 }
 ///////////////////////////////////////////////////////////////////////////////
 void writeRawDataToFile(const char* data, unsigned int size, const char* path)
@@ -48,15 +76,15 @@ void writeRawDataToFile(const char* data, unsigned int size, const char* path)
     ofstream outfile(path);
 
     while (size-- > 0) {
-    	//outfile << (unsigned int) (*data++);
-    	outfile << (float) (*data++);
+        //outfile << (unsigned int) (*data++);
+        outfile << (float) (*data++);
 
-    	if (size > 1)
-    		outfile << ", ";
-	}
+        if (size > 1)
+            outfile << ", ";
+    }
 
     outfile << endl;
 
-	outfile.close();
+    outfile.close();
 }
 ///////////////////////////////////////////////////////////////////////////////

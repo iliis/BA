@@ -7,7 +7,7 @@
 
 #include "colormap.h"
 #include "../core/image_data.h"
-
+#include "../utils/matrix.h"
 
 // helper tools to convert between Eigen Matrices and SFML Images
 
