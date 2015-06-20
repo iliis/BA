@@ -43,6 +43,7 @@
 #include "IrqScheduler.hpp"
 
 #include "odometry/odometry.h"
+#include "odometry/utils/FakeCamSensor.h"
 
 #define TCP_IMU_PORT 13776
 #define TCP_DATA_PORT 13777
@@ -99,6 +100,7 @@ int main(void) {
 								visensor::SensorId::EXTERNAL_TRIGGER0,
 								FPGA_CONSTANTS::EX_TRIGGER_CONFIG,
 								FPGA_CONSTANTS::EX_TRIGGER_BUFFER)));
+
 	if (fpga_config != FpgaConfig::D
 			&& ADIS16448::checkPresence(FPGA_CONSTANTS::IMU0_ADDRESS_BUS)) {
 		sensors.insert(
@@ -238,16 +240,16 @@ int main(void) {
 //          visensor::SensorId::NOTE_SPECIFIED,
 //          boost::make_shared<LightControl>(FPGA_CONSTANTS::LIGHT_CONTROL_REGCONF)));
 
-	boost::shared_ptr<TimingBlock> timing_block =
-			boost::make_shared<TimingBlock>(
-					FPGA_CONSTANTS::TIMING_BLOCK_REGCONF);
-	sensors.insert(
-			std::make_pair(visensor::SensorId::SENSOR_CLOCK, timing_block));
+	boost::shared_ptr<TimingBlock> timing_block = boost::make_shared<TimingBlock>(FPGA_CONSTANTS::TIMING_BLOCK_REGCONF);
+	sensors.insert(std::make_pair(visensor::SensorId::SENSOR_CLOCK, timing_block));
+	sensors.insert(std::make_pair(visensor::SensorId::SENSOR_CLOCK, boost::make_shared<TimingBlock>(FPGA_CONSTANTS::TIMING_BLOCK_REGCONF)));
 
-	sensors.insert(
-			std::make_pair(visensor::SensorId::SENSOR_CLOCK,
-					boost::make_shared<TimingBlock>(
-							FPGA_CONSTANTS::TIMING_BLOCK_REGCONF)));
+
+	// add virtual camera for debug output
+	printf("adding fake camera\n");
+	sensors.insert(std::make_pair(visensor::SensorId::CAM2, boost::make_shared<FakeCamSensor>(visensor::SensorId::CAM2)));
+	printf("fake camera created\n");
+
 
 	//turn off all sensors to get the fpga cores in a defined state if the server wasn't shutdown properly
 
@@ -266,12 +268,11 @@ int main(void) {
 		boost::asio::io_service io_service;
 
 		//timer for connection checks if idle
-		boost::asio::deadline_timer t1(io_service,
-				boost::posix_time::milliseconds(100)); //idle check timer
+		boost::asio::deadline_timer t1(io_service, boost::posix_time::milliseconds(100)); //idle check timer
+
 
 		boost::asio::io_service::work work(io_service); // needed to keep the io_service running between client connections
-		boost::thread bt(
-				boost::bind(&boost::asio::io_service::run, &io_service)); // run servers in other threads
+		boost::thread bt(boost::bind(&boost::asio::io_service::run, &io_service)); // run servers in other threads
 
 		// Autodiscovery responder
 		AutoDiscovery discovery_service(io_service, TCP_DISCOVERY_PORT);
@@ -291,10 +292,8 @@ int main(void) {
 		boost::thread ct(boost::bind(&ConfigServer::run, &config_server));
 
 		// handles clock sync messages
-		ClockSyncServer clock_sync_server(io_service, TCP_CLOCK_SYNC_PORT,
-				timing_block);
-		boost::thread cs(
-				boost::bind(&ClockSyncServer::run, &clock_sync_server));
+		ClockSyncServer clock_sync_server(io_service, TCP_CLOCK_SYNC_PORT, timing_block);
+		boost::thread cs(boost::bind(&ClockSyncServer::run, &clock_sync_server));
 
 //    config_server.run();
 
@@ -340,9 +339,14 @@ int main(void) {
 
 			//go through all sensors
 			BOOST_FOREACH(const Sensor::Map::value_type& sensor_pair, sensors) {
+
 				//only stream the following sensors
 				const Sensor::Ptr sensor = sensor_pair.second;
 				int sensor_type = sensor->getSensorType();
+
+				// CAM2 is a fake camera to transmit debug data
+				if (sensor->id() == 2)
+					continue;
 
 				///
 				// Sensors that send all available measurements
@@ -400,12 +404,12 @@ int main(void) {
 						//move shared buffer pointer (release the measurement)
 						sensor->data_mover()->movePointer();
 
-#if 0
+#if 1
 						printf("got new frame! %d bytes at %d ", sensor->data_mover()->current_data_size(), sensor->data_mover()->current_timestamp());
 
 						switch (sensor_type) {
 							case visensor::SensorType::CAMERA_MT9V034:
-								printf("CAMRA");
+								printf("CAMERA");
 								break;
 
 							case visensor::SensorType::DENSE_MATCHER:
@@ -417,6 +421,12 @@ int main(void) {
 								break;
 						}
 
+						printf(" first 4 bytes: %X %X %X %X",
+								sensor->data_mover()->data()[0],
+								sensor->data_mover()->data()[1],
+								sensor->data_mover()->data()[2],
+								sensor->data_mover()->data()[3]);
+
 						printf(" sensorID: %d ", sensor->id());
 
 						printf(" pixel[0,0] = %d ", (int) sensor->data_mover()->data()[10000]);
@@ -427,11 +437,11 @@ int main(void) {
 
 
 						//drop old frames (if network is too slow)
-           while( sensor->data_mover()->newDataAvailable() )
-           {
-             //printf(">> dropping camera frame on %u / total drops: %u (network too slow?)\n", sensor->id(), framedrop_cnt++);
-             sensor->data_mover()->movePointer();
-           }
+					    while( sensor->data_mover()->newDataAvailable() )
+					    {
+						  //printf(">> dropping camera frame on %u / total drops: %u (network too slow?)\n", sensor->id(), framedrop_cnt++);
+						  sensor->data_mover()->movePointer();
+					    }
 
 						// printf("sensor id: %d send dense size: %u\n", sensor->id(), sensor->data_mover()->current_data_size());
 
@@ -453,7 +463,7 @@ int main(void) {
 							tcp_server.sendNetworkData((char*) t.value.data(), header);
 							 */
 
-							// TODO: read intrinsics from calib_provider
+
 							handleNewData(sensor, tcp_server);
 						}
 					}

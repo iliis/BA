@@ -53,9 +53,11 @@ void DevMem::open_dev(off_t dev_base, size_t size) {
 	// be at the start of the page.
 
 	mapped_base = (char*)mmap(0, map_size, PROT_READ | PROT_WRITE, MAP_SHARED, memfd, dev_base & ~MAP_MASK);
+
 	if (mapped_base == (void *) -1) {
-    int myerr = errno;
+		int myerr = errno;
 		printf("Can't map the memory to user space:  (errno %d %s)\n", myerr, strerror(myerr));
+
 		exit(0);
 	}
 	// printf("Memory mapped at address %p.\n", mapped_base);

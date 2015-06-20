@@ -22,6 +22,7 @@ MatrixType     depth_data[2];
 uint32_t intensity_timestamp[2] = {0, 0};
 uint32_t     depth_timestamp[2] = {0, 0};
 
+// TODO: read intrinsics from calib_provider
 const CameraIntrinsics visensor_intrinsics = CameraIntrinsics(
         /* sensor size     */ Eigen::Vector2f(752, 480),
         /* principal point */ Eigen::Vector2f(370.105, 226.664),
@@ -30,19 +31,39 @@ const CameraIntrinsics visensor_intrinsics = CameraIntrinsics(
 
 Warp::Parameters minimization_parameters(new ErrorWeightNone());
 
+///////////////////////////////////////////////////////////////////////////////
+
+const size_t BUFSIZE = 360964;
+char* debug_buffer0;
 
 ///////////////////////////////////////////////////////////////////////////////
 void initOdometry()
 {
+	printf("initializing odometry...\n");
+
     minimization_parameters.pyramid_levels = 4;
     minimization_parameters.max_iterations = 100;
     minimization_parameters.T_init = Transformation(0,0,0,0,0,0);
     minimization_parameters.gradient_norm_threshold = 0.01; //0.1;
+
+
+	debug_buffer0 = (char*) malloc(BUFSIZE);
+
+	if (!debug_buffer0) {
+		cerr << "Failed to allocate memory for debug buffer!" << endl;
+		exit(0);
+	}
+
+	memset(debug_buffer0, 0, BUFSIZE);
 }
 ///////////////////////////////////////////////////////////////////////////////
 void shutdownOdometry()
 {
+	printf("shutting down odometry...\n");
+
     delete minimization_parameters.weight_function;
+
+    free(debug_buffer0);
 }
 ///////////////////////////////////////////////////////////////////////////////
 void handleNewData(const Sensor::Ptr sensor, TcpServer& tcp_server)
@@ -66,6 +87,17 @@ void handleNewData(const Sensor::Ptr sensor, TcpServer& tcp_server)
             //printf("got camera image\n");
 
             handleFrame();
+
+
+            memset(debug_buffer0+4+752*10, 255, 752*5);
+            memcpy(debug_buffer0, (const void*) sensor->data_mover()->data(), 4);
+
+            IpComm::Header header;
+			header.timestamp = sensor->data_mover()->current_timestamp();
+			header.data_size = BUFSIZE;
+			header.data_id   = 2;
+			tcp_server.sendNetworkData(debug_buffer0, header);
+
         }
 
     } else if(sensor->getSensorType() == visensor::SensorType::DENSE_MATCHER) {
