@@ -1,0 +1,12 @@
+eclipse.preferences.version=1
+environment/buildEnvironmentInclude/xilinx.gnu.armlinux.exe.debug.689443640/CPATH/delimiter=\:
+environment/buildEnvironmentInclude/xilinx.gnu.armlinux.exe.debug.689443640/CPATH/operation=replace
+environment/buildEnvironmentInclude/xilinx.gnu.armlinux.exe.debug.689443640/CPATH/value=/home/pascal/catkin_ws/devel/include\:/opt/ros/hydro/include
+environment/buildEnvironmentInclude/xilinx.gnu.armlinux.exe.debug.689443640/C_INCLUDE_PATH/delimiter=\:
+environment/buildEnvironmentInclude/xilinx.gnu.armlinux.exe.debug.689443640/C_INCLUDE_PATH/operation=remove
+environment/buildEnvironmentInclude/xilinx.gnu.armlinux.exe.debug.689443640/append=true
+environment/buildEnvironmentInclude/xilinx.gnu.armlinux.exe.debug.689443640/appendContributed=true
+environment/buildEnvironmentLibrary/xilinx.gnu.armlinux.exe.debug.689443640/LIBRARY_PATH/delimiter=\:
+environment/buildEnvironmentLibrary/xilinx.gnu.armlinux.exe.debug.689443640/LIBRARY_PATH/operation=remove
+environment/buildEnvironmentLibrary/xilinx.gnu.armlinux.exe.debug.689443640/append=true
+environment/buildEnvironmentLibrary/xilinx.gnu.armlinux.exe.debug.689443640/appendContributed=true

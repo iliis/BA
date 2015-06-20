@@ -75,7 +75,7 @@ void loadImageDataFromROSraw(ImageData& dest, const sensor_msgs::Image& source_d
         for (unsigned int x = 0; x < width; x++) {
             unsigned const char v = source_data.data[(y*width+x)];
             if (v > 0 && v < 240)
-                dest.data(y, x) = (float) v;
+                dest.data(y, x) = ((float) v);
             else
                 dest.data(y, x) = std::numeric_limits<float>::quiet_NaN();
         }

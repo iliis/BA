@@ -427,11 +427,11 @@ int main(void) {
 
 
 						//drop old frames (if network is too slow)
-//           while( sensor->data_mover()->newDataAvailable() )
-//           {
-//             printf(">> dropping camera frame on %u / total drops: %u (network too slow?)\n", sensor->id(), framedrop_cnt++);
-//             sensor->data_mover()->movePointer();
-//           }
+           while( sensor->data_mover()->newDataAvailable() )
+           {
+             //printf(">> dropping camera frame on %u / total drops: %u (network too slow?)\n", sensor->id(), framedrop_cnt++);
+             sensor->data_mover()->movePointer();
+           }
 
 						// printf("sensor id: %d send dense size: %u\n", sensor->id(), sensor->data_mover()->current_data_size());
 
@@ -454,7 +454,7 @@ int main(void) {
 							 */
 
 							// TODO: read intrinsics from calib_provider
-							//handleNewData(sensor, tcp_server);
+							handleNewData(sensor, tcp_server);
 						}
 					}
 				} else if (sensor_type == visensor::SensorType::TIMING_BLOCK) {

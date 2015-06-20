@@ -6,6 +6,7 @@
 #include <SFML/Graphics.hpp>
 #include <sensor_msgs/Image.h>
 #include <stereo_msgs/DisparityImage.h>
+#include <visensor_msgs/visensor_calibration.h>
 #include <ros/ros.h>
 
 #include "scene.h"

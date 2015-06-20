@@ -5,21 +5,40 @@ using namespace Eigen;
 
 ///////////////////////////////////////////////////////////////////////////////
 ImageData cam0, cam1, depth;
+CameraIntrinsics current_intrinsics = CameraIntrinsics(
+        /* sensor size     */ Eigen::Vector2f(752, 480),
+        /* principal point */ Eigen::Vector2f(370.105, 226.664),
+        /* focal length    */ 471.7,
+        /* stereo baseline */ 0.110174);
+///////////////////////////////////////////////////////////////////////////////
+void calibration_callback(const visensor_msgs::visensor_calibration::ConstPtr& m)
+{
+    current_intrinsics = CameraIntrinsics(
+        /* sensor size     */ Eigen::Vector2f(m->image_width, m->image_height),
+        /* principal point */ Eigen::Vector2f(m->principal_point[0], m->principal_point[1]),
+        /* focal length    */ m->focal_length[0],
+        /* stereo baseline */ 0.110174);
+}
 ///////////////////////////////////////////////////////////////////////////////
 void image0_callback(const sensor_msgs::Image::ConstPtr& m)
 {
     loadImageDataFromROSraw(cam0, *m);
+    // scale correctly
+    cam0.data /= 255.0f;
 }
 ///////////////////////////////////////////////////////////////////////////////
 void image1_callback(const sensor_msgs::Image::ConstPtr& m)
 {
     loadImageDataFromROSraw(cam1, *m);
+    // scale correctly
+    cam1.data /= 255.0f;
 }
 ///////////////////////////////////////////////////////////////////////////////
 void depth_callback(const sensor_msgs::Image::ConstPtr& m)
 {
     loadImageDataFromROSraw(depth, *m);
-    //depth.data *= 255;
+    // scale correctly
+    depth.data /= 6.0f;
 }
 ///////////////////////////////////////////////////////////////////////////////
 void set_coarse_shutter_width(int w)
@@ -28,6 +47,7 @@ void set_coarse_shutter_width(int w)
         'cam_coarse_shutter_width': " + boost::lexical_cast<string>(w) + " }\"");
     system(cmd.c_str());
 }
+///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 void show_live_data(sf::RenderWindow& window, sf::Font& font, int argc, char* argv[])
 {
@@ -38,6 +58,7 @@ void show_live_data(sf::RenderWindow& window, sf::Font& font, int argc, char* ar
 
     ros::NodeHandle node;
 
+    ros::Subscriber subI = node.subscribe("/cam0/calibration", 3, calibration_callback);
     ros::Subscriber sub0 = node.subscribe("/cam0/image_raw", 3, image0_callback);
     ros::Subscriber sub1 = node.subscribe("/cam1/image_raw", 3, image1_callback);
     ros::Subscriber subD = node.subscribe("/dense/image_raw", 3, depth_callback);
@@ -47,10 +68,16 @@ void show_live_data(sf::RenderWindow& window, sf::Font& font, int argc, char* ar
         'individual_cam_config': 0, \
         'cam_agc_enable': 0, \
         'cam_aec_enable': 0,  \
-        'cam_coarse_shutter_width': 10 \
+        'cam_coarse_shutter_width': 50, \
+        'penalty_1': 20, \
+        'penalty_2': 200, \
+        'threshold': 100, \
+        'lr_check': 2 \
     }\"");
 
-    int shutter = 10;
+    int shutter = 50;
+
+    // TODO: read this from ROS messages
 
     std::vector<CameraImage> recorded_frames;
 
@@ -109,16 +136,9 @@ void show_live_data(sf::RenderWindow& window, sf::Font& font, int argc, char* ar
                             params.cutout_top    = 50;
                             params.cutout_bottom = 20;
 
-                            // TODO: read this from ROS messages
-                            CameraIntrinsics visensor_intrinsics = CameraIntrinsics(
-                                    /* sensor size     */ Eigen::Vector2f(752, 480),
-                                    /* principal point */ Eigen::Vector2f(370.105, 226.664),
-                                    /* focal length    */ 471.7,
-                                    /* stereo baseline */ 0.110174);
-
                             Scene scene;
                             scene.addFrames(recorded_frames);
-                            scene.setIntrinsics(visensor_intrinsics);
+                            scene.setIntrinsics(current_intrinsics);
                             run_minimization(window, font, scene, params);
                         }
                         break;
@@ -144,6 +164,24 @@ void show_live_data(sf::RenderWindow& window, sf::Font& font, int argc, char* ar
         s << "number of recorded frames: " << recorded_frames.size() << endl;
         s << "cam_coarse_shutter_width: " << shutter;
         t.setString(s.str()); t.setPosition(2,window_size.y-t.getLocalBounds().height-4); window.draw(t);
+
+
+        if (depth.getWidth() > 0) {
+            float disparity = depth.getValue(depth.getSize().cast<int>()/2);
+            float depth = current_intrinsics.getBaseline() * current_intrinsics.getFocalLength() / disparity;
+
+            ostringstream s2;
+            s2 << "disparity: " << boost::lexical_cast<string>(disparity) << endl;
+            s2 << "depth:     " << boost::lexical_cast<string>(depth);
+            t.setString(s2.str()); t.setPosition(cam0.getWidth()+2,cam0.getHeight()/2); window.draw(t);
+
+            // draw crosshair
+            sf::Vector2f center(cam0.getWidth()*1.25, cam0.getHeight()/4.0f);
+            sf::RectangleShape r1(sf::Vector2f(2,50)), r2(sf::Vector2f(50,2));
+            r1.setPosition(center-sf::Vector2f(0,25)), r2.setPosition(center-sf::Vector2f(25,0));
+            r1.setFillColor(sf::Color::White); r2.setFillColor(sf::Color::White);
+            window.draw(r1); window.draw(r2);
+        }
 
         window.display();
 

@@ -56,7 +56,8 @@ void handleNewData(const Sensor::Ptr sensor, TcpServer& tcp_server)
 
 
 
-            memcpyCharToMatrix(intensity_data[current_frame], (const unsigned char*) sensor->data_mover()->data());
+            memcpyCharToMatrix(intensity_data[current_frame], (const unsigned char*) sensor->data_mover()->data()+4);
+            intensity_data[current_frame] /= 255.0f;
 
             intensity_timestamp[current_frame] = sensor->data_mover()->current_timestamp();
 
@@ -71,7 +72,8 @@ void handleNewData(const Sensor::Ptr sensor, TcpServer& tcp_server)
 
         depth_data[current_frame].resize(FRAME_HEIGHT, FRAME_WIDTH);
 
-        memcpyCharToMatrix(depth_data[current_frame], (const unsigned char*) sensor->data_mover()->data());
+        memcpyCharToMatrix(depth_data[current_frame], (const unsigned char*) sensor->data_mover()->data()+4);
+        depth_data[current_frame] /= 6.0f;
 
         depth_timestamp[current_frame] = sensor->data_mover()->current_timestamp();
 
@@ -101,6 +103,7 @@ void handleFrame()
             frame_prev   .loadFromMatrices(intensity_data[1-current_frame], depth_data[1-current_frame]);
 
             CameraStep step(frame_prev, frame_current, visensor_intrinsics);
+            step.downsampleBy(1);
 
             findTransformationWithPyramid(step, minimization_parameters);
         }

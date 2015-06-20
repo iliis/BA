@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <Eigen/Dense>
+#include <math.h>
 
 #include "transformation.h"
 #include "camera_step.h"

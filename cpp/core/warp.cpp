@@ -122,7 +122,7 @@ float Warp::calcError(const CameraStep& step, const Transformation& T, Eigen::Ve
             Pixel pixel_current  = step.frame_second.getPixel(Vector2i(x,y));
 
             // skip pixels without depth or intensity value
-            if (!isfinite(pixel_current.depth) || !isfinite(pixel_current.intensity))
+            if ((!isfinite(pixel_current.depth)) || (!isfinite(pixel_current.intensity)))
                 continue;
 
             float pixel_current_gradient_norm = step.frame_second.getIntensityData().getDiff(Vector2i(x,y)).norm();
@@ -152,15 +152,16 @@ float Warp::calcError(const CameraStep& step, const Transformation& T, Eigen::Ve
                     continue;
             }
 
+            if (!std::isfinite(J_I(0)) || !std::isfinite(J_I(1)))
+            	continue;
+
             float intensity_keyframe = step.frame_first.samplePixel(pixel_in_keyframe.pos);
 
             // skip pixels that map onto invalid color
-            if (!isfinite(intensity_keyframe) || !isfinite(J_I(0)) || !isfinite(J_I(1)))
+            if (!isfinite(intensity_keyframe))
             	continue;
 
             float error = (intensity_keyframe - pixel_current.intensity);
-
-            assert(isfinite(error));
 
             // calculate Jacobian
             Matrix<float, 3, 6> J_T = Warp::transformJacobian(point, T);

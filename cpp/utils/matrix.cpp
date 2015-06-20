@@ -15,8 +15,8 @@ float maxNoNaN(const Eigen::MatrixXf& mat)
 {
     float far = -std::numeric_limits<float>::infinity();
 
-    for (unsigned int r = 0; r < mat.rows(); r++) {
-        for (unsigned int c = 0; c < mat.cols(); c++) {
+    for (int r = 0; r < mat.rows(); r++) {
+        for (int c = 0; c < mat.cols(); c++) {
             if (far < mat(r,c))
                 far = mat(r,c);
         }
@@ -29,8 +29,8 @@ float minNoNaN(const Eigen::MatrixXf& mat)
 {
     float near =  std::numeric_limits<float>::infinity();
 
-    for (unsigned int r = 0; r < mat.rows(); r++) {
-        for (unsigned int c = 0; c < mat.cols(); c++) {
+    for (int r = 0; r < mat.rows(); r++) {
+        for (int c = 0; c < mat.cols(); c++) {
             if (near > mat(r,c))
                 near = mat(r,c);
         }
