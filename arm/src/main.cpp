@@ -312,7 +312,7 @@ int main(void) {
 
 		printf("starting main loop...\n");
 
-#if 1
+#if 0
 		// debug size of structs
         printf("params: %d\n", sizeof(Warp::Parameters));
         printf("enum: %d\n", sizeof(Warp::Parameters::MinimizationMethod));
@@ -479,6 +479,9 @@ int main(void) {
 
 						//send over network if sensor is active and has a client
 						if (clientConnected && sensor->isActive()) {
+
+							odometry.handleNewData(sensor);
+
 							IpComm::Header header;
 							header.timestamp = sensor->data_mover()->current_timestamp();
 							// HACK(gohlp) something is wrong with the dense data mover
@@ -494,9 +497,6 @@ int main(void) {
 							header.data_id = 41;
 							tcp_server.sendNetworkData((char*) t.value.data(), header);
 							 */
-
-
-							odometry.handleNewData(sensor);
 						}
 					}
 				} else if (sensor_type == visensor::SensorType::TIMING_BLOCK) {

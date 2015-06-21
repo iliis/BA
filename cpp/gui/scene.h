@@ -58,8 +58,10 @@ private:
 
 void loadCameraImageFromSceneDirectory(CameraImage& img, const std::string& scene_path, const unsigned int index, const CameraIntrinsics& intrinsics);
 
+// TODO: move these somewhere else... minimization.h?
 std::vector<Transformation> findTrajectory(const Scene& scene, const Warp::Parameters& params);
-std::vector<Transformation> findTrajectoryFromRosbag(const std::string& rosbag_path, const Warp::Parameters& params);
+std::vector<Transformation> findTrajectoryFromRosbag   (const std::string& rosbag_path, const Warp::Parameters& params);
+std::vector<Transformation> findTrajectoryFromRosbagRaw(const std::string& rosbag_path, const Warp::Parameters& params);
 
 ///////////////////////////////////////////////////////////////////////////////
 

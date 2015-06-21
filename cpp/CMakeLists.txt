@@ -82,12 +82,23 @@ if(SFML_FOUND)
   target_link_libraries(${EXECUTABLE_NAME} ${SFML_LIBRARIES})
 endif()
 
+
+# Detect and add OpenGL (for 3D visualization
 find_package(OpenGL REQUIRED)
 
 if(OPENGL_FOUND)
-    include_directories(${OPENGL_INCLUDE_DIR})
+    include_directories(${OPENGL_INCLUDE_DIRS})
     target_link_libraries(${EXECUTABLE_NAME} ${OPENGL_LIBRARIES})
 endif()
+
+# somehow, debug build requires GLEW?!
+find_package(GLEW REQUIRED)
+
+if(GLEW_FOUND)
+    include_directories(${GLEW_INCLUDE_DIRS})
+    target_link_libraries(${EXECUTABLE_NAME} ${GLEW_LIBRARIES})
+endif()
+
 
 
 # Detect and add Eigen 3

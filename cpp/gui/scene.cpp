@@ -106,7 +106,7 @@ void Scene::loadFromBagFile(const std::string& bag_path)
 
         ImageData intensities, depths;
         loadImageDataFromROSgrayscale(intensities, *p_intensities);
-        loadImageDataFromROSdepthmap (intensities, p_depths->image);
+        loadImageDataFromROSdepthmap (depths,      p_depths->image);
 
         frames[i].loadFromMatrices(intensities.getData(), depths.getData());
 
@@ -200,17 +200,24 @@ std::vector<Transformation> findTrajectoryFromRosbag(const string& rosbag_path, 
     rosbag::View view_intensity(bag, rosbag::TopicQuery("/stereo_dense_reconstruction/image_fused"));
     rosbag::View view_depth    (bag, rosbag::TopicQuery("/stereo_dense_reconstruction/disparity"));
 
+    if (view_intensity.size() == 0) {
+        cerr << "ERROR: rosbag file '" << rosbag_path << "' doesn't contain /stereo_dense_reconstruction/image_fused." << endl;
+        return traj;
+    }
+
     rosbag::View::const_iterator it_intensity = view_intensity.begin();
     rosbag::View::const_iterator it_depth     = view_depth    .begin();
 
     CameraImage prev_frame, current_frame;
 
 
-    unsigned int N = view_intensity.size()-10;
+    unsigned int N = view_intensity.size();
 
     unsigned int i = 0;
-    while (it_intensity++ != view_intensity.end() && it_depth++ != view_depth.end()) {
 
+    while (it_intensity != view_intensity.end() && it_depth != view_depth.end()) {
+
+        ImageData intensities, depths;
 
         sensor_msgs::Image::Ptr          p_intensities = it_intensity->instantiate<sensor_msgs::Image>();
         stereo_msgs::DisparityImage::Ptr p_depths      = it_depth    ->instantiate<stereo_msgs::DisparityImage>();
@@ -220,9 +227,9 @@ std::vector<Transformation> findTrajectoryFromRosbag(const string& rosbag_path, 
             return traj;
         }
 
-        ImageData intensities, depths;
         loadImageDataFromROSgrayscale(intensities, *p_intensities);
-        loadImageDataFromROSdepthmap (intensities, p_depths->image);
+        loadImageDataFromROSdepthmap (depths     , p_depths->image);
+
 
         prev_frame = current_frame;
         current_frame.loadFromMatrices(intensities.getData(), depths.getData());
@@ -245,6 +252,100 @@ std::vector<Transformation> findTrajectoryFromRosbag(const string& rosbag_path, 
 
         if (i >= N)
             break;
+
+        it_intensity++;
+        it_depth++;
+    }
+
+
+    return traj;
+}
+///////////////////////////////////////////////////////////////////////////////
+std::vector<Transformation> findTrajectoryFromRosbagRaw(const string& rosbag_path, const Warp::Parameters& params)
+{
+    std::vector<Transformation> traj;
+
+
+    rosbag::Bag bag;
+    bag.open(rosbag_path, rosbag::bagmode::Read);
+
+
+    rosbag::View view_intensity(bag, rosbag::TopicQuery("/cam0/image_raw"));
+    rosbag::View view_depth    (bag, rosbag::TopicQuery("/dense/image_raw"));
+
+    if (view_intensity.size() == 0) {
+        cerr << "ERROR: rosbag file '" << rosbag_path << "' doesn't contain /cam0/image_raw." << endl;
+        return traj;
+    }
+
+    if (view_intensity.size() != view_depth.size()) {
+        cerr << "WARNING: number of frames doesn't match:" << endl;
+        cerr << "got " << view_intensity.size() << " image frames and " << view_depth.size() << " depth frames." << endl;
+    }
+
+    rosbag::View::const_iterator it_intensity = view_intensity.begin();
+    rosbag::View::const_iterator it_depth     = view_depth    .begin();
+
+    CameraImage prev_frame, current_frame;
+
+
+    unsigned int N = view_depth.size();
+
+    unsigned int i = 0;
+
+    while (it_intensity != view_intensity.end() && it_depth != view_depth.end()) {
+
+        ImageData intensities, depths;
+
+        sensor_msgs::Image::Ptr p_intensities = it_intensity->instantiate<sensor_msgs::Image>();
+        sensor_msgs::Image::Ptr p_depths      = it_depth    ->instantiate<sensor_msgs::Image>();
+
+        // use intensity frame just before depth image
+        while (it_intensity->getTime() < it_depth->getTime()) {
+
+            //cout << "looking for newer image: cam0:  " << it_intensity->getTime() << endl;
+
+            p_intensities = it_intensity->instantiate<sensor_msgs::Image>();
+
+            it_intensity++;
+
+            if (it_intensity == view_intensity.end()) {
+                cout << "found no more camera images :(" << endl;
+                return traj;
+            }
+        }
+
+        if (!p_intensities || !p_depths) {
+            cerr << "failed to load data from bag file in frame " << i << endl;
+            return traj;
+        }
+
+        loadImageDataFromROSraw(intensities, *p_intensities);
+        loadImageDataFromROSraw(depths,      *p_depths);
+
+        prev_frame = current_frame;
+        current_frame.loadFromMatrices(intensities.getData(), depths.getData());
+
+#if 0
+        frames[i].downsample2();
+        intrinsics.downsample2();
+#endif
+
+        if (i > 0) {
+
+            CameraStep step(prev_frame, current_frame, visensor_intrinsics, Transformation(0,0,0,0,0,0), i-1, i);
+
+            traj.push_back(findTransformationWithPyramid(step, params));
+        }
+
+        printfProgress(i, 0, N);
+
+        i++;
+
+        if (i >= N)
+            break;
+
+        it_depth++;
     }
 
 
