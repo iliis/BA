@@ -42,8 +42,11 @@
 
 #include "IrqScheduler.hpp"
 
+#include "odometry/core/warp.h"
+#include "odometry/utils/live_telemetry.h"
 #include "odometry/odometry.h"
 #include "odometry/utils/FakeCamSensor.h"
+#include "odometry/utils/system.h"
 
 #define TCP_IMU_PORT 13776
 #define TCP_DATA_PORT 13777
@@ -305,9 +308,38 @@ int main(void) {
 		// Work loop
 		///////////////////////////////////
 
-		initOdometry();
+		Odometry odometry(tcp_server);
 
 		printf("starting main loop...\n");
+
+#if 1
+		// debug size of structs
+        printf("params: %d\n", sizeof(Warp::Parameters));
+        printf("enum: %d\n", sizeof(Warp::Parameters::MinimizationMethod));
+        printf("T:      %d\n", sizeof(Transformation));
+        printf("telemetry: %d\n", sizeof(Telemetry));
+
+        printf("padding: %d\n", sizeof(PADDING_TO_64BIT_T));
+
+        printf("funcptr: %d\n", sizeof(ErrorWeightFunction*));
+        printf("bool: %d\n", sizeof(bool));
+        printf("float: %d\n", sizeof(float));
+        printf("int: %d\n", sizeof(int));
+        printf("uint: %d\n", sizeof(unsigned int));
+        printf("uint32: %d\n", sizeof(uint32_t));
+
+        Warp::Parameters p(NULL);
+        printf("func: %d\n", (long int)&p - (long int)&(p.weight_function));
+        printf("thresh: %d\n", (long int)&p - (long int)&(p.gradient_norm_threshold));
+        printf("filter: %d\n", (long int)&p - (long int)&(p.filter_on_unwarped_gradient));
+        printf("pyramid: %d\n", (long int)&p - (long int)&(p.pyramid_levels));
+        printf("Tinit: %d\n", (long int)&p - (long int)&(p.T_init));
+        printf("max: %d\n", (long int)&p - (long int)&(p.max_iterations));
+        printf("method: %d\n", (long int)&p - (long int)&(p.method));
+        printf("cutoutleft: %d\n", (long int)&p - (long int)&(p.cutout_left));
+        printf("cutoutbottom: %d\n", (long int)&p - (long int)&(p.cutout_bottom));
+#endif
+
 
 		//boost::asio::deadline_timer t2(io_service, boost::posix_time::milliseconds(100)); //idle check timer
 		uint32_t framedrop_cnt = 0;
@@ -330,7 +362,7 @@ int main(void) {
 					sensor_pair.second->off();
 
 				printf("exiting application\n");
-				break; // exit application
+				break; // exit application (makes development easier)
 			}
 
 			///////////////////////////////////
@@ -404,7 +436,7 @@ int main(void) {
 						//move shared buffer pointer (release the measurement)
 						sensor->data_mover()->movePointer();
 
-#if 1
+#if 0
 						printf("got new frame! %d bytes at %d ", sensor->data_mover()->current_data_size(), sensor->data_mover()->current_timestamp());
 
 						switch (sensor_type) {
@@ -464,7 +496,7 @@ int main(void) {
 							 */
 
 
-							handleNewData(sensor, tcp_server);
+							odometry.handleNewData(sensor);
 						}
 					}
 				} else if (sensor_type == visensor::SensorType::TIMING_BLOCK) {
@@ -492,8 +524,6 @@ int main(void) {
 	printf("power off sensors\n");
 	BOOST_FOREACH(const Sensor::Map::value_type& sensor_pair, sensors)
 		sensor_pair.second->off();
-
-	shutdownOdometry();
 
 	return 0;
 }

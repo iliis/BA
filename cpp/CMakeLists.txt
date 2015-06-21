@@ -29,6 +29,7 @@ set(SOURCES
     "gui/live.cpp"
     "gui/minimization_gui.cpp"
     "gui/sf_image_data.cpp"
+    "gui/state_tracker.cpp"
     "utils/progress.cpp"
     "utils/matrix.cpp"
 )
@@ -81,6 +82,12 @@ if(SFML_FOUND)
   target_link_libraries(${EXECUTABLE_NAME} ${SFML_LIBRARIES})
 endif()
 
+find_package(OpenGL REQUIRED)
+
+if(OPENGL_FOUND)
+    include_directories(${OPENGL_INCLUDE_DIR})
+    target_link_libraries(${EXECUTABLE_NAME} ${OPENGL_LIBRARIES})
+endif()
 
 
 # Detect and add Eigen 3

@@ -10,6 +10,7 @@
 #include "camera_image.h"
 #include "../utils/progress.h"
 #include "../utils/matrix.h"
+#include "../utils/system.h"
 #include "weight_functions.h"
 
 namespace Warp {
@@ -20,11 +21,22 @@ namespace Warp {
 
     struct Parameters {
         ErrorWeightFunction* weight_function;
+
+        // make sure, this struct has the same structure on 32 bit and 64 bit systems
+        PADDING_TO_64BIT_T __padding;
+
         float gradient_norm_threshold; // keep only pixels with gradient >= this value
         bool filter_on_unwarped_gradient; // use gradient of image-to-be-warped instead of keyframe at warped points
         unsigned int pyramid_levels;
         Transformation T_init;
         unsigned int max_iterations;
+
+        // TODO: this isn't used yet!
+        enum MinimizationMethod {
+            GRADIENT_DESCENT,
+            GAUSS_NEWTON,
+            LEVENBERG_MARQUARDT
+        } method;
 
         // area of pixels to use, everything outside will be ignored
         unsigned int cutout_left, cutout_right, cutout_top, cutout_bottom;
@@ -41,13 +53,17 @@ namespace Warp {
             pyramid_levels(pyramid_levels),
             T_init(T_init),
             max_iterations(max_iterations),
+            method(GAUSS_NEWTON),
             cutout_left(0), cutout_right(0), cutout_top(0), cutout_bottom(0)
             {}
 
         void setWeightFunction(ErrorWeightFunction* func) { if (weight_function) { delete weight_function; } weight_function = func; }
 
         std::string toString();
-    };
+
+        // ensure this struct has a size of a multiple of 8 bytes, so that it
+        // has the same size on 32bit and 64bit systems
+    } __attribute__((__aligned__(8)));
 
     WorldPoint projectInv(const Pixel& pixel,      const CameraIntrinsics& intrinsics);
     Pixel      project   (const WorldPoint& point, const CameraIntrinsics& intrinsics);

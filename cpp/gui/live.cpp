@@ -10,6 +10,8 @@ CameraIntrinsics current_intrinsics = CameraIntrinsics(
         /* principal point */ Eigen::Vector2f(370.105, 226.664),
         /* focal length    */ 471.7,
         /* stereo baseline */ 0.110174);
+Telemetry telemetry;
+CameraState camera_state;
 ///////////////////////////////////////////////////////////////////////////////
 void calibration_callback(const visensor_msgs::visensor_calibration::ConstPtr& m)
 {
@@ -18,6 +20,24 @@ void calibration_callback(const visensor_msgs::visensor_calibration::ConstPtr& m
         /* principal point */ Eigen::Vector2f(m->principal_point[0], m->principal_point[1]),
         /* focal length    */ m->focal_length[0],
         /* stereo baseline */ 0.110174);
+}
+///////////////////////////////////////////////////////////////////////////////
+void telemetry_callback(const sensor_msgs::Image::ConstPtr& m)
+{
+    memcpy((void*) &telemetry, (const void*) m->data.data(), sizeof(Telemetry));
+
+    if (!telemetry.checkOK()) {
+        cerr << "WARNING: telemetry format is incorrect. Check that all structs have the same size on 64bit and 32bit!" << endl;
+
+        cout << "params: " << sizeof(Warp::Parameters) << endl;
+        cout << "telemetry: " << sizeof(Telemetry) << endl;
+
+        cout << std::hex << telemetry.magic_constant1 << endl;
+        cout << std::hex << telemetry.magic_constant2 << endl;
+        cout << std::dec;
+    }
+
+    camera_state.apply(telemetry.transformation);
 }
 ///////////////////////////////////////////////////////////////////////////////
 void image0_callback(const sensor_msgs::Image::ConstPtr& m)
@@ -59,6 +79,7 @@ void show_live_data(sf::RenderWindow& window, sf::Font& font, int argc, char* ar
     ros::NodeHandle node;
 
     ros::Subscriber subI = node.subscribe("/cam0/calibration", 3, calibration_callback);
+    ros::Subscriber subT = node.subscribe("/cam2/image_raw", 3, telemetry_callback);
     ros::Subscriber sub0 = node.subscribe("/cam0/image_raw", 3, image0_callback);
     ros::Subscriber sub1 = node.subscribe("/cam1/image_raw", 3, image1_callback);
     ros::Subscriber subD = node.subscribe("/dense/image_raw", 3, depth_callback);
@@ -110,6 +131,11 @@ void show_live_data(sf::RenderWindow& window, sf::Font& font, int argc, char* ar
                         set_coarse_shutter_width(shutter);
                         break;
 
+                    // reset visualization of camera state
+                    case sf::Keyboard::R:
+                        camera_state.reset();
+                        break;
+
                     // record a frame
                     case sf::Keyboard::Space:
                         {
@@ -150,6 +176,7 @@ void show_live_data(sf::RenderWindow& window, sf::Font& font, int argc, char* ar
         }
 
         window.clear(sf::Color(20,20,20));
+        //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         drawMatrixAt(window, cam0.data,  sf::Vector2f(0,0),   "camera 0",  &font, Colormap::Colormap(), 0.5);
         drawMatrixAt(window, cam1.data,  sf::Vector2f(cam0.getWidth()/2,0), "camera 1",  &font, Colormap::Colormap(), 0.5);
@@ -161,6 +188,8 @@ void show_live_data(sf::RenderWindow& window, sf::Font& font, int argc, char* ar
         t.setCharacterSize(12);
 
         ostringstream s;
+        s << telemetry.transformation << endl;
+        s << " ------------- " << endl;
         s << "number of recorded frames: " << recorded_frames.size() << endl;
         s << "cam_coarse_shutter_width: " << shutter;
         t.setString(s.str()); t.setPosition(2,window_size.y-t.getLocalBounds().height-4); window.draw(t);
@@ -182,6 +211,12 @@ void show_live_data(sf::RenderWindow& window, sf::Font& font, int argc, char* ar
             r1.setFillColor(sf::Color::White); r2.setFillColor(sf::Color::White);
             window.draw(r1); window.draw(r2);
         }
+
+        camera_state.shape.setPosition(sf::Vector2f(0,cam0.getHeight()/2));
+        camera_state.shape.setSize(sf::Vector2f(cam0.getWidth()/2, cam0.getHeight()/2));
+        window.draw(camera_state);
+
+
 
         window.display();
 

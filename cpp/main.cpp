@@ -76,7 +76,7 @@ int main(int argc, char* argv[])
     //testscene.loadFromSceneDirectory("../matlab/input/test_wide");
     //testscene.loadFromSceneDirectory("../matlab/input/trajectory1");
     //testscene.loadFromSceneDirectory("../matlab/input/testscene1");
-    testscene.loadFromSceneDirectory("../matlab/input/courtyard/lux");
+    //testscene.loadFromSceneDirectory("../matlab/input/courtyard/lux");
     //testscene.loadFromSceneDirectory("../matlab/input/courtyard/normal"); // step 22 is nice!
     //testscene.loadFromBagFile("/home/samuel/data/2015-06-11-16-30-01.bag");
 

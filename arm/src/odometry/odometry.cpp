@@ -11,33 +11,15 @@ using namespace std;
 using namespace Eigen;
 
 ///////////////////////////////////////////////////////////////////////////////
-
-unsigned int current_frame = 0;
-
-typedef Matrix<float, Dynamic, Dynamic> MatrixType;
-
-MatrixType intensity_data[2];
-MatrixType     depth_data[2];
-
-uint32_t intensity_timestamp[2] = {0, 0};
-uint32_t     depth_timestamp[2] = {0, 0};
-
-// TODO: read intrinsics from calib_provider
-const CameraIntrinsics visensor_intrinsics = CameraIntrinsics(
-        /* sensor size     */ Eigen::Vector2f(752, 480),
-        /* principal point */ Eigen::Vector2f(370.105, 226.664),
-        /* focal length    */ 471.7,
-        /* stereo baseline */ 0.110174);
-
-Warp::Parameters minimization_parameters(new ErrorWeightNone());
-
-///////////////////////////////////////////////////////////////////////////////
-
-const size_t BUFSIZE = 360964;
-char* debug_buffer0;
-
-///////////////////////////////////////////////////////////////////////////////
-void initOdometry()
+Odometry::Odometry(TcpServer& tcp_server)
+  : visensor_intrinsics(
+	          /* sensor size     */ Eigen::Vector2f(752, 480),
+	          /* principal point */ Eigen::Vector2f(370.105, 226.664),
+	          /* focal length    */ 471.7,
+	          /* stereo baseline */ 0.110174),
+	minimization_parameters(new ErrorWeightNone()),
+	tcp_server(tcp_server),
+	debug_buffer0(NULL)
 {
 	printf("initializing odometry...\n");
 
@@ -46,6 +28,7 @@ void initOdometry()
     minimization_parameters.T_init = Transformation(0,0,0,0,0,0);
     minimization_parameters.gradient_norm_threshold = 0.01; //0.1;
 
+    telemetry.parameters = minimization_parameters;
 
 	debug_buffer0 = (char*) malloc(BUFSIZE);
 
@@ -57,7 +40,7 @@ void initOdometry()
 	memset(debug_buffer0, 0, BUFSIZE);
 }
 ///////////////////////////////////////////////////////////////////////////////
-void shutdownOdometry()
+Odometry::~Odometry()
 {
 	printf("shutting down odometry...\n");
 
@@ -66,7 +49,7 @@ void shutdownOdometry()
     free(debug_buffer0);
 }
 ///////////////////////////////////////////////////////////////////////////////
-void handleNewData(const Sensor::Ptr sensor, TcpServer& tcp_server)
+void Odometry::handleNewData(const Sensor::Ptr sensor)
 {
     if(sensor->getSensorType() == visensor::SensorType::CAMERA_MT9V034) {
         if (sensor->id() == 0) {
@@ -87,17 +70,6 @@ void handleNewData(const Sensor::Ptr sensor, TcpServer& tcp_server)
             //printf("got camera image\n");
 
             handleFrame();
-
-
-            memset(debug_buffer0+4+752*10, 255, 752*5);
-            memcpy(debug_buffer0, (const void*) sensor->data_mover()->data(), 4);
-
-            IpComm::Header header;
-			header.timestamp = sensor->data_mover()->current_timestamp();
-			header.data_size = BUFSIZE;
-			header.data_id   = 2;
-			tcp_server.sendNetworkData(debug_buffer0, header);
-
         }
 
     } else if(sensor->getSensorType() == visensor::SensorType::DENSE_MATCHER) {
@@ -120,7 +92,7 @@ void handleNewData(const Sensor::Ptr sensor, TcpServer& tcp_server)
     }
 }
 ///////////////////////////////////////////////////////////////////////////////
-void handleFrame()
+void Odometry::handleFrame()
 {
     if (intensity_timestamp[current_frame] == depth_timestamp[current_frame]) {
         // got two matching images
@@ -137,7 +109,22 @@ void handleFrame()
             CameraStep step(frame_prev, frame_current, visensor_intrinsics);
             step.downsampleBy(1);
 
-            findTransformationWithPyramid(step, minimization_parameters);
+            telemetry.transformation = findTransformationWithPyramid(step, minimization_parameters);
+
+
+
+            // copy timestamp
+            memcpy(debug_buffer0, (const void*) &intensity_timestamp[current_frame], 4);
+
+            // copy telemetry data
+            memcpy(debug_buffer0+4, (const void*) &telemetry, sizeof(Telemetry));
+
+            // send everything to client
+            IpComm::Header header;
+			header.timestamp = intensity_timestamp[current_frame];
+			header.data_size = BUFSIZE;
+			header.data_id   = 2;
+			tcp_server.sendNetworkData(debug_buffer0, header);
         }
 
 

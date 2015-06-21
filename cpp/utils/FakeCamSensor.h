@@ -8,6 +8,7 @@
 #ifndef FAKECAMSENSOR_H_
 #define FAKECAMSENSOR_H_
 
+#include "fpga/FpgaConstants.hpp"
 #include "sensors/Sensor.hpp"
 #include "visensor/visensor_constants.hpp"
 

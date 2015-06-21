@@ -37,7 +37,7 @@ public:
     inline float gamma() const { return value(5); } // roll
 
     inline const Eigen::Matrix3f& getRotationMatrix() const { return R; }
-    inline Eigen::Vector3f getTranslation() const { return Eigen::Vector3f(x(),y(),z()); };
+    inline Eigen::Vector3f getTranslation() const { return value.head<3>(); } //Eigen::Vector3f(x(),y(),z()); };
 
     Eigen::Matrix<float, 3, 6> getJacobian(const Eigen::Vector3f& point) const;
 
