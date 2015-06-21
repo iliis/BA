@@ -190,9 +190,26 @@ Baseline:
 - insert new messages? or just overwrite existing channels?
 - check if images are read correctly in arm code
 - clamp depth data (0 or 240 --> NaN, cut out rectangle, mask with intensity = 255 or 0)
-- scale depth data (0-255 to ???)
+- scale depth data (0-255 to ??? /16 or /8)
 - params for FPGA: more sparse output?
 
 - don't downscale depth data
 - dynamic pyramid levels & gradient threshold (so that we have enough pixels!)
 - better stopping criterion (run a bit longer)
+
+
+
+präsentation:
+standard aufbau:
+- motivation
+- methodik
+    - mathe beschreiben
+- resultate
+    - video
+    - simulation
+    - quantitativ
+        - akumulierter fehler pro distanz gelaufen
+    - qualitative
+        - longer trajectory vs. map
+- conclusion / fazit / TL;DR
+
