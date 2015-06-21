@@ -29,6 +29,8 @@ public:
     void reset();
 
 private:
+    void drawCamera() const;
+
     virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 
     Eigen::Vector3f position;

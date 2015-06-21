@@ -67,9 +67,11 @@ void write_trajectory_rosbag(const string& rosbag_path, const Warp::Parameters& 
 ///////////////////////////////////////////////////////////////////////////////
 int main(int argc, char* argv[])
 {
-    sf::Font font;
-    sf::RenderWindow window(sf::VideoMode(1400, 768), "dense odometry");
+    sf::ContextSettings settings;
+    settings.antialiasingLevel = 8;
+    sf::RenderWindow window(sf::VideoMode(1400, 768), "dense odometry", sf::Style::Default, settings);
 
+    sf::Font font;
     font.loadFromFile("resources/fonts/default.otf");
 
     Scene testscene;

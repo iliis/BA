@@ -213,7 +213,7 @@ void show_live_data(sf::RenderWindow& window, sf::Font& font, int argc, char* ar
         }
 
         camera_state.shape.setPosition(sf::Vector2f(0,cam0.getHeight()/2));
-        camera_state.shape.setSize(sf::Vector2f(cam0.getWidth()/2, cam0.getHeight()/2));
+        camera_state.shape.setSize(sf::Vector2f(cam0.getWidth(), cam0.getHeight()/2));
         window.draw(camera_state);
 
 

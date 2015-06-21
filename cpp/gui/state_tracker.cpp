@@ -9,7 +9,7 @@ CameraState::CameraState()
     position(0,0,0),
     orientation(Eigen::Matrix3f::Identity())
 {
-    shape.setSize(sf::Vector2f(200,100));
+    shape.setSize(sf::Vector2f(400,100));
     shape.setFillColor(sf::Color(0,0,0));
     shape.setOutlineColor(sf::Color(100,100,100));
     shape.setOutlineThickness(1);
@@ -31,13 +31,15 @@ void CameraState::draw(sf::RenderTarget& target, sf::RenderStates states) const
 
     target.pushGLStates();
 
+    glEnable(GL_LINE_SMOOTH);
+
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     glOrtho(0.0f, target.getSize().x, target.getSize().y, 0.0f, -1000.0f, 1000.0f);
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    glTranslatef(shape.getPosition().x + shape.getSize().x/2, shape.getPosition().y + shape.getSize().y/2, 0.0f);
+    glTranslatef(shape.getPosition().x + shape.getSize().x/4, shape.getPosition().y + shape.getSize().y/2, 0.0f);
     glScalef(scale,scale,scale);
 
     // draw previous positions relative to current
@@ -56,8 +58,8 @@ void CameraState::draw(sf::RenderTarget& target, sf::RenderStates states) const
     // calculate model matrix from rotation matrix
     glLoadIdentity();
 
-    // move to center of subwindow
-    glTranslatef(shape.getPosition().x + shape.getSize().x/2, shape.getPosition().y + shape.getSize().y/2, 0.0f);
+    // move to center of left subwindow
+    glTranslatef(shape.getPosition().x + shape.getSize().x/4, shape.getPosition().y + shape.getSize().y/2, 0.0f);
 
     Matrix4f m = Matrix4f::Identity();
     m.block<3,3>(0,0) = orientation;
@@ -67,6 +69,40 @@ void CameraState::draw(sf::RenderTarget& target, sf::RenderStates states) const
     glScalef(40,40,40);
     //glScalef(10,10,10);
 
+    drawCamera();
+
+
+    // draw absolute trajectory from top view
+    ///////////////////////////////////////////////////////////////////////////
+
+    glLoadIdentity();
+
+    // move to center of right subwindow
+    glTranslatef(shape.getPosition().x + shape.getSize().x/4*3, shape.getPosition().y + shape.getSize().y/2, 0.0f);
+
+    // view everything from top
+    glRotatef(90,1,0,0);
+
+    glBegin(GL_LINE_STRIP);
+        glColor3f(1,0.5,0);
+        BOOST_FOREACH(const Eigen::Vector3f& v, trajectory) {
+            glVertex(v*scale);
+        }
+    glEnd();
+
+
+    glTranslate(position*scale);
+    glMultMatrix(m);
+    glScalef(10,10,10);
+
+    drawCamera();
+
+
+    target.popGLStates();
+}
+///////////////////////////////////////////////////////////////////////////////
+void CameraState::drawCamera() const
+{
     float w = 2, h = 1.5, d = 2; // camera size
     Vector3f c(0,0,0), r1(-w/2,-h/2,d), r2(w/2,-h/2,d), r3(w/2,h/2,d), r4(-w/2,h/2,d);
     Vector3f t1(r1*0.7+r2*0.3), t2(r1*0.3+r2*0.7), t3(r1/2+r2/2+Vector3f(0,-0.3,0));
@@ -97,8 +133,6 @@ void CameraState::draw(sf::RenderTarget& target, sf::RenderStates states) const
         glVertex(c); glVertex(r3);
         glVertex(c); glVertex(r4);
     glEnd();
-
-    target.popGLStates();
 }
 ///////////////////////////////////////////////////////////////////////////////
 void CameraState::reset()
