@@ -9,14 +9,14 @@ int iteration_count = 0;
 
 //#define PRINT_DEBUG_MESSAGES
 
+// 'static', to prevent any re-allocation of memory
+VectorXf errors;
+Matrix<float, Dynamic, 6> J;
+
 ///////////////////////////////////////////////////////////////////////////////
 float IterGaussNewton(const CameraStep& step, Transformation& T, const Warp::Parameters& params)
 {
     ++iteration_count;
-
-    VectorXf errors;
-    Matrix<float, Dynamic, 6> J;
-
 
 #ifdef PRINT_DEBUG_MESSAGES
     float total_error = Warp::calcError(step, T, errors, J, params);
@@ -47,9 +47,6 @@ float IterGaussNewton(const CameraStep& step, Transformation& T, const Warp::Par
 float IterGradientDescent(const CameraStep& step, Transformation& T, const Matrix<float,6,1>& stepSize, const Warp::Parameters& params)
 {
     ++iteration_count;
-
-    VectorXf errors;
-    Matrix<float, Dynamic, 6> J;
 
 #ifdef PRINT_DEBUG_MESSAGES
     float total_error = Warp::calcError(step, T, errors, J, params);
@@ -113,10 +110,8 @@ Transformation findTransformationWithPyramid(const CameraStep& step, const Warp:
     std::vector<CameraStep> pyramid;
     pyramid.push_back(s);
 
-#if 0
-    // TODO: use time measurement thats availabe on ARM too
-    sf::Clock clock;
-    clock.restart();
+#if 1
+    boost::timer::cpu_timer timer;
 #endif
 
     for (unsigned int i = 1; i < params.pyramid_levels; i++) {
@@ -132,12 +127,13 @@ Transformation findTransformationWithPyramid(const CameraStep& step, const Warp:
         p.T_init = findTransformation(*it, p);
     }
 
-#if 0
-    sf::Time t = clock.getElapsedTime();
+#if 1
+    timer.stop();
 
     // TODO: put this in a debug struct or something
-    cout << " >>>>> found solution in " << iteration_count << " iterations and " << ((double) t.asMicroseconds())/1000 << "ms ( " << 1000*1000/((double)t.asMicroseconds()) << " FPS)" << endl;
-    cout << " >>>>> this is " << t.asMicroseconds() / ((double) iteration_count * 1000) << "ms per Iteration (on average, with " << params.pyramid_levels << " pyramid levels)" << endl;
+    cout << " >>>>> found solution in " << iteration_count << " iterations and " << timer.format();
+    cout << ((double) (timer.elapsed().user/1000))/1000 << "ms ( " << 1000*1000/((double)timer.elapsed().user/1000) << " FPS)" << endl;
+    cout << " >>>>> this is " << timer.elapsed().user / ((double) iteration_count * 1000 * 1000) << "ms per Iteration (on average, with " << params.pyramid_levels << " pyramid levels)" << endl;
 #else
 //#ifdef PRINT_DEBUG_MESSAGES
     cout << " >>>>> found solution in " << iteration_count << " iterations: " << p.T_init << endl;

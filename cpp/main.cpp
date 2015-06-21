@@ -89,13 +89,13 @@ int main(int argc, char* argv[])
     //testscene.loadFromSceneDirectory("../matlab/input/test_wide");
     //testscene.loadFromSceneDirectory("../matlab/input/trajectory1");
     //testscene.loadFromSceneDirectory("../matlab/input/testscene1");
-    //testscene.loadFromSceneDirectory("../matlab/input/courtyard/lux");
+    testscene.loadFromSceneDirectory("../matlab/input/courtyard/lux");
     //testscene.loadFromSceneDirectory("../matlab/input/courtyard_circle");
     //testscene.loadFromSceneDirectory("../matlab/input/courtyard/normal"); // step 22 is nice!
     //testscene.loadFromBagFile("/home/samuel/data/2015-06-11-16-30-01.bag");
     
     //const string raw_bag = "/home/samuel/data/visensor/graveyard_small_circle1_forward.bag";
-    const string raw_bag = "/home/samuel/data/visensor/graveyard_path4.bag";
+    //const string raw_bag = "/home/samuel/data/visensor/graveyard_path4.bag";
     //testscene.loadFromBagFileRaw(raw_bag);
 
     //cout << testscene.getIntrinsics() << endl;
@@ -108,9 +108,9 @@ int main(int argc, char* argv[])
 
     //write_trajectory(testscene, params, ".");
     //write_trajectory_rosbag("/home/samuel/data/2015-06-11-16-30-01.bag", params, ".");
-    write_trajectory_rosbag(raw_bag, params, ".");
+    //write_trajectory_rosbag(raw_bag, params, ".");
 
-    //run_minimization(window, font, testscene, params);
+    run_minimization(window, font, testscene, params);
 
     //show_live_data(window, font, argc, argv);
 

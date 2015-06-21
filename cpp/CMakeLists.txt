@@ -112,10 +112,14 @@ endif()
 
 # Detect and add Boost
 # http://www.cmake.org/cmake/help/v3.0/module/FindBoost.html
-find_package(Boost REQUIRED) # TODO: add specific libraries
+find_package(Boost REQUIRED COMPONENTS timer) # TODO: add specific libraries
 
 if (Boost_FOUND)
     include_directories(${Boost_INCLUDE_DIRS})
+    include_directories(${Boost_Timer_INCLUDE_DIRS})
+    target_link_libraries(${EXECUTABLE_NAME} ${Boost_TIMER_LIBRARIES})
+    message(STATUS "boost libs for timer: ${Boost_TIMER_LIBRARIES}")
+
 endif()
 
 

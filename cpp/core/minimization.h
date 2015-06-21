@@ -4,6 +4,7 @@
 #include <Eigen/Dense>
 #include <math.h>
 #include <vector>
+#include <boost/timer/timer.hpp>
 
 #include "transformation.h"
 #include "camera_step.h"
