@@ -8,6 +8,9 @@
 #include <Eigen/Dense>
 
 
+#define IS_INVALID(x)   (!isfinite(x))
+#define INVALID()       (std::numeric_limits<float>::quiet_NaN())
+
 /*!
  * This class represents a basic image, with some additional helper functions
  *
@@ -48,6 +51,5 @@ public:
     // authorative data
     Eigen::MatrixXf data;
 };
-
 
 #endif /* end of include guard: IMAGE_DATA_H_INCLUDED */

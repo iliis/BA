@@ -81,15 +81,15 @@ void Scene::loadFromBagFile(const std::string& bag_path)
     rosbag::View::const_iterator it_depth     = view_depth    .begin();
 
     //const unsigned int N = view_intensity.size();
-    int START = 250;
-    const unsigned int N = 100; // don't load the whole scene (would need a bit too much RAM)
+    int START = 50;
+    const unsigned int N = 50; // don't load the whole scene (would need a bit too much RAM)
 
     this->frames.resize(N);
     this->ground_truth.resize(N);
     this->intrinsics = visensor_intrinsics;
 
     unsigned int i = 0;
-    while (it_intensity++ != view_intensity.end() && it_depth++ != view_depth.end()) {
+    while (it_intensity != view_intensity.end() && it_depth != view_depth.end()) {
 
         // skip the first few frames
         if (START-- > 0)
@@ -113,7 +113,7 @@ void Scene::loadFromBagFile(const std::string& bag_path)
         // TODO: load ground truth from bag
         ground_truth[i] = Transformation(0,0,0,0,0,0);
 
-#if 1
+#if 0
         frames[i].downsample2();
         intrinsics.downsample2();
 #endif
@@ -125,6 +125,9 @@ void Scene::loadFromBagFile(const std::string& bag_path)
         // just load the beginning of the recording
         if (i >= N)
             break;
+
+        it_intensity++;
+        it_depth++;
     }
 
     cout << "loaded scene with " << this->getFrameCount() << " frames from ROS bag." << endl;

@@ -38,6 +38,8 @@ namespace Warp {
             LEVENBERG_MARQUARDT
         } method;
 
+        bool use_streamlined;
+
         // area of pixels to use, everything outside will be ignored
         unsigned int cutout_left, cutout_right, cutout_top, cutout_bottom;
 
@@ -54,6 +56,7 @@ namespace Warp {
             T_init(T_init),
             max_iterations(max_iterations),
             method(GAUSS_NEWTON),
+            use_streamlined(false),
             cutout_left(0), cutout_right(0), cutout_top(0), cutout_bottom(0)
             {}
 

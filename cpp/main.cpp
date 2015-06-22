@@ -2,6 +2,7 @@
 #include <iostream>
 #include <fstream>
 #include <boost/foreach.hpp>
+#include <boost/timer/timer.hpp>
 #include <SFML/Graphics.hpp>
 #include <sensor_msgs/Image.h>
 #include <stereo_msgs/DisparityImage.h>
@@ -49,7 +50,11 @@ void write_trajectory(const Scene& scene, const Warp::Parameters& params, string
 ///////////////////////////////////////////////////////////////////////////////
 void write_trajectory_rosbag(const string& rosbag_path, const Warp::Parameters& params, string output_dir = ".")
 {
+    boost::timer::cpu_timer timer;
     std::vector<Transformation> traj = findTrajectoryFromRosbag(rosbag_path, params);
+    timer.stop();
+    cout << "found trajectory of " << traj.size() << " steps in: " << timer.format();
+    cout << "this is an average of " << ((double) traj.size()) / timer.elapsed().user * 1000 * 1000 * 1000 << " FPS" << endl;
 
     if (traj.empty()) {
         cout << "empty trajectory. maybe this is raw footage?" << endl;
@@ -89,11 +94,11 @@ int main(int argc, char* argv[])
     //testscene.loadFromSceneDirectory("../matlab/input/test_wide");
     //testscene.loadFromSceneDirectory("../matlab/input/trajectory1");
     //testscene.loadFromSceneDirectory("../matlab/input/testscene1");
-    testscene.loadFromSceneDirectory("../matlab/input/courtyard/lux");
+    //testscene.loadFromSceneDirectory("../matlab/input/courtyard/lux");
     //testscene.loadFromSceneDirectory("../matlab/input/courtyard_circle");
     //testscene.loadFromSceneDirectory("../matlab/input/courtyard/normal"); // step 22 is nice!
     //testscene.loadFromBagFile("/home/samuel/data/2015-06-11-16-30-01.bag");
-    
+
     //const string raw_bag = "/home/samuel/data/visensor/graveyard_small_circle1_forward.bag";
     //const string raw_bag = "/home/samuel/data/visensor/graveyard_path4.bag";
     //testscene.loadFromBagFileRaw(raw_bag);
@@ -105,12 +110,13 @@ int main(int argc, char* argv[])
     params.max_iterations = 100;
     params.T_init = Transformation(0,0,0,0,0,0);
     params.gradient_norm_threshold = 0.01;
+    //params.use_streamlined = true;
 
     //write_trajectory(testscene, params, ".");
-    //write_trajectory_rosbag("/home/samuel/data/2015-06-11-16-30-01.bag", params, ".");
+    write_trajectory_rosbag("/home/samuel/data/2015-06-11-16-30-01.bag", params, ".");
     //write_trajectory_rosbag(raw_bag, params, ".");
 
-    run_minimization(window, font, testscene, params);
+    //run_minimization(window, font, testscene, params);
 
     //show_live_data(window, font, argc, argv);
 

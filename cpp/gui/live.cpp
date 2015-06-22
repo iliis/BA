@@ -89,14 +89,14 @@ void show_live_data(sf::RenderWindow& window, sf::Font& font, int argc, char* ar
         'individual_cam_config': 0, \
         'cam_agc_enable': 0, \
         'cam_aec_enable': 0,  \
-        'cam_coarse_shutter_width': 50, \
+        'cam_coarse_shutter_width': 150, \
         'penalty_1': 20, \
         'penalty_2': 200, \
         'threshold': 100, \
         'lr_check': 2 \
     }\"");
 
-    int shutter = 50;
+    int shutter = 150;
 
     // TODO: read this from ROS messages
 

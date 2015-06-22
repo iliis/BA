@@ -22,6 +22,7 @@ set(SOURCES
     "core/camera_step.cpp"
     "core/camera_image.cpp"
     "core/warp.cpp"
+    "core/warp_streamlined.cpp"
     "core/minimization.cpp"
     "core/weight_functions.cpp"
     "gui/scene.cpp"

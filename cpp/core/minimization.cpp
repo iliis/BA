@@ -18,12 +18,21 @@ float IterGaussNewton(const CameraStep& step, Transformation& T, const Warp::Par
 {
     ++iteration_count;
 
+    if (params.use_streamlined) {
 #ifdef PRINT_DEBUG_MESSAGES
-    float total_error = Warp::calcError(step, T, errors, J, params);
-    cout << "[GN] " << T << " --> err: " << total_error;
+        float total_error = WarpStreamlined::calcError(step.frame_first.intensities.data, step.frame_second.intensities.data, step.frame_second.depths.data, T.value, step.intrinsics, errors, J, step.scale, params);
+        cout << "[GN sl] " << T << " --> err: " << total_error;
 #else
-    Warp::calcError(step, T, errors, J, params);
+        WarpStreamlined::calcError(step.frame_first.intensities.data, step.frame_second.intensities.data, step.frame_second.depths.data, T.value, step.intrinsics, errors, J, step.scale, params);
 #endif
+    } else {
+#ifdef PRINT_DEBUG_MESSAGES
+        float total_error = Warp::calcError(step, T, errors, J, params);
+        cout << "[GN] " << T << " --> err: " << total_error;
+#else
+        Warp::calcError(step, T, errors, J, params);
+#endif
+    }
 
     // step = - (J'*W*J) \ J' * W * err';
     VectorXf weights = (*params.weight_function)(errors);
@@ -110,7 +119,7 @@ Transformation findTransformationWithPyramid(const CameraStep& step, const Warp:
     std::vector<CameraStep> pyramid;
     pyramid.push_back(s);
 
-#if 1
+#if 0
     boost::timer::cpu_timer timer;
 #endif
 
@@ -127,7 +136,7 @@ Transformation findTransformationWithPyramid(const CameraStep& step, const Warp:
         p.T_init = findTransformation(*it, p);
     }
 
-#if 1
+#if 0
     timer.stop();
 
     // TODO: put this in a debug struct or something
@@ -135,9 +144,9 @@ Transformation findTransformationWithPyramid(const CameraStep& step, const Warp:
     cout << ((double) (timer.elapsed().user/1000))/1000 << "ms ( " << 1000*1000/((double)timer.elapsed().user/1000) << " FPS)" << endl;
     cout << " >>>>> this is " << timer.elapsed().user / ((double) iteration_count * 1000 * 1000) << "ms per Iteration (on average, with " << params.pyramid_levels << " pyramid levels)" << endl;
 #else
-//#ifdef PRINT_DEBUG_MESSAGES
+#ifdef PRINT_DEBUG_MESSAGES
     cout << " >>>>> found solution in " << iteration_count << " iterations: " << p.T_init << endl;
-//#endif
+#endif
 #endif
 
 
