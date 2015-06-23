@@ -76,18 +76,6 @@ void Odometry::handleNewData(const Sensor::Ptr sensor)
             //printf("got camera image\n");
 
             handleFrame();
-
-            // send current camera image to PC
-            if (intensity_timestamp[current_frame] == depth_timestamp[current_frame]) {
-				IpComm::Header header;
-				header.timestamp = sensor->data_mover()->current_timestamp();
-				// HACK(gohlp) something is wrong with the dense data mover
-				//             header.data_size = sensor->data_mover()->current_data_size();
-				header.data_size = sensor->data_mover()->data_size();
-				header.data_id   = sensor->id();
-
-				tcp_server.sendNetworkData(sensor->data_mover()->data(), header);
-            }
         }
 
     } else if(sensor->getSensorType() == visensor::SensorType::DENSE_MATCHER) {
