@@ -485,6 +485,7 @@ int main(void) {
 
 							odometry.handleNewData(sensor);
 
+							/*
 							IpComm::Header header;
 							header.timestamp = sensor->data_mover()->current_timestamp();
 							// HACK(gohlp) something is wrong with the dense data mover
@@ -493,6 +494,7 @@ int main(void) {
 							header.data_id   = sensor->id();
 
 							tcp_server.sendNetworkData(sensor->data_mover()->data(), header);
+							*/
 
 							/*
 							Transformation t(42,1,0.123,12345,-9999,0.42);

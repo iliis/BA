@@ -114,7 +114,6 @@ int main(int argc, char* argv[])
     const string raw_bag = "/home/samuel/data/visensor/lee_short_circle.bag";
     //testscene.loadFromBagFileRaw(raw_bag);
 
-    timer2.Start();
 
     //cout << testscene.getIntrinsics() << endl;
 
@@ -133,11 +132,15 @@ int main(int argc, char* argv[])
 
     show_live_data(window, font, argc, argv);
 
-    timer2.Stop();
     timertest.Stop();
+    timer2.Start();
+    sf::sleep(sf::seconds(2));
+    timer2.Stop();
 
     cout << "timings: " << endl;
-    cout << timing::Timing::Print() << endl;
+    cout << timing::Timing::Print();
+    cout << "timertest total seconds: " << timing::Timing::GetMeanSeconds(timertest.GetHandle()) << endl;
+    cout << "tiemr2 total seconds: " << timing::Timing::GetMeanSeconds(timer2.GetHandle()) << endl;
 
 
     delete params.weight_function;

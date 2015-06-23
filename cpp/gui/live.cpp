@@ -120,17 +120,24 @@ void show_live_data(sf::RenderWindow& window, sf::Font& font, int argc, char* ar
                         return;
 
                     // open camera shutter (for darker conditions)
-                    case sf::Keyboard::Add:
-                        shutter += 10;
+                    case sf::Keyboard::PageUp:
+                        shutter *= 1.5;
                         set_coarse_shutter_width(shutter);
                         break;
 
                     // close camera shutter (if the scene gets too bright)
-                    case sf::Keyboard::Subtract:
-                        shutter -= 10; if (shutter < 0) {shutter = 0;}
+                    case sf::Keyboard::PageDown:
+                        shutter /= 1.5; if (shutter < 1) {shutter = 1;}
                         set_coarse_shutter_width(shutter);
                         break;
 
+                    case sf::Keyboard::Add:
+                        camera_state.scale *= 1.5;
+                        break;
+
+                    case sf::Keyboard::Subtract:
+                        camera_state.scale /= 1.5;
+                        break;
 
                     case sf::Keyboard::S:
                         window.setVisible(false);

@@ -119,9 +119,6 @@ Transformation findTransformationWithPyramid(const CameraStep& step, const Warp:
     std::vector<CameraStep> pyramid;
     pyramid.push_back(s);
 
-
-    cout << step.intrinsics << endl;
-
 #if 0
     boost::timer::cpu_timer timer;
 #endif

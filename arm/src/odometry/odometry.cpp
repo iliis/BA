@@ -76,6 +76,18 @@ void Odometry::handleNewData(const Sensor::Ptr sensor)
             //printf("got camera image\n");
 
             handleFrame();
+
+            // send current camera image to PC
+            if (intensity_timestamp[current_frame] == depth_timestamp[current_frame]) {
+				IpComm::Header header;
+				header.timestamp = sensor->data_mover()->current_timestamp();
+				// HACK(gohlp) something is wrong with the dense data mover
+				//             header.data_size = sensor->data_mover()->current_data_size();
+				header.data_size = sensor->data_mover()->data_size();
+				header.data_id   = sensor->id();
+
+				tcp_server.sendNetworkData(sensor->data_mover()->data(), header);
+            }
         }
 
     } else if(sensor->getSensorType() == visensor::SensorType::DENSE_MATCHER) {
@@ -113,6 +125,7 @@ void Odometry::handleFrame()
             frame_prev   .loadFromMatrices(intensity_data[1-current_frame], depth_data[1-current_frame]);
 
             CameraStep step(frame_prev, frame_current, visensor_intrinsics);
+
             step.downsampleBy(1);
 
             telemetry.transformation = findTransformationWithPyramid(step, minimization_parameters);
@@ -125,7 +138,7 @@ void Odometry::handleFrame()
             // copy telemetry data
             memcpy(debug_buffer0+4, (const void*) &telemetry, sizeof(Telemetry));
 
-            // send everything to client
+            // send movement telemetry to client
             IpComm::Header header;
 			header.timestamp = intensity_timestamp[current_frame];
 			header.data_size = BUFSIZE;
