@@ -91,11 +91,11 @@ float Warp::calcError(const CameraStep& step, const Transformation& T, Eigen::Ve
 
 
     if (debug_out) {
-        INIT_NAN(debug_out->J_norm, W, H);
-        INIT_NAN(debug_out->selection_heuristic, W, H);
-        INIT_NAN(debug_out->warped_image, W, H);
-        INIT_NAN(debug_out->errors_in_current, W, H);
-        INIT_NAN(debug_out->weighted_errors, W, H);
+        INIT_INVALID(debug_out->J_norm, W, H);
+        INIT_INVALID(debug_out->selection_heuristic, W, H);
+        INIT_INVALID(debug_out->warped_image, W, H);
+        INIT_INVALID(debug_out->errors_in_current, W, H);
+        INIT_INVALID(debug_out->weighted_errors, W, H);
     }
 
     //Matrix3f R = T.getRotationMatrix();

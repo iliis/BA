@@ -54,7 +54,7 @@ void loadImageDataFromROSdepthmap (ImageData& dest, const sensor_msgs::Image& so
             // these are disparity values, not actual depth data!
             // TODO: use baseline value here!
             if (fdata[i] == 1.0f) {
-                dest.data(y, x) = std::numeric_limits<float>::quiet_NaN();
+                dest.data(y, x) = INVALID();
             } else {
                 //data(y, x) = 1.0f / fdata[i];
                 dest.data(y, x) = fdata[i];
@@ -77,7 +77,7 @@ void loadImageDataFromROSraw(ImageData& dest, const sensor_msgs::Image& source_d
             if (v > 0 && v < 240)
                 dest.data(y, x) = ((float) v);
             else
-                dest.data(y, x) = std::numeric_limits<float>::quiet_NaN();
+                dest.data(y, x) = INVALID();
         }
     }
 }
@@ -111,9 +111,9 @@ void matrix_to_image(const Eigen::MatrixXf& source, sf::Image& dest, const Color
     // initialize and clear image
     dest.create(source.cols(), source.rows());
 
-    // matrix might contain NaNs
-    float near = minNoNaN(source);
-    float far  = maxNoNaN(source);
+    // matrix might contain invalid values
+    float near = minNoInvalid(source);
+    float far  = maxNoInvalid(source);
 
     // convert matrix data into grayscale image
     for (unsigned int y = 0; y < source.rows(); y++) {

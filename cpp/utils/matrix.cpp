@@ -11,13 +11,13 @@ using namespace std;
 using namespace Eigen;
 
 ///////////////////////////////////////////////////////////////////////////////
-float maxNoNaN(const Eigen::MatrixXf& mat)
+float maxNoInvalid(const Eigen::MatrixXf& mat)
 {
     float far = -std::numeric_limits<float>::infinity();
 
     for (int r = 0; r < mat.rows(); r++) {
         for (int c = 0; c < mat.cols(); c++) {
-            if (far < mat(r,c))
+            if (!IS_INVALID(mat(r,c)) && far < mat(r,c))
                 far = mat(r,c);
         }
     }
@@ -25,13 +25,13 @@ float maxNoNaN(const Eigen::MatrixXf& mat)
     return far;
 }
 ///////////////////////////////////////////////////////////////////////////////
-float minNoNaN(const Eigen::MatrixXf& mat)
+float minNoInvalid(const Eigen::MatrixXf& mat)
 {
     float near =  std::numeric_limits<float>::infinity();
 
     for (int r = 0; r < mat.rows(); r++) {
         for (int c = 0; c < mat.cols(); c++) {
-            if (near > mat(r,c))
+            if (!IS_INVALID(mat(r,c)) && near > mat(r,c))
                 near = mat(r,c);
         }
     }
@@ -41,14 +41,13 @@ float minNoNaN(const Eigen::MatrixXf& mat)
 ///////////////////////////////////////////////////////////////////////////////
 void memcpyCharToMatrix(MatrixXf& mat, const unsigned char* source)
 {
-
     for (int r = 0; r < mat.rows(); r++) {
         for (int c = 0; c < mat.cols(); c++) {
             const unsigned char v = *source++;
             if (v > 0 && v < 240)
                 mat(r,c) = (float) v;
             else
-                mat(r,c) = std::numeric_limits<float>::quiet_NaN();
+                mat(r,c) = INVALID();
         }
     }
 }

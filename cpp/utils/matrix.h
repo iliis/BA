@@ -7,17 +7,18 @@
 #include <fstream>
 #include <limits.h>
 
-#define INIT_NAN(matrix, W, H) do { \
-    matrix.resize((H),(W)); \
-    for(unsigned int r = 0; r < (H); r++) { \
-        for(unsigned int c = 0; c < (W); c++) { \
-            (matrix)(r,c) = std::numeric_limits<float>::quiet_NaN(); \
-        } \
-    } \
-} while (0)
+//#define IS_INVALID(x)   (!isfinite(x))
+//#define INVALID()       (std::numeric_limits<float>::quiet_NaN())
+#define IS_INVALID(x)   ((x) < 0)
+#define INVALID()       (-1)
 
-float maxNoNaN(const Eigen::MatrixXf& mat);
-float minNoNaN(const Eigen::MatrixXf& mat);
+#define INIT_INVALID(matrix, W, H) do { \
+    matrix.resize((H),(W)); \
+    matrix.fill(INVALID()); \
+} while(0)
+
+float maxNoInvalid(const Eigen::MatrixXf& mat);
+float minNoInvalid(const Eigen::MatrixXf& mat);
 
 void memcpyCharToMatrix(Eigen::MatrixXf& mat, const unsigned char* source);
 void writeMatrixToFile(const Eigen::MatrixXf& mat, const char* path);

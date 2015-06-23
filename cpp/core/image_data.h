@@ -7,9 +7,7 @@
 #include <limits>
 #include <Eigen/Dense>
 
-
-#define IS_INVALID(x)   (!isfinite(x))
-#define INVALID()       (std::numeric_limits<float>::quiet_NaN())
+#include "../utils/matrix.h"
 
 /*!
  * This class represents a basic image, with some additional helper functions

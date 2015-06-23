@@ -6,6 +6,8 @@
 #include <SFML/Graphics.hpp>
 #include <Eigen/Dense> // for assert()
 
+#include "../utils/matrix.h"
+
 namespace Colormap {
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -21,7 +23,7 @@ protected:
     virtual sf::Color getColor(const float& value) const;
     virtual sf::Color invalidValue() const { return sf::Color(255,0,255); } // for NaN, infinity, etc.
 
-    inline bool isValid(const float& value) const { return std::isfinite(value); }
+    inline bool isValid(const float& value) const { return !IS_INVALID(value); }
 };
 ///////////////////////////////////////////////////////////////////////////////
 class Logarithmic : public Colormap
