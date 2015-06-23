@@ -27,6 +27,7 @@ Odometry::Odometry(TcpServer& tcp_server)
     minimization_parameters.max_iterations = 100;
     minimization_parameters.T_init = Transformation(0,0,0,0,0,0);
     minimization_parameters.gradient_norm_threshold = 0.01; //0.1;
+    minimization_parameters.use_streamlined = true;
 
     telemetry.parameters = minimization_parameters;
 

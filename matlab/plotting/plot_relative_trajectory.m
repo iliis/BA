@@ -24,12 +24,21 @@ for i = 1:N
     points(:, i+1) = current_pos;
 end
 
-%plot3(points(1,:), points(2,:), points(3,:), varargin{:});
-plot(points(1,:), points(3,:), varargin{:});
+plot3(points(1,:), points(3,:), points(2,:), varargin{:});
+xlabel('X');
+ylabel('Z');
+zlabel('Y');
+set(gca, 'Zdir', 'reverse');
+
+%plot(points(1,:), points(3,:), varargin{:});
+%xlabel('X');
+%ylabel('Z');
 
 %hold on;
 %plot3(points(1,:), points(2,:), zeros(size(points,2),1), varargin{:});
 %hold off;
+
+set(gca, 'DataAspectRatio', [1 1 1]);
 
 box on;
 grid on;

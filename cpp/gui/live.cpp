@@ -131,6 +131,16 @@ void show_live_data(sf::RenderWindow& window, sf::Font& font, int argc, char* ar
                         set_coarse_shutter_width(shutter);
                         break;
 
+
+                    case sf::Keyboard::S:
+                        window.setVisible(false);
+                        cin.clear(); cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                        cout << "set shutter width (current: " << shutter << "): ";
+                        cin >> shutter;
+                        set_coarse_shutter_width(shutter);
+                        window.setVisible(true);
+                        break;
+
                     // reset visualization of camera state
                     case sf::Keyboard::R:
                         camera_state.reset();

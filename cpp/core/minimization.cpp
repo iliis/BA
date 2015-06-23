@@ -144,9 +144,9 @@ Transformation findTransformationWithPyramid(const CameraStep& step, const Warp:
     cout << ((double) (timer.elapsed().user/1000))/1000 << "ms ( " << 1000*1000/((double)timer.elapsed().user/1000) << " FPS)" << endl;
     cout << " >>>>> this is " << timer.elapsed().user / ((double) iteration_count * 1000 * 1000) << "ms per Iteration (on average, with " << params.pyramid_levels << " pyramid levels)" << endl;
 #else
-#ifdef PRINT_DEBUG_MESSAGES
+//#ifdef PRINT_DEBUG_MESSAGES
     cout << " >>>>> found solution in " << iteration_count << " iterations: " << p.T_init << endl;
-#endif
+//#endif
 #endif
 
 

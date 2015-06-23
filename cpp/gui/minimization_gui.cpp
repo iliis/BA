@@ -308,6 +308,7 @@ void run_minimization(sf::RenderWindow& window, sf::Font& font, const Scene& sce
                             cout << "[ 12 ]: render error surface" << endl;
                             cout << "[ 13 ]: toggle pixel gradient filter (before or after warping)" << endl;
                             cout << "[  0 ]: exit" << endl;
+                            cin.clear(); cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
                             cin >> opt;
 
                             switch (opt) {

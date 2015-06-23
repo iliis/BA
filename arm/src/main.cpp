@@ -361,8 +361,11 @@ int main(void) {
 				BOOST_FOREACH(const Sensor::Map::value_type& sensor_pair, sensors)
 					sensor_pair.second->off();
 
+				/*
 				printf("exiting application\n");
 				break; // exit application (makes development easier)
+				*/
+
 			}
 
 			///////////////////////////////////
@@ -469,11 +472,13 @@ int main(void) {
 
 
 						//drop old frames (if network is too slow)
+					    /*
 					    while( sensor->data_mover()->newDataAvailable() )
 					    {
 						  //printf(">> dropping camera frame on %u / total drops: %u (network too slow?)\n", sensor->id(), framedrop_cnt++);
 						  sensor->data_mover()->movePointer();
 					    }
+					    */
 
 						// printf("sensor id: %d send dense size: %u\n", sensor->id(), sensor->data_mover()->current_data_size());
 
