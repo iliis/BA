@@ -5,7 +5,7 @@ using namespace Eigen;
 
 ///////////////////////////////////////////////////////////////////////////////
 CameraState::CameraState()
-  : scale(1000),
+  : scale(10),
     position(0,0,0),
     orientation(Eigen::Matrix3f::Identity())
 {

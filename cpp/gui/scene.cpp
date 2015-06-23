@@ -5,8 +5,8 @@ using namespace std;
 ///////////////////////////////////////////////////////////////////////////////
 CameraIntrinsics visensor_intrinsics = CameraIntrinsics(
         /* sensor size     */ Eigen::Vector2f(752, 480),
-        /* principal point */ Eigen::Vector2f(370.105, 226.664),
-        /* focal length    */ 471.7,
+        /* principal point */ Eigen::Vector2f(384.3624542696897, 240.639381314597),
+        /* focal length    */ 466.1191501697315,
         /* stereo baseline */ 0.110174);
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
@@ -325,6 +325,8 @@ std::vector<Transformation> findTrajectoryFromRosbagRaw(const string& rosbag_pat
 
         loadImageDataFromROSraw(intensities, *p_intensities);
         loadImageDataFromROSraw(depths,      *p_depths);
+
+        depths.data /= 8;
 
         prev_frame = current_frame;
         current_frame.loadFromMatrices(intensities.getData(), depths.getData());

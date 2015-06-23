@@ -102,7 +102,9 @@ int main(int argc, char* argv[])
     //const string raw_bag = "/home/samuel/data/visensor/graveyard_small_circle1_forward.bag";
     //const string raw_bag = "/home/samuel/data/visensor/graveyard_path4.bag";
     //const string raw_bag = "/home/samuel/REMOTE/home/samuel/data/visensor/path2.bag";
-    const string raw_bag = "/home/samuel/REMOTE/home/samuel/data/visensor/path1.bag";
+    //const string raw_bag = "/home/samuel/REMOTE/home/samuel/data/visensor/path1.bag";
+    //const string raw_bag = "/home/samuel/data/visensor/lee_medium_circle.bag";
+    const string raw_bag = "/home/samuel/data/visensor/lee_short_circle.bag";
     //testscene.loadFromBagFileRaw(raw_bag);
 
     //cout << testscene.getIntrinsics() << endl;
@@ -116,11 +118,11 @@ int main(int argc, char* argv[])
 
     //write_trajectory(testscene, params, ".");
     //write_trajectory_rosbag("/home/samuel/data/2015-06-11-16-30-01.bag", params, ".");
-    write_trajectory_rosbag(raw_bag, params, ".");
+    //write_trajectory_rosbag(raw_bag, params, ".");
 
     //run_minimization(window, font, testscene, params);
 
-    //show_live_data(window, font, argc, argv);
+    show_live_data(window, font, argc, argv);
 
 
     delete params.weight_function;

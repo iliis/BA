@@ -197,11 +197,15 @@ Baseline:
 - dynamic pyramid levels & gradient threshold (so that we have enough pixels!)
 - better stopping criterion (run a bit longer)
 
+- punktwolke exportieren
 
 
 präsentation:
 standard aufbau:
 - motivation
+    - embedded
+    - better integration of FPGA and ARM/CPU
+        - stereo auf FPGA makes embedded feasible
 - methodik
     - mathe beschreiben
 - resultate
@@ -211,5 +215,18 @@ standard aufbau:
         - akumulierter fehler pro distanz gelaufen
     - qualitative
         - longer trajectory vs. map
+        - circles
 - conclusion / fazit / TL;DR
+- github: ethz-asl/student_templates (PPT)
 
+1. draft presentation to determine what data is required
+2. record that data
+3. 1-2 days for presentation
+
+report:
+- analog zu präsentation
+- additionally:
+    - related work
+- estimate was wieviel braucht
+- nett: so und so viel schneller wenn x und y auf FPGA
+- github: ethz-asl/student_templates
