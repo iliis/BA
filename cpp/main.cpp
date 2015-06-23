@@ -18,6 +18,7 @@
 #include "core/camera_intrinsics.h"
 #include "core/warp.h"
 #include "core/minimization.h"
+#include "utils/timing/timer.hpp"
 
 using namespace std;
 using namespace Eigen;
@@ -81,11 +82,17 @@ void write_trajectory_rosbag(const string& rosbag_path, const Warp::Parameters& 
     cout << "wrote trajectory to disk" << endl;
 }
 ///////////////////////////////////////////////////////////////////////////////
+
+timing::Timer timertest("0_foobar");
+timing::Timer timer2("1_asdfasdf");
+
 int main(int argc, char* argv[])
 {
     sf::ContextSettings settings;
     settings.antialiasingLevel = 8;
     sf::RenderWindow window(sf::VideoMode(1400, 768), "dense odometry", sf::Style::Default, settings);
+
+    timertest.Start();
 
     sf::Font font;
     font.loadFromFile("resources/fonts/default.otf");
@@ -107,6 +114,8 @@ int main(int argc, char* argv[])
     const string raw_bag = "/home/samuel/data/visensor/lee_short_circle.bag";
     //testscene.loadFromBagFileRaw(raw_bag);
 
+    timer2.Start();
+
     //cout << testscene.getIntrinsics() << endl;
 
     Warp::Parameters params(new ErrorWeightNone());
@@ -123,6 +132,12 @@ int main(int argc, char* argv[])
     //run_minimization(window, font, testscene, params);
 
     show_live_data(window, font, argc, argv);
+
+    timer2.Stop();
+    timertest.Stop();
+
+    cout << "timings: " << endl;
+    cout << timing::Timing::Print() << endl;
 
 
     delete params.weight_function;

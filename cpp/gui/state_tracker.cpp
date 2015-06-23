@@ -5,7 +5,7 @@ using namespace Eigen;
 
 ///////////////////////////////////////////////////////////////////////////////
 CameraState::CameraState()
-  : scale(10),
+  : scale(1000),
     position(0,0,0),
     orientation(Eigen::Matrix3f::Identity())
 {
@@ -19,7 +19,7 @@ CameraState::CameraState()
 ///////////////////////////////////////////////////////////////////////////////
 void CameraState::apply(const Transformation& T)
 {
-    position = position + T.value.head<3>();
+    position += T.getRotationMatrix() * T.value.head<3>();
     trajectory.push_back(position);
 
     orientation = T.getRotationMatrix() * orientation;
@@ -132,6 +132,16 @@ void CameraState::drawCamera() const
         glVertex(c); glVertex(r2);
         glVertex(c); glVertex(r3);
         glVertex(c); glVertex(r4);
+    glEnd();
+
+    // coordinate axes
+    glBegin(GL_LINES);
+        glColor3f(1,0,0);
+        glVertex(c); glVertex(c+Vector3f::UnitX());
+        glColor3f(0,1,0);
+        glVertex(c); glVertex(c+Vector3f::UnitY());
+        glColor3f(0,0,1);
+        glVertex(c); glVertex(c+Vector3f::UnitZ());
     glEnd();
 }
 ///////////////////////////////////////////////////////////////////////////////

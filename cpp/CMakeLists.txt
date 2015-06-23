@@ -12,7 +12,7 @@ project (dense_odometry)
 
 #set(EXTRA_FLAGS "-pg -fprofile-arcs -ftest-coverage")
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra ${EXTRA_FLAGS}")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++11 -Wall -Wextra ${EXTRA_FLAGS}")
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${EXTRA_FLAGS}")
 
 set(SOURCES
@@ -33,6 +33,8 @@ set(SOURCES
     "gui/state_tracker.cpp"
     "utils/progress.cpp"
     "utils/matrix.cpp"
+    "utils/timing/timer.cpp"
+    "utils/timing/perf_cnt.cpp"
 )
 
 

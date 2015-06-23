@@ -23,11 +23,16 @@ Odometry::Odometry(TcpServer& tcp_server)
 {
 	printf("initializing odometry...\n");
 
-    minimization_parameters.pyramid_levels = 4;
+    minimization_parameters.pyramid_levels = 3;
     minimization_parameters.max_iterations = 100;
     minimization_parameters.T_init = Transformation(0,0,0,0,0,0);
     minimization_parameters.gradient_norm_threshold = 0.01; //0.1;
     minimization_parameters.use_streamlined = true;
+
+    minimization_parameters.cutout_left   = 20;
+    minimization_parameters.cutout_right  = 20;
+    minimization_parameters.cutout_top    = 50;
+    minimization_parameters.cutout_bottom = 20;
 
     telemetry.parameters = minimization_parameters;
 
