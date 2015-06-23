@@ -7,7 +7,8 @@ using namespace Eigen;
 std::string Warp::Parameters::toString()
 {
     return "Error weighting function: " + weight_function->toString()
-       + "\npyramid levels: " + boost::lexical_cast<string>(pyramid_levels)
+       + "\npyramid levels: " + boost::lexical_cast<string>(min_pyramid_levels)
+       + " to " + boost::lexical_cast<string>(max_pyramid_levels)
        + "\ngradient norm threshold: " + boost::lexical_cast<string>(gradient_norm_threshold)
        + "\nmeasure gradient on image-to-be-warped: " + boost::lexical_cast<string>(this->filter_on_unwarped_gradient);
        //+ "\nmax. iterations: " + boost::lexical_cast<string>(max_iterations);

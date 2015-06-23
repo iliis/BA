@@ -23,7 +23,8 @@ Odometry::Odometry(TcpServer& tcp_server)
 {
 	printf("initializing odometry...\n");
 
-    minimization_parameters.pyramid_levels = 3;
+    minimization_parameters.min_pyramid_levels = 1;
+    minimization_parameters.max_pyramid_levels = 4;
     minimization_parameters.max_iterations = 100;
     minimization_parameters.T_init = Transformation(0,0,0,0,0,0);
     minimization_parameters.gradient_norm_threshold = 0.01; //0.1;
@@ -113,8 +114,6 @@ void Odometry::handleFrame()
             frame_prev   .loadFromMatrices(intensity_data[1-current_frame], depth_data[1-current_frame]);
 
             CameraStep step(frame_prev, frame_current, visensor_intrinsics);
-
-            step.downsampleBy(1);
 
             telemetry.transformation = findTransformationWithPyramid(step, minimization_parameters);
 

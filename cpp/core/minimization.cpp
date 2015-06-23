@@ -123,7 +123,7 @@ Transformation findTransformationWithPyramid(const CameraStep& step, const Warp:
     boost::timer::cpu_timer timer;
 #endif
 
-    for (unsigned int i = 1; i < params.pyramid_levels; i++) {
+    for (unsigned int i = 1; i <= params.max_pyramid_levels; i++) {
         s.downsampleBy(1);
         pyramid.push_back(s);
     }
@@ -132,8 +132,8 @@ Transformation findTransformationWithPyramid(const CameraStep& step, const Warp:
 
     // actually process them
     Warp::Parameters p = params;
-    for (std::vector<CameraStep>::const_reverse_iterator it = pyramid.rbegin(); it != pyramid.rend(); ++it) {
-        p.T_init = findTransformation(*it, p);
+    for (int level = params.max_pyramid_levels; level >= (int)params.min_pyramid_levels; level--) {
+        p.T_init = findTransformation(pyramid[level], p);
     }
 
 #if 0

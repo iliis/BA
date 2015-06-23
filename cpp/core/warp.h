@@ -27,7 +27,8 @@ namespace Warp {
 
         float gradient_norm_threshold; // keep only pixels with gradient >= this value
         bool filter_on_unwarped_gradient; // use gradient of image-to-be-warped instead of keyframe at warped points
-        unsigned int pyramid_levels;
+        unsigned int min_pyramid_levels; // 0 to use max resolution
+        unsigned int max_pyramid_levels; // 1 = use 1x downscaled image (and nothing smaller)
         Transformation T_init;
         unsigned int max_iterations;
 
@@ -46,13 +47,15 @@ namespace Warp {
         Parameters(ErrorWeightFunction* weight_function,
                 float gradient_norm_threshold = 0,
                 bool filter_on_unwarped_gradient = false,
-                unsigned int pyramid_levels = 3,
+                unsigned int min_pyramid_levels = 1,
+                unsigned int max_pyramid_levels = 4,
                 const Transformation& T_init = Transformation(0,0,0,0,0,0),
                 unsigned int max_iterations = 1000)
           : weight_function(weight_function),
             gradient_norm_threshold(gradient_norm_threshold),
             filter_on_unwarped_gradient(filter_on_unwarped_gradient),
-            pyramid_levels(pyramid_levels),
+            min_pyramid_levels(min_pyramid_levels),
+            max_pyramid_levels(max_pyramid_levels),
             T_init(T_init),
             max_iterations(max_iterations),
             method(GAUSS_NEWTON),

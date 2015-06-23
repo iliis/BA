@@ -113,11 +113,6 @@ void Scene::loadFromBagFile(const std::string& bag_path)
         // TODO: load ground truth from bag
         ground_truth[i] = Transformation(0,0,0,0,0,0);
 
-#if 0
-        frames[i].downsample2();
-        intrinsics.downsample2();
-#endif
-
         printfProgress(i, 0, N);
 
         i++;
@@ -237,11 +232,6 @@ std::vector<Transformation> findTrajectoryFromRosbag(const string& rosbag_path, 
         prev_frame = current_frame;
         current_frame.loadFromMatrices(intensities.getData(), depths.getData());
 
-#if 0
-        frames[i].downsample2();
-        intrinsics.downsample2();
-#endif
-
         if (i > 0) {
 
             CameraStep step(prev_frame, current_frame, visensor_intrinsics, Transformation(0,0,0,0,0,0), i-1, i);
@@ -331,10 +321,6 @@ std::vector<Transformation> findTrajectoryFromRosbagRaw(const string& rosbag_pat
         prev_frame = current_frame;
         current_frame.loadFromMatrices(intensities.getData(), depths.getData());
 
-#if 0
-        frames[i].downsample2();
-        intrinsics.downsample2();
-#endif
 
         if (i > 0) {
 

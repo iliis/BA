@@ -424,9 +424,11 @@ void run_minimization(sf::RenderWindow& window, sf::Font& font, const Scene& sce
 
                                 case 10:
                                     do {
-                                        cout << "number of levels [>=1] (current: " << params.pyramid_levels << "): ";
-                                        cin >> params.pyramid_levels;
-                                    } while (params.pyramid_levels < 1);
+                                        cout << "min level [>=0]   (current: " << params.min_pyramid_levels << "): ";
+                                        cin >> params.min_pyramid_levels;
+                                        cout << "max level [>=min] (current: " << params.max_pyramid_levels << "): ";
+                                        cin >> params.max_pyramid_levels;
+                                    } while (params.min_pyramid_levels <= params.max_pyramid_levels);
                                     break;
 
                                 case 11:

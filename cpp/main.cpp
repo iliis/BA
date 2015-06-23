@@ -118,7 +118,8 @@ int main(int argc, char* argv[])
     //cout << testscene.getIntrinsics() << endl;
 
     Warp::Parameters params(new ErrorWeightNone());
-    params.pyramid_levels = 4;
+    params.min_pyramid_levels = 1;
+    params.max_pyramid_levels = 4;
     params.max_iterations = 100;
     params.T_init = Transformation(0,0,0,0,0,0);
     params.gradient_norm_threshold = 0.01;
