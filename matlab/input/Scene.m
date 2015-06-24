@@ -62,9 +62,7 @@ classdef Scene
 
             end
 
-            % don't scale focal length (TODO: is this correct?)
             obj.intrinsics = CameraIntrinsics(size(obj.intensities{1},2), size(obj.intensities{1},1), obj.intrinsics.focal_length * scale_factor);
-
         end
         
         function step = getStep(obj, step_idx)

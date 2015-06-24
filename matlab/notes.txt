@@ -79,12 +79,14 @@ TODO MATLAB:
 - fix Blender script
 - render more cost surfaces
     -> also with weighted errors
+
 - render longer trajectory
     - with more surrounding geometry
 
 TODO BLENDER:
 - link common stuff from external .blend files (such as node layout and python scripts)
 - fix export script to handle camera's parented to other stuff (such as following a path)
+- create testscene with more geometry and better textures (das Atrium könnte gut sein)
 
 
 IDEAS
@@ -100,3 +102,131 @@ IDEAS
 - fix c++ code on single screen -.-
     -> kernel update -> reinstall ATI drivers
 - debug jacobians !!!
+
+
+- numerical derivation!
+
+
+- bigger images
+- add 'play with min' modus:
+    - choose algo?
+    [done] - key for downsampling
+    [done] - press 'm' or something to enter menu on command line
+        [done] - choose scene step
+        [done] - scale down scene
+        [done] - choose T
+        [done] - choose delta T
+        [done] - reset T
+        [done] - T = ground_truth
+        - render cost surface (including ground truth)
+[done] - auto pyramid scheme
+    -> measure convergence speed
+- profile everything
+
+
+[done] 1. pyramidenstufen
+[done] 2. mask only interesting pixels
+    - strong gradients
+        comport: direct iterative closest point
+        enge (?), TUM: semidense visual odometry
+    - use dynamic threshold!
+[done?] 3. fehler gewichtung
+    use vector::asDiagonal() ;)
+    http://eigen.tuxfamily.org/dox/classEigen_1_1MatrixBase.html#adaf22d3a2069ec2c0df912cb87329e9c
+[done] 4. use real(tm) data
+
+
+
+lux/25 has quite a strong bias
+lux/16 doesn't converge (on level 3)
+lux/37 doesn't converge on scale 3 (2x halbiert) -> jitters too much
+
+
+64ms / 16 FPS
+190ms / 5 FPS
+491ms / 2 FPS
+
+- tool to render error surface
+    - keep range1,range2
+    - use mouse to draw rect to zoom in
+    - zoom in / out with +/-
+    - press <F5> or <Enter> to render
+
+- write some error / convergence speed measurement code with different
+    - error weight functions
+    - gradient norm threshold
+    - pyramid levels
+    measure:
+    - time (ms and iterations) until convergence
+    - error vs. iterations / time
+    - average perturbation from ground truth for convergence
+
+[done] - choose steps that are further apart
+
+[done] - measure longer trajectory
+
+1. measure gradient for pixel filtering on original / current frame
+2. portiere auf sensor
+
+[- levenberg marquart]
+
+- separate SFML code from math
+
+Intrinsic Parameter Matrix K (von original camera 0 und rektifiezierter Kamera):
+
+471.988       0              370.105
+      0            471.302   226.664
+      0            0              1
+
+Baseline:
+
+0.110174 m
+
+-> /root/calibration.xml
+
+- view raw data from sensor in pc app
+    -> run algo on live data
+- use calibration provider in arm code
+- insert new messages? or just overwrite existing channels?
+- check if images are read correctly in arm code
+- clamp depth data (0 or 240 --> NaN, cut out rectangle, mask with intensity = 255 or 0)
+- scale depth data (0-255 to ??? /16 or /8)
+- params for FPGA: more sparse output?
+
+- don't downscale depth data
+- dynamic pyramid levels & gradient threshold (so that we have enough pixels!)
+- better stopping criterion (run a bit longer)
+
+- punktwolke exportieren
+
+
+präsentation:
+standard aufbau:
+- motivation
+    - embedded
+    - better integration of FPGA and ARM/CPU
+        - stereo auf FPGA makes embedded feasible
+- methodik
+    - mathe beschreiben
+- resultate
+    - video
+    - simulation
+    - quantitativ
+        - akumulierter fehler pro distanz gelaufen
+    - qualitative
+        - longer trajectory vs. map
+        - circles
+- conclusion / fazit / TL;DR
+- github: ethz-asl/student_templates (PPT)
+
+1. draft presentation to determine what data is required
+2. record that data
+3. 1-2 days for presentation
+
+report:
+- analog zu präsentation
+- additionally:
+    - related work
+- estimate was wieviel braucht
+- nett: so und so viel schneller wenn x und y auf FPGA
+- github: ethz-asl/student_templates

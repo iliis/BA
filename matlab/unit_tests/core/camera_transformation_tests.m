@@ -2,7 +2,6 @@ classdef camera_transformation_tests < matlab.unittest.TestCase
 % test core::camera_transformation()
     
     properties
-        intrinsics = CameraIntrinsics(7, 5, 1);
     end
     
     methods (Test)

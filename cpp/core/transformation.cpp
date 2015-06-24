@@ -4,9 +4,22 @@ using namespace std;
 using namespace boost;
 
 ///////////////////////////////////////////////////////////////////////////////
+float rad2deg(float rad)
+{
+    return rad / (2*M_PI) * 360;
+}
+///////////////////////////////////////////////////////////////////////////////
+float deg2rad(float deg)
+{
+    return deg / 360 * (2*M_PI);
+}
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 Transformation::Transformation()
 {
     this->value << 0,0,0,0,0,0;
+    updateRotationMatrix();
 }
 ///////////////////////////////////////////////////////////////////////////////
 Transformation::Transformation(float x, float y, float z, float alpha, float beta, float gamma)
@@ -17,8 +30,24 @@ Transformation::Transformation(float x, float y, float z, float alpha, float bet
 ///////////////////////////////////////////////////////////////////////////////
 std::ostream& operator <<(std::ostream &output, const Transformation &T)
 {
-    output << "T[ " << T.x() << " " << T.y() << " " << T.z() << " / ";
-    output << T.alpha() << " " << T.beta() << " " << T.gamma() << " ]";
+    output << "T[ " << setiosflags(ios::fixed) << setprecision(4)
+        << setw(8) << T.x() << " "
+        << setw(8) << T.y() << " "
+        << setw(8) << T.z() << " / "
+        << setw(8) << rad2deg(T.alpha()) << "d "
+        << setw(8) << rad2deg(T.beta()) << "d "
+        << setw(8) << rad2deg(T.gamma()) << "d ]";
+    return output;
+}
+///////////////////////////////////////////////////////////////////////////////
+std::ostream& Transformation::printCSV(std::ostream &output)
+{
+    output << this->x() << ", "
+           << this->y() << ", "
+           << this->z() << ", "
+           << this->alpha() << ", "
+           << this->beta() << ", "
+           << this->gamma();
     return output;
 }
 ///////////////////////////////////////////////////////////////////////////////
@@ -80,6 +109,14 @@ void Transformation::updateRotationMatrix()
 Eigen::Vector3f Transformation::operator()(const Eigen::Vector3f& vect) const
 {
     return this->getRotationMatrix() * vect + this->getTranslation();
+}
+///////////////////////////////////////////////////////////////////////////////
+Transformation Transformation::operator+(const Transformation& other) const
+{
+    Transformation T = *this;
+    T.value += other.value;
+    T.updateRotationMatrix();
+    return T;
 }
 ///////////////////////////////////////////////////////////////////////////////
 Eigen::Matrix<float, 3, 6> Transformation::getJacobian(const Eigen::Vector3f& point) const

@@ -2,6 +2,7 @@
 #define TRANSFORMATION_H_INCLUDED
 
 #include <iostream>
+#include <iomanip>
 #include <vector>
 #include <string>
 #include <Eigen/Dense>
@@ -9,13 +10,18 @@
 
 #include "../utils/csv.h"
 
+float rad2deg(float rad);
+float deg2rad(float deg);
+
 class Transformation
 {
 public:
     Transformation();
     Transformation(float x, float y, float z, float alpha, float beta, float gamma);
+    Transformation(Eigen::Matrix<float, 6, 1> value) : value(value) {}; // WARNING: doesn't update rotation matrix!
 
-    friend std::ostream& operator <<(std::ostream &output, const Transformation &q);
+    friend std::ostream& operator <<(std::ostream &output, const Transformation &T);
+           std::ostream& printCSV   (std::ostream &output);
 
     static std::vector<Transformation> loadFromCSV(const std::string& filename);
 
@@ -32,11 +38,13 @@ public:
     inline float gamma() const { return value(5); } // roll
 
     inline const Eigen::Matrix3f& getRotationMatrix() const { return R; }
-    inline Eigen::Vector3f getTranslation() const { return Eigen::Vector3f(x(),y(),z()); };
+    inline Eigen::Vector3f getTranslation() const { return value.head<3>(); } //Eigen::Vector3f(x(),y(),z()); };
 
     Eigen::Matrix<float, 3, 6> getJacobian(const Eigen::Vector3f& point) const;
 
     Eigen::Vector3f operator()(const Eigen::Vector3f& vect) const;
+
+    Transformation operator+(const Transformation& other) const;
 
     void updateRotationMatrix();
 

@@ -2,27 +2,31 @@
 #define CAMERA_STEP_H_INCLUDED
 
 #include "camera_image.h"
+#include "camera_intrinsics.h"
 #include "transformation.h"
-
-class Scene;
 
 /*!
  * a single step in a longer trajectory
  * contains two frames (CameraImage)
  */
-class CameraStep
+struct CameraStep
 {
-public:
-    CameraStep(const CameraImage& first, const CameraImage& second, const Transformation& ground_truth, unsigned int index = 0, Scene* scene = NULL);
+    CameraStep(const CameraImage& first, const CameraImage& second, const CameraIntrinsics& intrinsics, const Transformation& ground_truth = Transformation(0,0,0,0,0,0), unsigned int index_first = 0, unsigned int index_second = 0);
 
-    const CameraImage& frame_first;
-    const CameraImage& frame_second;
+    CameraImage frame_first;
+    CameraImage frame_second;
 
-    const Transformation& ground_truth;
+    void downsampleBy(unsigned int s);
+
+    unsigned int scale;
+
+    CameraIntrinsics intrinsics;
+
 
     // for convenience
-    const unsigned int index;
-    const Scene * const scene;
+    Transformation ground_truth;
+    unsigned int index_first;
+    unsigned int index_second;
 };
 
 #endif /* end of include guard: CAMERA_STEP_H_INCLUDED */

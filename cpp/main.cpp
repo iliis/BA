@@ -1,125 +1,153 @@
 #include <stdlib.h>
 #include <iostream>
+#include <fstream>
+#include <boost/foreach.hpp>
+#include <boost/timer/timer.hpp>
 #include <SFML/Graphics.hpp>
+#include <sensor_msgs/Image.h>
+#include <stereo_msgs/DisparityImage.h>
+#include <rosbag/bag.h>
+#include <rosbag/view.h>
 
-#include "core/scene.h"
+#include "gui/scene.h"
+#include "gui/sf_image_data.h"
+#include "gui/live.h"
+#include "gui/minimization_gui.h"
 #include "core/image_data.h"
 #include "core/transformation.h"
 #include "core/camera_intrinsics.h"
 #include "core/warp.h"
+#include "core/minimization.h"
+#include "utils/timing/timer.hpp"
 
 using namespace std;
 using namespace Eigen;
 
+//sf::RenderWindow window(sf::VideoMode(1280, 768), "dense odometry");
+//sf::RenderWindow window(sf::VideoMode(4*752+6, 3*480), "dense odometry");
+//sf::RenderWindow window(sf::VideoMode(256*4+2, 128*5), "dense odometry");
+//sf::RenderWindow window(sf::VideoMode(256*3+4, 128*4+4), "dense odometry");
 
-inline sf::Vector2f toSF(Eigen::Vector2f v)
+///////////////////////////////////////////////////////////////////////////////
+void write_trajectory(const Scene& scene, const Warp::Parameters& params, string output_dir = "")
 {
-    return sf::Vector2f(v.x(), v.y());
-}
+    std::vector<Transformation> traj = findTrajectory(scene, params);
 
-inline Eigen::Vector2f toEigen(sf::Vector2f v)
-{
-    return Eigen::Vector2f(v.x, v.y);
-}
-
-void drawArrow(sf::RenderTarget& target, float x, float y, float vect_x, float vect_y)
-{
-    sf::Vector2f pos(x,y);
-    sf::Vector2f vect(vect_x, vect_y);
-    Eigen::Vector2f v = toEigen(vect).normalized() * 4;
-
-    sf::Vertex line[] = {
-        // arrow base
-        sf::Vertex(pos),
-        sf::Vertex(pos + vect),
-        // arrow head
-        sf::Vertex(pos + vect + toSF(Eigen::Rotation2Df( M_PI*0.85) * v)),
-        sf::Vertex(pos + vect),
-        sf::Vertex(pos + vect + toSF(Eigen::Rotation2Df(-M_PI*0.85) * v)),
-        sf::Vertex(pos + vect),
-    };
-
-    for(unsigned int i = 0; i < sizeof(line)/sizeof(sf::Vertex); i++)
-        line[i].color = sf::Color(0,0,255);
-
-    target.draw(line, sizeof(line)/sizeof(sf::Vertex), sf::Lines);
-}
-
-int main()
-{
-    sf::RenderWindow window(sf::VideoMode(1280, 768), "SFML test");
-
-    Scene testscene;
-    testscene.loadFromSceneDirectory("../matlab/input/trajectory1");
-
-    CameraStep teststep = testscene.getStep(24);
-
-    VectorXf errors;
-    Matrix<float, Dynamic, 6> jacobian;
-
-    cout << teststep.ground_truth << endl;
-    cout << "total error: " << Warp::calcError(teststep, teststep.ground_truth, errors, jacobian) << endl;
-
-
-    Warp::PlotRange range1(0, -1, 1,40);
-    Warp::PlotRange range2(1, -1, 1,40);
-    //Warp::PlotRange range2(4,-.1,.1,40); // beta = yaw
-
-    Eigen::MatrixXf errorsurface(range1.steps, range2.steps);
-    Eigen::Matrix<float, Dynamic, 6> errorgradients(range1.steps*range2.steps, 6);
-
-    cout << "rendering error surface ..." << endl;
-
-    sf::Clock clock;
-    clock.restart();
-    Warp::renderErrorSurface(errorsurface, errorgradients, teststep, teststep.ground_truth, range1, range2);
-    sf::Int32 ms = clock.getElapsedTime().asMilliseconds();
-
-    cout << "rendered surface in " << ms << "ms (" << ((float) ms) / (errorsurface.rows() * errorsurface.cols()) << "ms per point)" << endl;
-
-    ImageData errorplot;
-    errorplot.loadFromMatrix(errorsurface, Colormap::Hot());
-
-
-    Eigen::VectorXf error_tmp;
-    Eigen::Matrix<float, Eigen::Dynamic, 6> J_tmp;
-
-    unsigned int i = 0;
-    while (window.isOpen())
-    {
-        sf::Event event;
-        while (window.pollEvent(event))
-        {
-            if (event.type == sf::Event::Closed)
-                window.close();
-        }
-
-        window.clear();
-        //window.draw(errorplot);
-        errorplot.drawAt(window, sf::Vector2f(0,0), 16);
-
-#if 0
-        // plot gradients (they are clearly wrong at the moment!)
-        for (unsigned int y = 0; y < errorplot.getHeight(); ++y) {
-            for (unsigned int x = 0; x < errorplot.getWidth(); ++x) {
-                unsigned int idx = y*errorplot.getWidth()+x;
-                float factor = 0.1;
-                drawArrow(window, x*16+8, y*16+8, errorgradients(idx, range1.dim)*factor, errorgradients(idx, range2.dim)*factor);
-            }
-        }
-#endif
-
-        CameraStep step = testscene.getStep(i);
-        Warp::calcError(step, step.ground_truth, error_tmp, J_tmp, &window);
-
-        i++;
-        if (i >= testscene.getStepCount())
-            i = 0;
-
-        window.display();
-
-        sf::sleep(sf::milliseconds(100));
+    if (output_dir.empty()) {
+        output_dir = scene.getSourceDirectory();
     }
 
-    return 0;
+    string path = output_dir + "/measured_trajectory.csv";
+    ofstream outfile(path.c_str());
+
+    outfile << "x, y, z, alpha, beta, gamma" << endl;
+
+    for(size_t i = 0; i < traj.size(); i++) {
+        traj[i].printCSV(outfile) << endl;
+    }
+
+    outfile.close();
 }
+///////////////////////////////////////////////////////////////////////////////
+void write_trajectory_rosbag(const string& rosbag_path, const Warp::Parameters& params, string output_dir = ".")
+{
+    boost::timer::cpu_timer timer;
+    std::vector<Transformation> traj = findTrajectoryFromRosbag(rosbag_path, params);
+    timer.stop();
+    cout << "found trajectory of " << traj.size() << " steps in: " << timer.format();
+    cout << "this is an average of " << ((double) traj.size()) / timer.elapsed().user * 1000 * 1000 * 1000 << " FPS" << endl;
+
+    if (traj.empty()) {
+        cout << "empty trajectory. maybe this is raw footage?" << endl;
+
+        traj = findTrajectoryFromRosbagRaw(rosbag_path, params);
+
+        if (traj.empty()) {
+            cerr << "nope, no raw data. giving up." << endl;
+            return;
+        }
+    }
+
+    string path = output_dir + "/measured_trajectory.csv";
+    ofstream outfile(path.c_str());
+
+    outfile << "x, y, z, alpha, beta, gamma" << endl;
+
+    for(size_t i = 0; i < traj.size(); i++) {
+        traj[i].printCSV(outfile) << endl;
+    }
+
+    outfile.close();
+
+    cout << "wrote trajectory to disk" << endl;
+}
+///////////////////////////////////////////////////////////////////////////////
+
+timing::Timer timertest("0_foobar");
+timing::Timer timer2("1_asdfasdf");
+
+int main(int argc, char* argv[])
+{
+    sf::ContextSettings settings;
+    settings.antialiasingLevel = 8;
+    sf::RenderWindow window(sf::VideoMode(1140, 730), "dense odometry", sf::Style::Default, settings);
+
+    timertest.Start();
+
+    sf::Font font;
+    font.loadFromFile("resources/fonts/default.otf");
+
+    Scene testscene;
+    //testscene.loadFromSceneDirectory("../matlab/input/test_wide");
+    //testscene.loadFromSceneDirectory("../matlab/input/trajectory1");
+    //testscene.loadFromSceneDirectory("../matlab/input/testscene1");
+    //testscene.loadFromSceneDirectory("../matlab/input/courtyard/lux");
+    //testscene.loadFromSceneDirectory("../matlab/input/courtyard_circle");
+    //testscene.loadFromSceneDirectory("../matlab/input/courtyard/normal"); // step 22 is nice!
+    //testscene.loadFromBagFile("/home/samuel/data/2015-06-11-16-30-01.bag");
+    testscene.loadFromSceneDirectory("../presentations/final/media/smallscene");
+
+    //const string raw_bag = "/home/samuel/data/visensor/graveyard_small_circle1_forward.bag";
+    //const string raw_bag = "/home/samuel/data/visensor/graveyard_path4.bag";
+    //const string raw_bag = "/home/samuel/REMOTE/home/samuel/data/visensor/path2.bag";
+    //const string raw_bag = "/home/samuel/REMOTE/home/samuel/data/visensor/path1.bag";
+    //const string raw_bag = "/home/samuel/data/visensor/lee_medium_circle.bag";
+    const string raw_bag = "/home/samuel/data/visensor/lee_short_circle.bag";
+    //testscene.loadFromBagFileRaw(raw_bag);
+
+
+    //cout << testscene.getIntrinsics() << endl;
+
+    Warp::Parameters params(new ErrorWeightNone());
+    params.min_pyramid_levels = 1;
+    params.max_pyramid_levels = 4;
+    params.max_iterations = 100;
+    params.T_init = Transformation(0,0,0,0,0,0);
+    //params.gradient_norm_threshold = 0.01;
+    params.gradient_norm_threshold = 0;
+    //params.use_streamlined = true;
+
+    //write_trajectory(testscene, params, ".");
+    //write_trajectory_rosbag("/home/samuel/data/2015-06-11-16-30-01.bag", params, ".");
+    //write_trajectory_rosbag(raw_bag, params, ".");
+
+    run_minimization(window, font, testscene, params);
+
+    //show_live_data(window, font, argc, argv);
+
+    timertest.Stop();
+    timer2.Start();
+    sf::sleep(sf::seconds(2));
+    timer2.Stop();
+
+    cout << "timings: " << endl;
+    cout << timing::Timing::Print();
+    cout << "timertest total seconds: " << timing::Timing::GetMeanSeconds(timertest.GetHandle()) << endl;
+    cout << "tiemr2 total seconds: " << timing::Timing::GetMeanSeconds(timer2.GetHandle()) << endl;
+
+
+    delete params.weight_function;
+
+    return EXIT_SUCCESS;
+}
+///////////////////////////////////////////////////////////////////////////////

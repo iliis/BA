@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?fileVersion 4.0.0?>
+
+<cproject storage_type_id="org.eclipse.cdt.core.XmlProjectDescriptionStorage">
+	<storageModule moduleId="org.eclipse.cdt.core.settings">
+		<cconfiguration id="xilinx.gnu.armlinux.exe.debug.689443640">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="xilinx.gnu.armlinux.exe.debug.689443640" moduleId="org.eclipse.cdt.core.settings" name="Debug">
+				<externalSettings>
+					<externalSetting/>
+				</externalSettings>
+				<extensions>
+					<extension id="com.xilinx.sdk.managedbuilder.XELF.armlinux" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+				</extensions>
+			</storageModule>
+			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+				<configuration artifactExtension="elf" artifactName="${ProjName}" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug,org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe" cleanCommand="rm -rf" description="" id="xilinx.gnu.armlinux.exe.debug.689443640" name="Debug" parent="xilinx.gnu.armlinux.exe.debug" postbuildStep="">
+					<folderInfo id="xilinx.gnu.armlinux.exe.debug.689443640." name="/" resourcePath="">
+						<toolChain id="xilinx.gnu.armlinux.exe.debug.toolchain.55019948" name="Xilinx ARM GNU/Linux Toolchain" superClass="xilinx.gnu.armlinux.exe.debug.toolchain">
+							<targetPlatform binaryParser="com.xilinx.sdk.managedbuilder.XELF.armlinux" id="xilinx.armlinux.target.gnu.base.debug.51485166" isAbstract="false" name="Debug Platform" superClass="xilinx.armlinux.target.gnu.base.debug"/>
+							<builder buildPath="${workspace_loc:/visensor-srv/Debug}" enableAutoBuild="false" id="xilinx.gnu.armlinux.toolchain.builder.debug.1732779041" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="GNU make" parallelBuildOn="true" parallelizationNumber="optimal" superClass="xilinx.gnu.armlinux.toolchain.builder.debug"/>
+							<tool command="arm-xilinx-linux-gnueabi-gcc" commandLinePattern="${COMMAND} -c ${FLAGS} ${OUTPUT_FLAG}${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" id="xilinx.gnu.armlinux.c.toolchain.assembler.debug.1937468496" name="ARM Linux gcc assembler" superClass="xilinx.gnu.armlinux.c.toolchain.assembler.debug">
+								<option id="xilinx.gnu.both.asm.option.include.paths.874212776" name="Include Paths (-I)" superClass="xilinx.gnu.both.asm.option.include.paths" valueType="includePath">
+									<listOptionValue builtIn="false" value="/opt/ros/indigo/include"/>
+								</option>
+								<inputType id="xilinx.gnu.assembler.input.2007024233" superClass="xilinx.gnu.assembler.input"/>
+							</tool>
+							<tool id="xilinx.gnu.armlinux.c.toolchain.compiler.debug.683504308" name="ARM Linux gcc compiler" superClass="xilinx.gnu.armlinux.c.toolchain.compiler.debug">
+								<option defaultValue="gnu.c.optimization.level.none" id="xilinx.gnu.compiler.option.optimization.level.100875198" name="Optimization Level" superClass="xilinx.gnu.compiler.option.optimization.level" valueType="enumerated"/>
+								<option id="xilinx.gnu.compiler.option.debugging.level.1744178460" name="Debug Level" superClass="xilinx.gnu.compiler.option.debugging.level" value="gnu.c.debugging.level.max" valueType="enumerated"/>
+							</tool>
+							<tool id="xilinx.gnu.armlinux.cxx.toolchain.compiler.debug.1262891358" name="ARM Linux g++ compiler" superClass="xilinx.gnu.armlinux.cxx.toolchain.compiler.debug">
+								<option defaultValue="gnu.c.optimization.level.none" id="xilinx.gnu.compiler.option.optimization.level.1187317585" name="Optimization Level" superClass="xilinx.gnu.compiler.option.optimization.level" value="gnu.c.optimization.level.optimize" valueType="enumerated"/>
+								<option id="xilinx.gnu.compiler.option.debugging.level.97379711" name="Debug Level" superClass="xilinx.gnu.compiler.option.debugging.level" value="gnu.c.debugging.level.max" valueType="enumerated"/>
+								<option id="xilinx.gnu.compiler.dircategory.includes.1985675710" name="Include Paths" superClass="xilinx.gnu.compiler.dircategory.includes" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/libraries/eigen}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/libraries/boost_arm/include}&quot;"/>
+									<listOptionValue builtIn="false" value="/home/samuel/ros/devel/include"/>
+									<listOptionValue builtIn="false" value="/opt/ros/indigo/include"/>
+								</option>
+								<option id="xilinx.gnu.compiler.misc.other.848998508" name="Other flags" superClass="xilinx.gnu.compiler.misc.other" value="-c -fmessage-length=0 -std=c++0x" valueType="string"/>
+								<option id="xilinx.gnu.compiler.option.profiling.enable.317827386" name="Enable Profiling (-pg)" superClass="xilinx.gnu.compiler.option.profiling.enable" value="true" valueType="boolean"/>
+								<inputType id="xilinx.gnu.armlinux.cxx.compiler.input.98545695" name="C++ source files" superClass="xilinx.gnu.armlinux.cxx.compiler.input"/>
+							</tool>
+							<tool id="xilinx.gnu.armlinux.toolchain.archiver.208581864" name="ARM Linux archiver" superClass="xilinx.gnu.armlinux.toolchain.archiver"/>
+							<tool id="xilinx.gnu.armlinux.c.toolchain.linker.debug.1645407350" name="ARM Linux gcc linker" superClass="xilinx.gnu.armlinux.c.toolchain.linker.debug">
+								<option id="xilinx.gnu.c.linker.option.pg.2113998871" name="Enable Profiling" superClass="xilinx.gnu.c.linker.option.pg" value="true" valueType="boolean"/>
+							</tool>
+							<tool id="xilinx.gnu.armlinux.cxx.toolchain.linker.debug.1196611578" name="ARM Linux g++ linker" superClass="xilinx.gnu.armlinux.cxx.toolchain.linker.debug">
+								<option id="xilinx.gnu.c.link.option.paths.2083665133" name="Library search path (-L)" superClass="xilinx.gnu.c.link.option.paths" valueType="libPaths">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/libraries/boost_arm/static}&quot;"/>
+								</option>
+								<option id="xilinx.gnu.c.link.option.libs.292157325" name="Libraries (-l)" superClass="xilinx.gnu.c.link.option.libs" valueType="libs">
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="boost_system"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="boost_thread"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="pthread"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="rt"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="boost_chrono"/>
+								</option>
+								<option id="xilinx.gnu.c.linker.option.pg.808662067" name="Enable Profiling" superClass="xilinx.gnu.c.linker.option.pg" value="true" valueType="boolean"/>
+								<inputType id="xilinx.gnu.linker.input.1137789689" superClass="xilinx.gnu.linker.input">
+									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
+									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
+								</inputType>
+								<inputType id="xilinx.gnu.linker.input.lscript.351401335" name="Linker Script" superClass="xilinx.gnu.linker.input.lscript"/>
+							</tool>
+							<tool command="arm-xilinx-linux-gnueabi-size" commandLinePattern="${COMMAND} ${FLAGS} ${INPUTS} |tee ${OUTPUT}" id="xilinx.gnu.armlinux.size.debug.1925239304" name="ARM Linux Print Size" superClass="xilinx.gnu.armlinux.size.debug"/>
+						</toolChain>
+					</folderInfo>
+					<sourceEntries>
+						<entry excluding="work" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
+					</sourceEntries>
+				</configuration>
+			</storageModule>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+		</cconfiguration>
+		<cconfiguration id="xilinx.gnu.armlinux.exe.debug.689443640.1977043802">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="xilinx.gnu.armlinux.exe.debug.689443640.1977043802" moduleId="org.eclipse.cdt.core.settings" name="Release">
+				<externalSettings>
+					<externalSetting/>
+				</externalSettings>
+				<extensions>
+					<extension id="com.xilinx.sdk.managedbuilder.XELF.armlinux" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+				</extensions>
+			</storageModule>
+			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+				<configuration artifactExtension="elf" artifactName="${ProjName}" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug,org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe" cleanCommand="rm -rf" description="" id="xilinx.gnu.armlinux.exe.debug.689443640.1977043802" name="Release" parent="xilinx.gnu.armlinux.exe.debug" postbuildStep="">
+					<folderInfo id="xilinx.gnu.armlinux.exe.debug.689443640.1977043802." name="/" resourcePath="">
+						<toolChain id="xilinx.gnu.armlinux.exe.debug.toolchain.1553035487" name="Xilinx ARM GNU/Linux Toolchain" superClass="xilinx.gnu.armlinux.exe.debug.toolchain">
+							<targetPlatform binaryParser="com.xilinx.sdk.managedbuilder.XELF.armlinux" id="xilinx.armlinux.target.gnu.base.debug.1230060647" isAbstract="false" name="Debug Platform" superClass="xilinx.armlinux.target.gnu.base.debug"/>
+							<builder buildPath="${workspace_loc:/visensor-srv/Debug}" enableAutoBuild="false" id="xilinx.gnu.armlinux.toolchain.builder.debug.254973163" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="GNU make" parallelBuildOn="true" parallelizationNumber="optimal" superClass="xilinx.gnu.armlinux.toolchain.builder.debug"/>
+							<tool command="arm-xilinx-linux-gnueabi-gcc" commandLinePattern="${COMMAND} -c ${FLAGS} ${OUTPUT_FLAG}${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" id="xilinx.gnu.armlinux.c.toolchain.assembler.debug.331793523" name="ARM Linux gcc assembler" superClass="xilinx.gnu.armlinux.c.toolchain.assembler.debug">
+								<option id="xilinx.gnu.both.asm.option.include.paths.90326877" name="Include Paths (-I)" superClass="xilinx.gnu.both.asm.option.include.paths" valueType="includePath">
+									<listOptionValue builtIn="false" value="/opt/ros/indigo/include"/>
+								</option>
+								<inputType id="xilinx.gnu.assembler.input.1762604739" superClass="xilinx.gnu.assembler.input"/>
+							</tool>
+							<tool id="xilinx.gnu.armlinux.c.toolchain.compiler.debug.1894891358" name="ARM Linux gcc compiler" superClass="xilinx.gnu.armlinux.c.toolchain.compiler.debug">
+								<option defaultValue="gnu.c.optimization.level.none" id="xilinx.gnu.compiler.option.optimization.level.111995520" name="Optimization Level" superClass="xilinx.gnu.compiler.option.optimization.level" valueType="enumerated"/>
+								<option id="xilinx.gnu.compiler.option.debugging.level.147078195" name="Debug Level" superClass="xilinx.gnu.compiler.option.debugging.level" value="gnu.c.debugging.level.max" valueType="enumerated"/>
+							</tool>
+							<tool id="xilinx.gnu.armlinux.cxx.toolchain.compiler.debug.166540351" name="ARM Linux g++ compiler" superClass="xilinx.gnu.armlinux.cxx.toolchain.compiler.debug">
+								<option defaultValue="gnu.c.optimization.level.none" id="xilinx.gnu.compiler.option.optimization.level.326031159" name="Optimization Level" superClass="xilinx.gnu.compiler.option.optimization.level" value="gnu.c.optimization.level.most" valueType="enumerated"/>
+								<option id="xilinx.gnu.compiler.option.debugging.level.1417358136" name="Debug Level" superClass="xilinx.gnu.compiler.option.debugging.level" value="gnu.c.debugging.level.none" valueType="enumerated"/>
+								<option id="xilinx.gnu.compiler.dircategory.includes.103871910" name="Include Paths" superClass="xilinx.gnu.compiler.dircategory.includes" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/libraries/eigen}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/libraries/boost_arm/include}&quot;"/>
+									<listOptionValue builtIn="false" value="/home/samuel/ros/devel/include"/>
+									<listOptionValue builtIn="false" value="/opt/ros/indigo/include"/>
+								</option>
+								<option id="xilinx.gnu.compiler.misc.other.907988602" name="Other flags" superClass="xilinx.gnu.compiler.misc.other" value="-c -fmessage-length=0 -std=c++0x" valueType="string"/>
+								<option id="xilinx.gnu.compiler.option.optimization.flags.1344229798" name="Other optimization flags" superClass="xilinx.gnu.compiler.option.optimization.flags" value="-mfpu=neon -mfloat-abi=softfp -ffast-math -fno-finite-math-only " valueType="string"/>
+								<inputType id="xilinx.gnu.armlinux.cxx.compiler.input.122484563" name="C++ source files" superClass="xilinx.gnu.armlinux.cxx.compiler.input"/>
+							</tool>
+							<tool id="xilinx.gnu.armlinux.toolchain.archiver.555107456" name="ARM Linux archiver" superClass="xilinx.gnu.armlinux.toolchain.archiver"/>
+							<tool id="xilinx.gnu.armlinux.c.toolchain.linker.debug.1720705395" name="ARM Linux gcc linker" superClass="xilinx.gnu.armlinux.c.toolchain.linker.debug"/>
+							<tool id="xilinx.gnu.armlinux.cxx.toolchain.linker.debug.1755208675" name="ARM Linux g++ linker" superClass="xilinx.gnu.armlinux.cxx.toolchain.linker.debug">
+								<option id="xilinx.gnu.c.link.option.paths.1154120095" name="Library search path (-L)" superClass="xilinx.gnu.c.link.option.paths" valueType="libPaths">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/libraries/boost_arm/static}&quot;"/>
+								</option>
+								<option id="xilinx.gnu.c.link.option.libs.560154042" name="Libraries (-l)" superClass="xilinx.gnu.c.link.option.libs" valueType="libs">
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="boost_system"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="boost_thread"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="pthread"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="rt"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="boost_chrono"/>
+								</option>
+								<inputType id="xilinx.gnu.linker.input.1881264512" superClass="xilinx.gnu.linker.input">
+									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
+									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
+								</inputType>
+								<inputType id="xilinx.gnu.linker.input.lscript.1494361268" name="Linker Script" superClass="xilinx.gnu.linker.input.lscript"/>
+							</tool>
+							<tool command="arm-xilinx-linux-gnueabi-size" commandLinePattern="${COMMAND} ${FLAGS} ${INPUTS} |tee ${OUTPUT}" id="xilinx.gnu.armlinux.size.debug.332285307" name="ARM Linux Print Size" superClass="xilinx.gnu.armlinux.size.debug"/>
+						</toolChain>
+					</folderInfo>
+					<sourceEntries>
+						<entry excluding="work" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
+					</sourceEntries>
+				</configuration>
+			</storageModule>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+		</cconfiguration>
+	</storageModule>
+	<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+		<project id="visensor-srv.xilinx.gnu.armlinux.exe.1818934872" name="Xilinx ARM Linux Executable" projectType="xilinx.gnu.armlinux.exe"/>
+	</storageModule>
+	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
+	<storageModule moduleId="refreshScope" versionNumber="2">
+		<configuration configurationName="Release2"/>
+		<configuration configurationName="Release">
+			<resource resourceType="PROJECT" workspacePath="/visensor-srv"/>
+		</configuration>
+		<configuration configurationName="Multiple configurations">
+			<resource resourceType="PROJECT" workspacePath="/dense-odometry-arm"/>
+		</configuration>
+		<configuration configurationName="Debug">
+			<resource resourceType="PROJECT" workspacePath="/visensor-srv"/>
+		</configuration>
+	</storageModule>
+	<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
+	<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets"/>
+	<storageModule moduleId="scannerConfiguration">
+		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		<scannerConfigBuildInfo instanceId="xilinx.gnu.armlinux.exe.debug.689443640.2032168305;xilinx.gnu.armlinux.exe.debug.689443640.2032168305.">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="com.xilinx.managedbuilder.ui.ARMLinuxGCCManagedMakePerProjectProfileC"/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="xilinx.gnu.armlinux.exe.release.179270280;xilinx.gnu.armlinux.exe.release.179270280.">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="xilinx.gnu.armlinux.exe.debug.689443640.2032168305;xilinx.gnu.armlinux.exe.debug.689443640.2032168305.;xilinx.gnu.armlinux.cxx.toolchain.compiler.debug.1644002071;xilinx.gnu.armlinux.cxx.compiler.input.454174661">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="com.xilinx.managedbuilder.ui.ARMLinuxGCCManagedMakePerProjectProfileC"/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="xilinx.gnu.armlinux.exe.release.400556070;xilinx.gnu.armlinux.exe.release.400556070.;xilinx.gnu.armlinux.cxx.toolchain.compiler.release.1847594881;xilinx.gnu.armlinux.cxx.compiler.input.1865312668">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="com.xilinx.managedbuilder.ui.ARMLinuxGCCManagedMakePerProjectProfileC"/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="xilinx.gnu.armlinux.exe.debug.689443640.1977043802;xilinx.gnu.armlinux.exe.debug.689443640.1977043802.;xilinx.gnu.armlinux.cxx.toolchain.compiler.debug.166540351;xilinx.gnu.armlinux.cxx.compiler.input.122484563">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="com.xilinx.managedbuilder.ui.ARMLinuxGCCManagedMakePerProjectProfileC"/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="xilinx.gnu.armlinux.exe.debug.689443640;xilinx.gnu.armlinux.exe.debug.689443640.;xilinx.gnu.armlinux.cxx.toolchain.compiler.debug.1262891358;xilinx.gnu.armlinux.cxx.compiler.input.98545695">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="com.xilinx.managedbuilder.ui.ARMLinuxGCCManagedMakePerProjectProfileC"/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="xilinx.gnu.armlinux.exe.release.179270280;xilinx.gnu.armlinux.exe.release.179270280.;xilinx.gnu.armlinux.cxx.toolchain.compiler.release.1017983007;xilinx.gnu.armlinux.cxx.compiler.input.1848181016">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="xilinx.gnu.armlinux.exe.debug.689443640.1977043802;xilinx.gnu.armlinux.exe.debug.689443640.1977043802.">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="com.xilinx.managedbuilder.ui.ARMLinuxGCCManagedMakePerProjectProfileC"/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="xilinx.gnu.armlinux.exe.release.400556070;xilinx.gnu.armlinux.exe.release.400556070.">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="com.xilinx.managedbuilder.ui.ARMLinuxGCCManagedMakePerProjectProfileC"/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="xilinx.gnu.armlinux.exe.debug.689443640;xilinx.gnu.armlinux.exe.debug.689443640.">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="com.xilinx.managedbuilder.ui.ARMLinuxGCCManagedMakePerProjectProfileC"/>
+		</scannerConfigBuildInfo>
+	</storageModule>
+</cproject>

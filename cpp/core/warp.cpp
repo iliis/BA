@@ -4,16 +4,36 @@ using namespace std;
 using namespace Eigen;
 
 ///////////////////////////////////////////////////////////////////////////////
+std::string Warp::Parameters::toString()
+{
+    return "Error weighting function: " + weight_function->toString()
+       + "\npyramid levels: " + boost::lexical_cast<string>(min_pyramid_levels)
+       + " to " + boost::lexical_cast<string>(max_pyramid_levels)
+       + "\ngradient norm threshold: " + boost::lexical_cast<string>(gradient_norm_threshold)
+       + "\nmeasure gradient on image-to-be-warped: " + boost::lexical_cast<string>(this->filter_on_unwarped_gradient);
+       //+ "\nmax. iterations: " + boost::lexical_cast<string>(max_iterations);
+}
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 WorldPoint Warp::projectInv(const Pixel& pixel, const CameraIntrinsics& intrinsics)
 {
     WorldPoint p;
     p.pixel = pixel;
 
     // project into 3D space
-    Vector2f pxy = (pixel.pos - intrinsics.getPrincipalPoint()) * pixel.depth / intrinsics.getFocalLength();
-    p.pos(0) = pxy(0);
-    p.pos(1) = pxy(1);
-    p.pos(2) = pixel.depth;
+    if (intrinsics.isDisparityCamera()) {
+        // quick hack to use disparity images
+        Vector2f pxy = (pixel.pos - intrinsics.getPrincipalPoint()) * intrinsics.getBaseline() / pixel.depth;
+        p.pos(0) = pxy(0);
+        p.pos(1) = pxy(1);
+        p.pos(2) = intrinsics.getBaseline() * intrinsics.getFocalLength() / pixel.depth;
+    } else {
+        Vector2f pxy = (pixel.pos - intrinsics.getPrincipalPoint()) * pixel.depth / intrinsics.getFocalLength();
+        p.pos(0) = pxy(0);
+        p.pos(1) = pxy(1);
+        p.pos(2) = pixel.depth;
+    }
 
     return p;
 }
@@ -37,8 +57,8 @@ Eigen::Matrix<float, 2, 3> Warp::projectJacobian(const WorldPoint& point, const 
     float F = intrinsics.getFocalLength();
 
     Eigen::Matrix<float, 2, 3> J;
-    J << 280/z,     0, -(F*x)/(z*z),
-         0,     280/z, -(F*y)/(z*z);
+    J << F/z,   0, -(F*x)/(z*z),
+         0,   F/z, -(F*y)/(z*z);
 
     return J;
 }
@@ -61,19 +81,22 @@ Eigen::Matrix<float, 1, 2> Warp::sampleJacobian(const Pixel& pixel, const Camera
     return image.getIntensityData().sampleDiff(pixel.pos);
 }
 ///////////////////////////////////////////////////////////////////////////////
-float Warp::calcError(const CameraStep& step, const Transformation& T, Eigen::VectorXf& error_out, Eigen::Matrix<float, Eigen::Dynamic, 6>& J_out, sf::RenderTarget* plotTarget)
+float Warp::calcError(const CameraStep& step, const Transformation& T, Eigen::VectorXf& error_out, Eigen::Matrix<float, Eigen::Dynamic, 6>& J_out, const Parameters& params, WarpDebugData* debug_out)
 {
-    const unsigned int W = step.scene->getIntrinsics().getCameraWidth();
-    const unsigned int H = step.scene->getIntrinsics().getCameraHeight();
+    const unsigned int W = step.intrinsics.getCameraWidth();
+    const unsigned int H = step.intrinsics.getCameraHeight();
 
     //cout << "warping with " << T << endl;
 
     float total_error = 0;
 
-    sf::Image img_c, img_k;
-    if (plotTarget) {
-        img_c.create(W,H, sf::Color(0,0,255));
-        img_k.create(W,H, sf::Color(0,0,255));
+
+    if (debug_out) {
+        INIT_INVALID(debug_out->J_norm, W, H);
+        INIT_INVALID(debug_out->selection_heuristic, W, H);
+        INIT_INVALID(debug_out->warped_image, W, H);
+        INIT_INVALID(debug_out->errors_in_current, W, H);
+        INIT_INVALID(debug_out->weighted_errors, W, H);
     }
 
     //Matrix3f R = T.getRotationMatrix();
@@ -85,60 +108,106 @@ float Warp::calcError(const CameraStep& step, const Transformation& T, Eigen::Ve
     error_out.resize(W*H);
     J_out.resize(W*H, 6);
 
-    for (unsigned int y = 0; y < H; ++y) {
-        for (unsigned int x = 0; x < W; ++x) {
+    const float s = pow(2,step.scale);
+
+    const unsigned int X_START = params.cutout_left / s;
+    const unsigned int X_END   = W - (params.cutout_right / s);
+
+    const unsigned int Y_START = params.cutout_top / s;
+    const unsigned int Y_END   = H - (params.cutout_bottom / s);
+
+    for (unsigned int y = Y_START; y < Y_END; ++y) {
+        for (unsigned int x = X_START; x < X_END; ++x) {
+
+
             Pixel pixel_current  = step.frame_second.getPixel(Vector2i(x,y));
 
-            WorldPoint point = projectInv(pixel_current, step.scene->getIntrinsics());
+            // skip pixels without depth or intensity value
+            if ((!isfinite(pixel_current.depth)) || (!isfinite(pixel_current.intensity)))
+                continue;
+
+            float pixel_current_gradient_norm = step.frame_second.getIntensityData().getDiff(Vector2i(x,y)).norm();
+
+            // skip pixels with weak gradient (approximate keyframe gradient with gradient from current frame)
+            if (params.filter_on_unwarped_gradient) {
+                if (pixel_current_gradient_norm < params.gradient_norm_threshold)
+                    continue;
+            }
+
+            WorldPoint point = projectInv(pixel_current, step.intrinsics);
 
             WorldPoint point_transformed = transform(point, T); // 6.2ms per point, 3.7ms with cached rotation matrix
             //point.pos = R * point.pos + M; // 3.5ms per point
 
-            Pixel pixel_in_keyframe = project(point_transformed, step.scene->getIntrinsics());
+            Pixel pixel_in_keyframe = project(point_transformed, step.intrinsics);
 
             // skip pixels that project outside the keyframe
             if (!step.frame_first.isValidPixel(pixel_in_keyframe.pos))
                 continue;
 
+            Matrix<float, 1, 2> J_I = Warp::sampleJacobian(pixel_in_keyframe, step.frame_first);
+
+            // skip pixels that don't provide a good gradient
+            if (!params.filter_on_unwarped_gradient) {
+                if (J_I.norm() < params.gradient_norm_threshold)
+                    continue;
+            }
+
+            if (!std::isfinite(J_I(0)) || !std::isfinite(J_I(1)))
+            	continue;
+
             float intensity_keyframe = step.frame_first.samplePixel(pixel_in_keyframe.pos);
 
-            float error = (intensity_keyframe - pixel_current.intensity);
-            error = error * error; // squared differences
+            // skip pixels that map onto invalid color
+            if (!isfinite(intensity_keyframe))
+            	continue;
 
+            float error = (intensity_keyframe - pixel_current.intensity);
 
             // calculate Jacobian
             Matrix<float, 3, 6> J_T = Warp::transformJacobian(point, T);
-            Matrix<float, 2, 3> J_P = Warp::projectJacobian(point_transformed, step.scene->getIntrinsics());
-            Matrix<float, 1, 2> J_I = Warp::sampleJacobian(pixel_in_keyframe, step.frame_first);
-            Matrix<float, 1, 6> jacobian = J_I * J_P * J_T;
-
+            Matrix<float, 2, 3> J_P = Warp::projectJacobian(point_transformed, step.intrinsics);
+            J_out.row(pixel_count) = J_I * J_P * J_T;
 
             // store in output values
             error_out(pixel_count) = error;
 
-            for (unsigned int i = 0; i < 6; i++)
-                J_out(pixel_count, i) = jacobian(i);
 
-            total_error += error;
-            ++pixel_count;
+            total_error += error * error;
 
 
-            if (plotTarget) {
-                img_c.setPixel(x,y, sf::Color(error*255, (1-error)*255, 0));
-                //img_k.setPixel(pixel_in_keyframe.pos.x(),pixel_in_keyframe.pos.y(), sf::Color(error*255, (1-error)*255, 0));
-                img_k.setPixel(pixel_in_keyframe.pos.x(),pixel_in_keyframe.pos.y(), sf::Color(255*pixel_in_keyframe.intensity, 255*pixel_in_keyframe.intensity, 255*pixel_in_keyframe.intensity));
+            if (debug_out) {
+
+                debug_out->errors_in_current(y,x) = abs(error);
+
+                Vector2i p(pixel_in_keyframe.pos.x()+0.5,pixel_in_keyframe.pos.y()+0.5);
+                debug_out->warped_image(p.y(), p.x()) = pixel_current.intensity;
+
+                debug_out->J_norm(y,x) = J_out.row(pixel_count).norm();
+
+                if (params.filter_on_unwarped_gradient) {
+                    debug_out->selection_heuristic(y,x) = step.frame_second.getIntensityData().getDiff(Vector2i(x,y)).norm();
+                } else {
+                    debug_out->selection_heuristic(y,x) = J_I.norm();
+                }
+
+                debug_out->weighted_errors(y,x) = (*params.weight_function)(error) * error;
             }
+
+            ++pixel_count;
         }
     }
 
-    error_out.conservativeResize(pixel_count);
-    J_out.conservativeResize(pixel_count, Eigen::NoChange);
+    // catch the border case where pixels are warped so that *none* actually falls on to the other image
+    if (pixel_count == 0) {
+        error_out.resize(1);
+        J_out.resize(1, Eigen::NoChange);
 
-    if (plotTarget) {
-        drawImageAt(img_c, sf::Vector2f(650,0),   *plotTarget);
-        drawImageAt(img_k, sf::Vector2f(650,H+2), *plotTarget);
-        step.frame_first .getIntensityData().drawAt( *plotTarget, sf::Vector2f(650+W+2,0));
-        step.frame_second.getIntensityData().drawAt( *plotTarget, sf::Vector2f(650+W+2,H+2));
+        error_out.setZero();
+        J_out.setZero();
+    } else {
+        error_out.conservativeResize(pixel_count);
+        J_out.conservativeResize(pixel_count, Eigen::NoChange);
     }
 
     //cout << "total error: " << total_error << "  =  " << sqrt(total_error) << endl;
@@ -146,7 +215,7 @@ float Warp::calcError(const CameraStep& step, const Transformation& T, Eigen::Ve
     return sqrt(total_error);
 }
 ///////////////////////////////////////////////////////////////////////////////
-void Warp::renderErrorSurface(MatrixXf& target_out, Matrix<float,Dynamic,6>& gradients_out, const CameraStep& step, const Transformation& Tcenter, const PlotRange& range1, const PlotRange& range2)
+void Warp::renderErrorSurface(MatrixXf& target_out, Matrix<float,Dynamic,6>& gradients_out, const CameraStep& step, const Transformation& Tcenter, const PlotRange& range1, const PlotRange& range2, const Warp::Parameters& params)
 {
     assert(range1.dim <  6);
     assert(range2.dim <  6);
@@ -170,12 +239,13 @@ void Warp::renderErrorSurface(MatrixXf& target_out, Matrix<float,Dynamic,6>& gra
             Matrix<float, Eigen::Dynamic, 6> J;
             VectorXf errs;
 
-            float error = calcError(step, T, errs, J);
+            float error = calcError(step, T, errs, J, params);
 
-            Matrix<float, 1, 6> gradient = J.transpose() * errs;
+            //Matrix<float, 1, 6> gradient = J.transpose() * errs;
+            gradients_out.row(y*range1.steps +x) = J.transpose() * errs;
 
-            for (int i = 0; i < 6; i++)
-                gradients_out(y * range1.steps + x, i) = gradient(i);
+            //for (int i = 0; i < 6; i++)
+                //gradients_out(y * range1.steps + x, i) = gradient(i);
 
             target_out(y, x) = error;
 
@@ -185,5 +255,26 @@ void Warp::renderErrorSurface(MatrixXf& target_out, Matrix<float,Dynamic,6>& gra
 
         printfProgress(y,0,range2.steps-1);
     }
+}
+///////////////////////////////////////////////////////////////////////////////
+void Warp::PlotRange::readFromStdin()
+{
+    do {
+        cout << "dimension [0-5]? ";
+        cin >> this->dim;
+    } while (this->dim > 5);
+
+    cout << "from? ";
+    cin >> this->from;
+
+    do {
+        cout << "to (>from)? ";
+        cin >> this->to;
+    } while (to <= from);
+
+    do {
+        cout << "steps? ";
+        cin >> this->steps;
+    } while (steps < 1);
 }
 ///////////////////////////////////////////////////////////////////////////////

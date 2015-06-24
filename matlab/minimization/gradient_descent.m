@@ -39,10 +39,10 @@ for i = 1:1000
         break;
     end
     
-    hold on;
-    plot(T(1), T(2), '.g');
-    drawnow;
-    hold off;
+    %hold on;
+    %plot(T(1), T(2), '.g');
+    %drawnow;
+    %hold off;
     
     if (~minimization_running)
         break;
