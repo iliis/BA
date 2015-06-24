@@ -199,6 +199,8 @@ Baseline:
 
 - punktwolke exportieren
 
+- does image pyramid help with convergence radius? (I don't think so, its just faster)
+
 
 präsentation:
 standard aufbau:
