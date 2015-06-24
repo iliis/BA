@@ -27,3 +27,7 @@ papers/private/
 cpp/build/
 
 arm/build/
+
+# LibreOffice
+###########################################################
+.~lock.*#
