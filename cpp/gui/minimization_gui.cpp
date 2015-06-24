@@ -41,6 +41,8 @@ void draw_error_surface(sf::RenderWindow& window, const CameraStep& step, const 
 
     cout << "rendered surface in " << ms << "ms (" << ((float) ms) / (errorsurface.rows() * errorsurface.cols()) << "ms per point)" << endl;
 
+    save_matrix_to_image(errorsurface, "error_surface.png", Colormap::Hot());
+
     window.setVisible(true);
 
 
@@ -125,6 +127,7 @@ void run_minimization(sf::RenderWindow& window, sf::Font& font, const Scene& sce
     float view_scale = 1;
 
     bool show_keyframe = false;
+    bool record_frames = false; int iterations = 0;
     while (window.isOpen())
     {
         sf::Event event;
@@ -177,7 +180,7 @@ void run_minimization(sf::RenderWindow& window, sf::Font& font, const Scene& sce
                         break;
 
                     // set to ground truth
-                    case sf::Keyboard::E:
+                    case sf::Keyboard::T:
                         T = step.ground_truth;
                         break;
 
@@ -289,6 +292,21 @@ void run_minimization(sf::RenderWindow& window, sf::Font& font, const Scene& sce
                     case sf::Keyboard::Num5: params.setWeightFunction(new ErrorWeightHuber(1)); break;
                     case sf::Keyboard::Num6: params.setWeightFunction(new ErrorWeightHuber(10)); break;
 
+                    // save all images
+                    case sf::Keyboard::F1:
+                        {
+                            save_matrix_to_image(warpdebugdata.warped_image, "warped_image.png", Colormap::Colormap());
+                            save_matrix_to_image(warpdebugdata.errors_in_current, "errors_current.png", Colormap::Jet());
+                            save_matrix_to_image(warpdebugdata.J_norm, "J_norm.png", Colormap::Jet());
+                        }
+                        break;
+
+                    case sf::Keyboard::F2:
+                        record_frames = !record_frames;
+                        if (record_frames)
+                            iterations = 0; // reset iteration counter
+                        break;
+
                     case sf::Keyboard::M:
                         window.setVisible(false);
                         {
@@ -308,8 +326,7 @@ void run_minimization(sf::RenderWindow& window, sf::Font& font, const Scene& sce
                             cout << "[ 12 ]: render error surface" << endl;
                             cout << "[ 13 ]: toggle pixel gradient filter (before or after warping)" << endl;
                             cout << "[  0 ]: exit" << endl;
-                            cin.clear(); cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-                            cin >> opt;
+                            readInput(opt);
 
                             switch (opt) {
                                 case 0:
@@ -329,12 +346,12 @@ void run_minimization(sf::RenderWindow& window, sf::Font& font, const Scene& sce
                                     break;
 
                                 case 4:
-                                    cout << "x [m]: "; cin >> T.value(0);
-                                    cout << "y [m]: "; cin >> T.value(1);
-                                    cout << "z [m]: "; cin >> T.value(2);
-                                    cout << "alpha / pitch [degrees]: "; cin >> T.value(3);
-                                    cout << "beta / yaw    [degrees]: "; cin >> T.value(4);
-                                    cout << "gamma / roll  [degrees]: "; cin >> T.value(5);
+                                    cout << "x [m]: "; readInput(T.value(0));
+                                    cout << "y [m]: "; readInput(T.value(1));
+                                    cout << "z [m]: "; readInput(T.value(2));
+                                    cout << "alpha / pitch [degrees]: "; readInput(T.value(3));
+                                    cout << "beta / yaw    [degrees]: "; readInput(T.value(4));
+                                    cout << "gamma / roll  [degrees]: "; readInput(T.value(5));
                                     // convert to radians
                                     T.value(3) = deg2rad(T.value(3));
                                     T.value(4) = deg2rad(T.value(4));
@@ -346,12 +363,12 @@ void run_minimization(sf::RenderWindow& window, sf::Font& font, const Scene& sce
                                 case 5:
                                     {
                                         Transformation tmp;
-                                        cout << "x [m]: "; cin >> tmp.value(0);
-                                        cout << "y [m]: "; cin >> tmp.value(1);
-                                        cout << "z [m]: "; cin >> tmp.value(2);
-                                        cout << "alpha / pitch [degrees]: "; cin >> tmp.value(3);
-                                        cout << "beta / yaw    [degrees]: "; cin >> tmp.value(4);
-                                        cout << "gamma / roll  [degrees]: "; cin >> tmp.value(5);
+                                        cout << "x [m]: "; readInput(tmp.value(0));
+                                        cout << "y [m]: "; readInput(tmp.value(1));
+                                        cout << "z [m]: "; readInput(tmp.value(2));
+                                        cout << "alpha / pitch [degrees]: "; readInput(tmp.value(3));
+                                        cout << "beta / yaw    [degrees]: "; readInput(tmp.value(4));
+                                        cout << "gamma / roll  [degrees]: "; readInput(tmp.value(5));
                                         // convert to radians
                                         tmp.value(3) = deg2rad(tmp.value(3));
                                         tmp.value(4) = deg2rad(tmp.value(4));
@@ -372,7 +389,7 @@ void run_minimization(sf::RenderWindow& window, sf::Font& font, const Scene& sce
                                 case 7:
                                     do {
                                         cout << "enter scene number [0-" << (scene.getStepCount()-1) << "]: ";
-                                        cin >> index;
+                                        readInput(index);
                                     } while(index >= scene.getStepCount());
                                     step = scene.getStep(index);
                                     break;
@@ -382,12 +399,12 @@ void run_minimization(sf::RenderWindow& window, sf::Font& font, const Scene& sce
                                         unsigned int indexA, indexB;
                                         do {
                                             cout << "enter frame number [0-" << (scene.getFrameCount()-1) << "] for first frame: ";
-                                            cin >> indexA;
+                                            readInput(indexA);
                                         } while(indexA >= scene.getFrameCount());
 
                                         do {
                                             cout << "enter frame number [0-" << (scene.getFrameCount()-1) << "] for second frame: ";
-                                            cin >> indexB;
+                                            readInput(indexB);
                                         } while(indexB >= scene.getFrameCount());
 
                                         step = scene.getStep(indexA, indexB);
@@ -400,7 +417,7 @@ void run_minimization(sf::RenderWindow& window, sf::Font& font, const Scene& sce
                                         cout << "1: None" << endl;
                                         cout << "2: Huber" << endl;
                                         cout << "0: cancel" << endl;
-                                        cin >> opt;
+                                        readInput(opt);
                                     } while (opt < 0 || opt > 2);
 
                                     switch (opt) {
@@ -412,7 +429,7 @@ void run_minimization(sf::RenderWindow& window, sf::Font& font, const Scene& sce
                                             {
                                                 float d = 0;
                                                 cout << "delta? ";
-                                                cin >> d;
+                                                readInput(d);
                                                 params.setWeightFunction(new ErrorWeightHuber(d));
                                             }
                                             break;
@@ -425,15 +442,15 @@ void run_minimization(sf::RenderWindow& window, sf::Font& font, const Scene& sce
                                 case 10:
                                     do {
                                         cout << "min level [>=0]   (current: " << params.min_pyramid_levels << "): ";
-                                        cin >> params.min_pyramid_levels;
+                                        readInput(params.min_pyramid_levels);
                                         cout << "max level [>=min] (current: " << params.max_pyramid_levels << "): ";
-                                        cin >> params.max_pyramid_levels;
+                                        readInput(params.max_pyramid_levels);
                                     } while (params.min_pyramid_levels <= params.max_pyramid_levels);
                                     break;
 
                                 case 11:
                                     cout << "new gradient norm threshold [0-1] (current: " << params.gradient_norm_threshold << "): ";
-                                    cin >> params.gradient_norm_threshold;
+                                    readInput(params.gradient_norm_threshold);
                                     break;
 
                                 case 12:
@@ -441,7 +458,7 @@ void run_minimization(sf::RenderWindow& window, sf::Font& font, const Scene& sce
                                         bool around_T = false;
                                         Warp::PlotRange range1(0,0,1,1), range2(1,0,1,1);
                                         cout << "around current Transformation? [0/1] ";
-                                        cin >> around_T;
+                                        readInput(around_T);
                                         cout << around_T;
                                         cout << " >>> range 1:" << endl;
                                         range1.readFromStdin();
@@ -475,10 +492,14 @@ void run_minimization(sf::RenderWindow& window, sf::Font& font, const Scene& sce
             }
         }
 
-        window.clear();
+        if (record_frames)
+            window.clear(sf::Color(155,0,0));
+        else
+            window.clear();
 
         if (!min_paused) {
             bool finished;
+            ++iterations;
 #if 1
             finished = IterGaussNewton(step, T, params) < 0.0001;
 #else
@@ -487,6 +508,7 @@ void run_minimization(sf::RenderWindow& window, sf::Font& font, const Scene& sce
 
 // auto upscale / pause when converged
             if (finished) {
+                record_frames = false;
 #if 0
                 if (step.scale > 0) {
                     // upscale image again
@@ -503,6 +525,17 @@ void run_minimization(sf::RenderWindow& window, sf::Font& font, const Scene& sce
         float total_error = Warp::calcError(step, T, error_tmp, J_tmp, params, &warpdebugdata);
 
         plot_warp_debug_data(window, font, warpdebugdata, step, show_keyframe, view_scale);
+
+        if (record_frames) {
+            ostringstream index_string;
+            index_string.width(4);
+            index_string.fill('0');
+            index_string << iterations;
+            const std::string num = index_string.str();
+            save_matrix_to_image(warpdebugdata.warped_image, "recording/" + num + "_warped_image.png", Colormap::Colormap());
+            save_matrix_to_image(warpdebugdata.errors_in_current, "recording/" + num + "_errors_current.png", Colormap::Jet());
+            save_matrix_to_image(warpdebugdata.J_norm, "recording/" + num + "_J_norm.png", Colormap::Jet());
+        }
 
         sf::Text t;
         t.setFont(font);

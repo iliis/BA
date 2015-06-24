@@ -24,6 +24,7 @@ set(SOURCES
     "core/warp.cpp"
     "core/warp_streamlined.cpp"
     "core/minimization.cpp"
+    "core/minimization_streamlined.cpp"
     "core/weight_functions.cpp"
     "gui/scene.cpp"
     "gui/colormap.cpp"

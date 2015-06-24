@@ -20,13 +20,16 @@ class CameraState : public sf::Drawable
 public:
     CameraState();
 
-    void apply(const Transformation& T);
+    void apply(Transformation T);
 
     sf::RectangleShape shape;
 
     float scale;
 
     void reset();
+
+    inline Eigen::Vector3f getPosition() { return position; }
+    inline Eigen::Matrix3f getOrientationMatrix() { return orientation; }
 
 private:
     void drawCamera() const;

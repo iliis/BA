@@ -16,7 +16,7 @@
 #include "tcp_server.hpp"
 #include "ConfigServer.hpp"
 
-#include "core/minimization.h"
+#include "core/minimization_streamlined.h"
 #include "utils/matrix.h"
 #include "utils/live_telemetry.h"
 
@@ -42,8 +42,8 @@ private:
 
 	typedef Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic> MatrixType;
 
-	MatrixType intensity_data[2];
-	MatrixType     depth_data[2];
+    std::vector<MatrixType> intensity_data[2];
+    std::vector<MatrixType>     depth_data[2];
 
 	uint32_t intensity_timestamp[2] = {0, 0};
 	uint32_t     depth_timestamp[2] = {0, 0};
@@ -52,6 +52,7 @@ private:
 
 	// TODO: read intrinsics from calib_provider
 	CameraIntrinsics visensor_intrinsics;
+    std::vector<CameraIntrinsics> intrinsics_pyramid;
 
 
 	// for debugging

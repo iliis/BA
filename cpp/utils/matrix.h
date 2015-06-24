@@ -2,15 +2,15 @@
 #define MATRIX_H_INCLUDED
 
 #include <limits>
+#include <cmath>
+#include <fstream>
 
 #include <Eigen/Dense>
-#include <fstream>
-#include <limits.h>
 
-//#define IS_INVALID(x)   (!isfinite(x))
-//#define INVALID()       (std::numeric_limits<float>::quiet_NaN())
-#define IS_INVALID(x)   ((x) < 0)
-#define INVALID()       (-1)
+#define IS_INVALID(x)   (!std::isfinite(x))
+#define INVALID()       (std::numeric_limits<float>::quiet_NaN())
+//#define IS_INVALID(x)   ((x) < 0)
+//#define INVALID()       (-1)
 
 #define INIT_INVALID(matrix, W, H) do { \
     matrix.resize((H),(W)); \

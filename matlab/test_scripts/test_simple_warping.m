@@ -4,14 +4,15 @@
 %testscene = Scene('input/testscene1');
 %testscene = Scene('input/testscene2');
 %testscene = Scene('input/trajectory1');
-testscene = Scene('input/courtyard/lux');
+%testscene = Scene('input/courtyard/lux');
 %testscene = Scene('input/testscene_rotonly');
+testscene = Scene('../presentations/final/media/smallscene');
 
 %testscene = testscene.scale_down(3);
 
 %for k = 1:testscene.step_count
 
-k = 4;
+k = 1;
     
     step = testscene.getStep(k);
     T = [-3 3 0 0 0 0];
@@ -35,3 +36,5 @@ k = 4;
     
     %disp(['step ' num2str(k) ' of ' num2str(testscene.step_count)]);
 %end
+
+

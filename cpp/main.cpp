@@ -90,7 +90,7 @@ int main(int argc, char* argv[])
 {
     sf::ContextSettings settings;
     settings.antialiasingLevel = 8;
-    sf::RenderWindow window(sf::VideoMode(1400, 768), "dense odometry", sf::Style::Default, settings);
+    sf::RenderWindow window(sf::VideoMode(1140, 730), "dense odometry", sf::Style::Default, settings);
 
     timertest.Start();
 
@@ -105,6 +105,7 @@ int main(int argc, char* argv[])
     //testscene.loadFromSceneDirectory("../matlab/input/courtyard_circle");
     //testscene.loadFromSceneDirectory("../matlab/input/courtyard/normal"); // step 22 is nice!
     //testscene.loadFromBagFile("/home/samuel/data/2015-06-11-16-30-01.bag");
+    testscene.loadFromSceneDirectory("../presentations/final/media/smallscene");
 
     //const string raw_bag = "/home/samuel/data/visensor/graveyard_small_circle1_forward.bag";
     //const string raw_bag = "/home/samuel/data/visensor/graveyard_path4.bag";
@@ -122,16 +123,17 @@ int main(int argc, char* argv[])
     params.max_pyramid_levels = 4;
     params.max_iterations = 100;
     params.T_init = Transformation(0,0,0,0,0,0);
-    params.gradient_norm_threshold = 0.01;
-    params.use_streamlined = true;
+    //params.gradient_norm_threshold = 0.01;
+    params.gradient_norm_threshold = 0;
+    //params.use_streamlined = true;
 
     //write_trajectory(testscene, params, ".");
     //write_trajectory_rosbag("/home/samuel/data/2015-06-11-16-30-01.bag", params, ".");
     //write_trajectory_rosbag(raw_bag, params, ".");
 
-    //run_minimization(window, font, testscene, params);
+    run_minimization(window, font, testscene, params);
 
-    show_live_data(window, font, argc, argv);
+    //show_live_data(window, font, argc, argv);
 
     timertest.Stop();
     timer2.Start();

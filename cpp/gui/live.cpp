@@ -89,14 +89,14 @@ void show_live_data(sf::RenderWindow& window, sf::Font& font, int argc, char* ar
         'individual_cam_config': 0, \
         'cam_agc_enable': 0, \
         'cam_aec_enable': 0,  \
-        'cam_coarse_shutter_width': 150, \
+        'cam_coarse_shutter_width': 20, \
         'penalty_1': 20, \
         'penalty_2': 200, \
         'threshold': 100, \
         'lr_check': 2 \
     }\"");
 
-    int shutter = 150;
+    int shutter = 20;
 
     // TODO: read this from ROS messages
 
@@ -207,6 +207,8 @@ void show_live_data(sf::RenderWindow& window, sf::Font& font, int argc, char* ar
 
         ostringstream s;
         s << telemetry.transformation << endl;
+        s << "current position: " << camera_state.getPosition().transpose() << endl;
+        s << camera_state.getOrientationMatrix() << endl;
         s << " ------------- " << endl;
         s << "number of recorded frames: " << recorded_frames.size() << endl;
         s << "cam_coarse_shutter_width: " << shutter;

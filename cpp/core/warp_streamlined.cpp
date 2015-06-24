@@ -19,6 +19,17 @@ float WarpStreamlined::calcError(
     const unsigned int H = intrinsics.getCameraHeight();
 
 
+    if (IS_INVALID(T(0))
+     || IS_INVALID(T(1))
+     || IS_INVALID(T(2))
+     || IS_INVALID(T(3))
+     || IS_INVALID(T(4))
+     || IS_INVALID(T(5))) {
+    	cerr << "ERROR: invalid transformation passed to calcError: " << T.transpose() << endl;
+    	return -1;
+    }
+
+
     const float cA = cos(T(3)), sA = sin(T(3));
     const float cB = cos(T(4)), sB = sin(T(4));
     const float cC = cos(T(5)), sC = sin(T(5));
@@ -76,7 +87,7 @@ float WarpStreamlined::calcError(
 
             const float current_depth = current_depths(y,x);
 
-            if (IS_INVALID(current_depth))
+            if (IS_INVALID(current_depth) || current_depth <= 0 )
                 continue;
 
             // warp point
@@ -170,7 +181,7 @@ float WarpStreamlined::calcError(
 
             ///////////////////////////////////////////////////////////////////
 
-            const float error = keyframe_intensity - current_intensity;
+            float error = keyframe_intensity - current_intensity;
 
             // store in output values
             error_out(pixel_count) = error;
@@ -195,7 +206,7 @@ float WarpStreamlined::calcError(
 
     //cout << "total error: " << total_error << "  =  " << sqrt(total_error) << endl;
 
-    return -1; //sqrt(total_error);
+    return INVALID(); //sqrt(total_error);
 
 }
 ///////////////////////////////////////////////////////////////////////////////

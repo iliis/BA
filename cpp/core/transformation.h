@@ -18,6 +18,7 @@ class Transformation
 public:
     Transformation();
     Transformation(float x, float y, float z, float alpha, float beta, float gamma);
+    Transformation(Eigen::Matrix<float, 6, 1> value) : value(value) {}; // WARNING: doesn't update rotation matrix!
 
     friend std::ostream& operator <<(std::ostream &output, const Transformation &T);
            std::ostream& printCSV   (std::ostream &output);

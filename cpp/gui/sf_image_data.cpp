@@ -125,6 +125,13 @@ void matrix_to_image(const Eigen::MatrixXf& source, sf::Image& dest, const Color
     // cout << "done." << endl;
 }
 ///////////////////////////////////////////////////////////////////////////////
+void save_matrix_to_image(const Eigen::MatrixXf& source, const std::string& path, const Colormap::Colormap& colormap)
+{
+    sf::Image i;
+    matrix_to_image(source, i, colormap);
+    i.saveToFile(path);
+}
+///////////////////////////////////////////////////////////////////////////////
 void drawImageAt(sf::RenderTarget& target, const sf::Image& img, const sf::Vector2f& pos, const std::string& label, const sf::Font* font, const float& scale)
 {
     sf::Texture t;
