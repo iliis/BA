@@ -83,16 +83,11 @@ void write_trajectory_rosbag(const string& rosbag_path, const Warp::Parameters& 
 }
 ///////////////////////////////////////////////////////////////////////////////
 
-timing::Timer timertest("0_foobar");
-timing::Timer timer2("1_asdfasdf");
-
 int main(int argc, char* argv[])
 {
     sf::ContextSettings settings;
     settings.antialiasingLevel = 8;
     sf::RenderWindow window(sf::VideoMode(1140, 730), "dense odometry", sf::Style::Default, settings);
-
-    timertest.Start();
 
     sf::Font font;
     font.loadFromFile("resources/fonts/default.otf");
@@ -101,7 +96,7 @@ int main(int argc, char* argv[])
     //testscene.loadFromSceneDirectory("../matlab/input/test_wide");
     //testscene.loadFromSceneDirectory("../matlab/input/trajectory1");
     //testscene.loadFromSceneDirectory("../matlab/input/testscene1");
-    testscene.loadFromSceneDirectory("../matlab/input/courtyard/lux");
+    //testscene.loadFromSceneDirectory("../matlab/input/courtyard/lux");
     //testscene.loadFromSceneDirectory("../matlab/input/courtyard_circle");
     //testscene.loadFromSceneDirectory("../matlab/input/courtyard/normal"); // step 22 is nice!
     //testscene.loadFromBagFile("/home/samuel/data/2015-06-11-16-30-01.bag");
@@ -132,23 +127,11 @@ int main(int argc, char* argv[])
     //write_trajectory_rosbag(raw_bag, params, ".");
 
     //run_minimization(window, font, testscene, params);
-    
 
-    Warp::PlotRange range1(0,-5,5,201), range2(1,-5,5,201);
-    draw_error_surface(window, font, testscene.getStep(14), range1, range2, params);
+    //Warp::PlotRange range1(0,-5,5,201), range2(1,-5,5,201);
+    //draw_error_surface(window, font, testscene.getStep(14), range1, range2, params);
 
-    //show_live_data(window, font, argc, argv);
-
-    timertest.Stop();
-    timer2.Start();
-    sf::sleep(sf::seconds(2));
-    timer2.Stop();
-
-    cout << "timings: " << endl;
-    cout << timing::Timing::Print();
-    cout << "timertest total seconds: " << timing::Timing::GetMeanSeconds(timertest.GetHandle()) << endl;
-    cout << "tiemr2 total seconds: " << timing::Timing::GetMeanSeconds(timer2.GetHandle()) << endl;
-
+    show_live_data(window, font, argc, argv);
 
     delete params.weight_function;
 
