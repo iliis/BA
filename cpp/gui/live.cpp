@@ -37,6 +37,7 @@ void telemetry_callback(const sensor_msgs::Image::ConstPtr& m)
         cout << std::dec;
     }
 
+    telemetry.transformation.updateRotationMatrix();
     camera_state.apply(telemetry.transformation);
 }
 ///////////////////////////////////////////////////////////////////////////////

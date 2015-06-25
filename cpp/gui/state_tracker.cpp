@@ -19,8 +19,8 @@ CameraState::CameraState()
 ///////////////////////////////////////////////////////////////////////////////
 void CameraState::apply(Transformation T)
 {
-    T.updateRotationMatrix();
-    position += T.getRotationMatrix() * T.value.head<3>();
+    position += this->orientation * T.value.head<3>();
+
     trajectory.push_back(position);
 
     orientation = T.getRotationMatrix() * orientation;
