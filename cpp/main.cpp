@@ -134,7 +134,7 @@ int main(int argc, char* argv[])
     //run_minimization(window, font, testscene, params);
     
 
-    Warp::PlotRange range1(0,-1,1,11), range2(1,-1,1,11);
+    Warp::PlotRange range1(0,-5,5,201), range2(1,-5,5,201);
     draw_error_surface(window, font, testscene.getStep(14), range1, range2, params);
 
     //show_live_data(window, font, argc, argv);

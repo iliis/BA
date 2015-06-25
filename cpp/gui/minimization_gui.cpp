@@ -56,8 +56,8 @@ void render_error_surface(
     sf::Image img;
     matrix_to_image(errorsurface, img, colormap);
 
-    float border_x = 90;
-    float border_y = 70;
+    float border_x = 150;
+    float border_y = 140;
 
     float scale_x = (target.getSize().x - 2*border_x) / range1.steps;
     float scale_y = (target.getSize().y - 2*border_y) / range2.steps;
@@ -99,11 +99,15 @@ void render_error_surface(
     sf::Text t;
     t.setColor(decoration_color);
     t.setFont(font);
-    t.setCharacterSize(12);
+    t.setCharacterSize(20);
 
-    // vertical
+    // vertical ticks
     r.setSize(sf::Vector2f(10,1));
-    for (unsigned int i = 0; i < range2.steps; i+=2) {
+    unsigned int stepsize_y = (range2.steps+1)/6;
+    if (stepsize_y < 1)
+        stepsize_y = 1;
+
+    for (unsigned int i = 0; i < range2.steps; i+=stepsize_y) {
 
         float y = border_y-1+i*scale_y+scale_y/2;
 
@@ -116,10 +120,13 @@ void render_error_surface(
         target.draw(t);
     }
 
-    // horizontal
+    // horizontal ticks
     r.setSize(sf::Vector2f(1,10));
     float y = border_y - 1 + frame.getSize().y;
-    for (unsigned int i = 0; i < range1.steps; i+=2) {
+    unsigned int stepsize_x = (range1.steps+1)/6;
+    if (stepsize_x < 1)
+        stepsize_x = 1;
+    for (unsigned int i = 0; i < range1.steps; i+=stepsize_x) {
 
         float x = border_x-1+i*scale_x+scale_x/2;
 
@@ -162,7 +169,7 @@ void draw_error_surface(sf::RenderWindow& window, sf::Font& font, const CameraSt
     save_matrix_to_image(errorsurface, "error_surface_raw.png", Colormap::Hot());
 
     sf::RenderTexture surfaceplot;
-    surfaceplot.create(500,500);
+    surfaceplot.create(1300,1300);
     surfaceplot.clear(sf::Color(255,255,255,0));
     render_error_surface(surfaceplot, errorsurface, errorgradients, range1, range2, false, font, Colormap::Hot());
     surfaceplot.getTexture().copyToImage().saveToFile("error_surface.png");
@@ -172,6 +179,8 @@ void draw_error_surface(sf::RenderWindow& window, sf::Font& font, const CameraSt
 
     bool run = true;
 
+    bool show_gradient = true;
+
     while (window.isOpen() && run)
     {
         sf::Event event;
@@ -180,13 +189,26 @@ void draw_error_surface(sf::RenderWindow& window, sf::Font& font, const CameraSt
             if (event.type == sf::Event::Closed)
                 window.close();
 
-            if (event.type == sf::Event::KeyPressed && (event.key.code == sf::Keyboard::Escape || event.key.code == sf::Keyboard::Q))
-                run = false;
+            if (event.type == sf::Event::KeyPressed) {
+                switch(event.key.code) {
+                    case sf::Keyboard::Escape:
+                    case sf::Keyboard::Q:
+                        run = false;
+                        break;
+
+                    case sf::Keyboard::G:
+                        show_gradient = !show_gradient;
+                        break;
+
+                    default:
+                        break;
+                }
+            }
         }
 
         window.clear(sf::Color(255,255,255));
 
-        render_error_surface(window, errorsurface, errorgradients, range1, range2, true, font, Colormap::Hot());
+        render_error_surface(window, errorsurface, errorgradients, range1, range2, show_gradient, font, Colormap::Hot());
 
         window.display();
 
