@@ -14,11 +14,11 @@ void printfProgress(float current_value, float min_value, float max_value)
     printf("\r [ "); // go back to start of line
 
     int i = 0;
-    for (; i < percent; i++) {
+    for (; i < percent/2; i++) {
         putchar('#');
     }
 
-    for (; i < 100; i++) {
+    for (; i < 100/2; i++) {
         putchar(' ');
     }
 

@@ -25,6 +25,9 @@ void save_matrix_to_image(const Eigen::MatrixXf& source, const std::string& path
 
 // similar to imagesc()
 void drawImageAt (sf::RenderTarget& target, const sf::Image& img,       const sf::Vector2f& pos, const std::string& label = "", const sf::Font* font = NULL, const float& scale = 1);
+
+void drawImageAt(sf::RenderTarget& target, const sf::Image& img, const sf::Vector2f& pos, const std::string& label = "", const sf::Font* font = NULL, const sf::Vector2f& scale = sf::Vector2f(1,1));
+
 void drawMatrixAt(sf::RenderTarget& target, const Eigen::MatrixXf& mat, const sf::Vector2f& pos, const std::string& label = "", const sf::Font* font = NULL, const Colormap::Colormap& colormap = Colormap::Colormap(), const float& scale = 1);
 
 #endif /* end of include guard: SF_IMAGE_DATA_H_INCLUDED */

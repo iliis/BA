@@ -28,8 +28,11 @@ inline Eigen::Vector2f toEigen(sf::Vector2f v)
 ///////////////////////////////////////////////////////////////////////////////
 
 void drawArrow(sf::RenderTarget& target, float x, float y, float vect_x, float vect_y);
-void draw_error_surface(sf::RenderWindow& window, const CameraStep& step, const Warp::PlotRange& range1, const Warp::PlotRange& range2, const Warp::Parameters params);
+
+void draw_error_surface(sf::RenderWindow& window, sf::Font& font, const CameraStep& step, const Warp::PlotRange& range1, const Warp::PlotRange& range2, const Warp::Parameters params);
+
 void plot_warp_debug_data(sf::RenderWindow& window, sf::Font& font, const Warp::WarpDebugData& data, const CameraStep& step, const bool show_keyframe, const float view_scale = 1);
+
 void run_minimization(sf::RenderWindow& window, sf::Font& font, const Scene& scene, Warp::Parameters params);
 
 #endif /* end of include guard: MINIMIZATION_GUI_H_INCLUDED */

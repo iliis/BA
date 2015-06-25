@@ -27,7 +27,125 @@ void drawArrow(sf::RenderTarget& target, float x, float y, float vect_x, float v
     target.draw(line, sizeof(line)/sizeof(sf::Vertex), sf::Lines);
 }
 ///////////////////////////////////////////////////////////////////////////////
-void draw_error_surface(sf::RenderWindow& window, const CameraStep& step, const Warp::PlotRange& range1, const Warp::PlotRange& range2, const Warp::Parameters params)
+std::string float_to_string(const float& f)
+{
+    ostringstream s;
+    s.width(4);
+    s << f;
+    return s.str();
+}
+///////////////////////////////////////////////////////////////////////////////
+void render_error_surface(
+        sf::RenderTarget& target,
+        const Eigen::MatrixXf& errorsurface,
+        const Eigen::Matrix<float, Eigen::Dynamic, 6>& errorgradients,
+        const Warp::PlotRange& range1,
+        const Warp::PlotRange& range2,
+        const bool show_gradient,
+        sf::Font& font,
+        const Colormap::Colormap& colormap)
+{
+    std::vector<std::string> dimension_labels;
+    dimension_labels.push_back("X");
+    dimension_labels.push_back("Y");
+    dimension_labels.push_back("Z");
+    dimension_labels.push_back("alpha / pitch");
+    dimension_labels.push_back("beta / yaw");
+    dimension_labels.push_back("gamma / roll");
+
+    sf::Image img;
+    matrix_to_image(errorsurface, img, colormap);
+
+    float border_x = 90;
+    float border_y = 70;
+
+    float scale_x = (target.getSize().x - 2*border_x) / range1.steps;
+    float scale_y = (target.getSize().y - 2*border_y) / range2.steps;
+
+    drawImageAt(target, img, sf::Vector2f(border_x,border_y), "", NULL, sf::Vector2f(scale_x, scale_y));
+
+    if (show_gradient) {
+        for (unsigned int y = 0; y < errorsurface.rows(); ++y) {
+            for (unsigned int x = 0; x < errorsurface.cols(); ++x) {
+                unsigned int idx = y*errorsurface.cols()+x;
+                float factor = -0.004; // point *down*
+                drawArrow(target,
+                        x*scale_x + scale_x/2 + border_x,
+                        y*scale_y + scale_y/2 + border_y,
+                        errorgradients(idx, range1.dim)*factor,
+                        errorgradients(idx, range2.dim)*factor);
+            }
+        }
+    }
+
+
+    sf::Color decoration_color(0,0,0);
+
+    // draw border around surface
+    sf::RectangleShape frame;
+    frame.setFillColor(sf::Color::Transparent);
+    frame.setOutlineColor(decoration_color);
+    frame.setOutlineThickness(1);
+    frame.setSize(sf::Vector2f(target.getSize().x-2*border_x+2, target.getSize().y-2*border_y+2));
+    frame.setPosition(border_x-1, border_y-1);
+    target.draw(frame);
+
+    // draw axis ticks
+    sf::RectangleShape r;
+    r.setFillColor(decoration_color);
+    r.setOutlineColor(sf::Color::Transparent);
+    r.setOutlineThickness(0);
+
+    sf::Text t;
+    t.setColor(decoration_color);
+    t.setFont(font);
+    t.setCharacterSize(12);
+
+    // vertical
+    r.setSize(sf::Vector2f(10,1));
+    for (unsigned int i = 0; i < range2.steps; i+=2) {
+
+        float y = border_y-1+i*scale_y+scale_y/2;
+
+        r.setPosition(border_x-1-10, y);
+        target.draw(r);
+
+        t.setString(float_to_string( i*(range2.to-range2.from)/(range2.steps-1) + range2.from ));
+        t.setPosition(border_x-1-10-3-t.getLocalBounds().width, y-t.getLocalBounds().height/2-2);
+
+        target.draw(t);
+    }
+
+    // horizontal
+    r.setSize(sf::Vector2f(1,10));
+    float y = border_y - 1 + frame.getSize().y;
+    for (unsigned int i = 0; i < range1.steps; i+=2) {
+
+        float x = border_x-1+i*scale_x+scale_x/2;
+
+        r.setPosition(x, y);
+        target.draw(r);
+
+        t.setString(float_to_string( i*(range1.to-range1.from)/(range1.steps-1) + range1.from ));
+        t.setPosition(x-1-t.getLocalBounds().width/2, y+10+2);
+
+        target.draw(t);
+    }
+
+    // X label
+    t.setCharacterSize(t.getCharacterSize()*1.5);
+    t.setString(dimension_labels[range1.dim]);
+    t.setPosition(border_x-1+frame.getSize().x/2-t.getLocalBounds().width/2, y+10+t.getLocalBounds().height*2);
+    target.draw(t);
+
+    // Y label
+    t.setString(dimension_labels[range2.dim]);
+    t.setRotation(-90);
+    t.setPosition(border_x-1-10-t.getLocalBounds().height*4, border_y-1+frame.getSize().y/2 + t.getLocalBounds().width/2);
+    target.draw(t);
+}
+///////////////////////////////////////////////////////////////////////////////
+void draw_error_surface(sf::RenderWindow& window, sf::Font& font, const CameraStep& step, const Warp::PlotRange& range1, const Warp::PlotRange& range2, const Warp::Parameters params)
 {
     Eigen::MatrixXf errorsurface(range1.steps, range2.steps);
     Eigen::Matrix<float, Dynamic, 6> errorgradients(range1.steps*range2.steps, 6);
@@ -41,16 +159,18 @@ void draw_error_surface(sf::RenderWindow& window, const CameraStep& step, const 
 
     cout << "rendered surface in " << ms << "ms (" << ((float) ms) / (errorsurface.rows() * errorsurface.cols()) << "ms per point)" << endl;
 
-    save_matrix_to_image(errorsurface, "error_surface.png", Colormap::Hot());
+    save_matrix_to_image(errorsurface, "error_surface_raw.png", Colormap::Hot());
+
+    sf::RenderTexture surfaceplot;
+    surfaceplot.create(500,500);
+    surfaceplot.clear(sf::Color(255,255,255,0));
+    render_error_surface(surfaceplot, errorsurface, errorgradients, range1, range2, false, font, Colormap::Hot());
+    surfaceplot.getTexture().copyToImage().saveToFile("error_surface.png");
+    // TODO: store to disk
 
     window.setVisible(true);
 
-
-    float TILE_SIZE = window.getSize().y / range2.steps;
-
     bool run = true;
-    ImageData errorplot;
-    errorplot.loadFromMatrix(errorsurface);
 
     while (window.isOpen() && run)
     {
@@ -64,18 +184,9 @@ void draw_error_surface(sf::RenderWindow& window, const CameraStep& step, const 
                 run = false;
         }
 
-        window.clear();
+        window.clear(sf::Color(255,255,255));
 
-        drawMatrixAt(window, errorplot.data, sf::Vector2f(0,0), "", NULL, Colormap::Hot(), TILE_SIZE);
-
-        for (unsigned int y = 0; y < errorplot.getHeight(); ++y) {
-            for (unsigned int x = 0; x < errorplot.getWidth(); ++x) {
-                unsigned int idx = y*errorplot.getWidth()+x;
-                float factor = -0.004; // point *down*
-                drawArrow(window, x*TILE_SIZE+TILE_SIZE/2, y*TILE_SIZE+TILE_SIZE/2, errorgradients(idx, range1.dim)*factor, errorgradients(idx, range2.dim)*factor);
-            }
-        }
-
+        render_error_surface(window, errorsurface, errorgradients, range1, range2, true, font, Colormap::Hot());
 
         window.display();
 
@@ -468,7 +579,7 @@ void run_minimization(sf::RenderWindow& window, sf::Font& font, const Scene& sce
                                             range1.from += T.value(range1.dim); range1.to += T.value(range1.dim);
                                             range2.from += T.value(range2.dim); range2.to += T.value(range2.dim);
                                         }
-                                        draw_error_surface(window, step, range1, range2, params);
+                                        draw_error_surface(window, font, step, range1, range2, params);
                                     }
                                     break;
 

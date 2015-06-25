@@ -134,13 +134,18 @@ void save_matrix_to_image(const Eigen::MatrixXf& source, const std::string& path
 ///////////////////////////////////////////////////////////////////////////////
 void drawImageAt(sf::RenderTarget& target, const sf::Image& img, const sf::Vector2f& pos, const std::string& label, const sf::Font* font, const float& scale)
 {
+    drawImageAt(target, img, pos, label, font, sf::Vector2f(scale, scale));
+}
+///////////////////////////////////////////////////////////////////////////////
+void drawImageAt(sf::RenderTarget& target, const sf::Image& img, const sf::Vector2f& pos, const std::string& label, const sf::Font* font, const sf::Vector2f& scale)
+{
     sf::Texture t;
     t.loadFromImage(img);
 
     sf::Sprite s;
     s.setTexture(t);
     s.setPosition(pos.x, pos.y);
-    s.setScale(scale, scale);
+    s.setScale(scale.x, scale.y);
 
     target.draw(s);
 
@@ -149,7 +154,7 @@ void drawImageAt(sf::RenderTarget& target, const sf::Image& img, const sf::Vecto
         t.setFont(*font);
         t.setCharacterSize(12);
         t.setString(label);
-        t.setPosition(pos.x+2, pos.y+img.getSize().y*scale-t.getLocalBounds().height-4);
+        t.setPosition(pos.x+2, pos.y+img.getSize().y*scale.y-t.getLocalBounds().height-4);
         target.draw(t);
     }
 }
