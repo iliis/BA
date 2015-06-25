@@ -32,8 +32,6 @@ public:
 
 private:
 
-    void updatePrincipalPoint();
-
     // TODO: use Eigen::Vector2f to store these
     unsigned int camera_width, camera_height;   // size of image [pixels]
     float principal_point_x, principal_point_y; // center of image [pixels]

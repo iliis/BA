@@ -12,6 +12,7 @@
 #include "scene.h"
 #include "sf_image_data.h"
 #include "../utils/system.h"
+#include "../core/minimization_streamlined.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 

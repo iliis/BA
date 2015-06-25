@@ -259,6 +259,20 @@ void run_minimization(sf::RenderWindow& window, sf::Font& font, const Scene& sce
 
     float view_scale = 1;
 
+
+
+    std::vector<Eigen::MatrixXf> pyramid_kf_I, pyramid_c_I, pyramid_c_D;
+    std::vector<CameraIntrinsics> intrinsics_pyramid;
+    intrinsics_pyramid.push_back(scene.getIntrinsics());
+    Streamlined::initIntrinsicsPyramid(intrinsics_pyramid, params.max_pyramid_levels);
+
+    Streamlined::initImagePyramid(pyramid_kf_I, scene.getIntrinsics(), params.max_pyramid_levels);
+    Streamlined::initImagePyramid(pyramid_c_I,  scene.getIntrinsics(), params.max_pyramid_levels);
+    Streamlined::initImagePyramid(pyramid_c_D,  scene.getIntrinsics(), params.max_pyramid_levels);
+
+
+
+
     bool show_keyframe = false;
     bool record_frames = false; int iterations = 0;
     while (window.isOpen())
@@ -335,7 +349,7 @@ void run_minimization(sf::RenderWindow& window, sf::Font& font, const Scene& sce
 
                     // reset image to original size
                     case sf::Keyboard::A:
-                        step = scene.getStep(index);
+                        step = scene.getStep(step.index_first, step.index_second);
                         break;
 
                     case sf::Keyboard::Add:
@@ -353,6 +367,22 @@ void run_minimization(sf::RenderWindow& window, sf::Font& font, const Scene& sce
                     // run minimization algorithm at full speed (without visualization and starting at T = [0 0 0 0 0 0])
                     case sf::Keyboard::F5:
                         T = findTransformationWithPyramid(step, params);
+                        break;
+
+                    case sf::Keyboard::F6:
+                        pyramid_kf_I[0] = step.frame_first.getIntensityData().data;
+                        pyramid_c_I[0]  = step.frame_second.getIntensityData().data;
+                        pyramid_c_D[0]  = step.frame_second.getDepthData().data;
+                        Streamlined::buildImagePyramid(pyramid_kf_I, params.max_pyramid_levels);
+                        Streamlined::buildImagePyramid(pyramid_c_I, params.max_pyramid_levels);
+                        Streamlined::buildImagePyramid(pyramid_c_D, params.max_pyramid_levels);
+                        T = Streamlined::findTransformationWithPyramid(
+                                pyramid_kf_I,
+                                pyramid_c_I,
+                                pyramid_c_D,
+                                intrinsics_pyramid,
+                                params);
+                        T.updateRotationMatrix();
                         break;
 
                     // move virtual camera / modify T
@@ -578,7 +608,7 @@ void run_minimization(sf::RenderWindow& window, sf::Font& font, const Scene& sce
                                         readInput(params.min_pyramid_levels);
                                         cout << "max level [>=min] (current: " << params.max_pyramid_levels << "): ";
                                         readInput(params.max_pyramid_levels);
-                                    } while (params.min_pyramid_levels <= params.max_pyramid_levels);
+                                    } while (params.min_pyramid_levels > params.max_pyramid_levels);
                                     break;
 
                                 case 11:

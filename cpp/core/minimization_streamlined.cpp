@@ -51,7 +51,7 @@ void buildImagePyramid(std::vector<MatrixXf>& pyramid, const unsigned int max_le
         // actually do the downsampling
         // TODO: handle invalid values (NaN should be handled automatically)
         for (unsigned int y = 0; y < h_p; y++) {
-            for (unsigned int x = 0; x < h_p; x++) {
+            for (unsigned int x = 0; x < w_p; x++) {
                 pyramid[level](y,x) = (
                         + pyramid[level-1](y*2,   x*2)
                         + pyramid[level-1](y*2+1, x*2)
