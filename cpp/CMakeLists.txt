@@ -12,7 +12,7 @@ project (dense_odometry)
 
 #set(EXTRA_FLAGS "-pg -fprofile-arcs -ftest-coverage")
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++11 -Wall -Wextra ${EXTRA_FLAGS}")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNO_TIMER -std=gnu++11 -Wall -Wextra ${EXTRA_FLAGS}")
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${EXTRA_FLAGS}")
 
 set(SOURCES
@@ -34,6 +34,7 @@ set(SOURCES
     "gui/state_tracker.cpp"
     "utils/progress.cpp"
     "utils/matrix.cpp"
+    "utils/live_telemetry.cpp"
     "utils/timing/timer.cpp"
     "utils/timing/perf_cnt.cpp"
 )
@@ -116,14 +117,10 @@ endif()
 
 # Detect and add Boost
 # http://www.cmake.org/cmake/help/v3.0/module/FindBoost.html
-find_package(Boost REQUIRED COMPONENTS timer) # TODO: add specific libraries
+find_package(Boost REQUIRED COMPONENTS) # TODO: add specific libraries
 
 if (Boost_FOUND)
     include_directories(${Boost_INCLUDE_DIRS})
-    include_directories(${Boost_Timer_INCLUDE_DIRS})
-    target_link_libraries(${EXECUTABLE_NAME} ${Boost_TIMER_LIBRARIES})
-    message(STATUS "boost libs for timer: ${Boost_TIMER_LIBRARIES}")
-
 endif()
 
 

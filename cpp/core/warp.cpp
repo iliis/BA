@@ -10,7 +10,8 @@ std::string Warp::Parameters::toString()
        + "\npyramid levels: " + boost::lexical_cast<string>(min_pyramid_levels)
        + " to " + boost::lexical_cast<string>(max_pyramid_levels)
        + "\ngradient norm threshold: " + boost::lexical_cast<string>(gradient_norm_threshold)
-       + "\nmeasure gradient on image-to-be-warped: " + boost::lexical_cast<string>(this->filter_on_unwarped_gradient);
+       + "\nvalid pixel percentage threshold: " + boost::lexical_cast<string>(valid_pixel_threshold*100)
+       + "%\nmeasure gradient on image-to-be-warped: " + boost::lexical_cast<string>(this->filter_on_unwarped_gradient);
        //+ "\nmax. iterations: " + boost::lexical_cast<string>(max_iterations);
 }
 ///////////////////////////////////////////////////////////////////////////////
@@ -123,7 +124,7 @@ float Warp::calcError(const CameraStep& step, const Transformation& T, Eigen::Ve
             Pixel pixel_current  = step.frame_second.getPixel(Vector2i(x,y));
 
             // skip pixels without depth or intensity value
-            if ((!isfinite(pixel_current.depth)) || (!isfinite(pixel_current.intensity)))
+            if (IS_INVALID(pixel_current.depth) || IS_INVALID(pixel_current.intensity) || (pixel_current.depth <= 0))
                 continue;
 
             float pixel_current_gradient_norm = step.frame_second.getIntensityData().getDiff(Vector2i(x,y)).norm();
@@ -212,7 +213,8 @@ float Warp::calcError(const CameraStep& step, const Transformation& T, Eigen::Ve
 
     //cout << "total error: " << total_error << "  =  " << sqrt(total_error) << endl;
 
-    return sqrt(total_error);
+    // return percentage of valid pixels
+    return pixel_count / ((float) (X_END-X_START)*(Y_END-Y_START));
 }
 ///////////////////////////////////////////////////////////////////////////////
 void Warp::renderErrorSurface(MatrixXf& target_out, Matrix<float,Dynamic,6>& gradients_out, const CameraStep& step, const Transformation& Tcenter, const PlotRange& range1, const PlotRange& range2, const Warp::Parameters& params)

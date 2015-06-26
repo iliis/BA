@@ -11,6 +11,9 @@ namespace Streamlined {
 VectorXf errors;
 Matrix<float, Dynamic, 6> J;
 
+// TODO: clean this up, too lazy to implement this cleanly :P
+float valid_percentage = 0;
+
 ///////////////////////////////////////////////////////////////////////////////
 void initIntrinsicsPyramid(std::vector<CameraIntrinsics>& pyramid, const unsigned int max_level)
 {
@@ -72,6 +75,7 @@ float IterGaussNewton(
         const unsigned int level,
         const Warp::Parameters& params)
 {
+    valid_percentage =
     WarpStreamlined::calcError(
             keyframe_intensities,
             current_intensities,
@@ -82,15 +86,23 @@ float IterGaussNewton(
             level,
             params);
 
+    GlobalTiming::gaussnewton.Start();
+
     // step = - (J'*W*J) \ J' * W * err';
+#if 1
     VectorXf weights = (*params.weight_function)(errors);
 
     Matrix<float, 6, 1> delta = - (J.transpose() * weights.asDiagonal() * J).fullPivLu().solve(
             J.transpose() * weights.asDiagonal() * errors );
+#else
+    Matrix<float, 6, 1> delta = - (J.transpose() * J).ldlt().solve(J.transpose() * errors);
+#endif
 
     //cout << "  delta: " << delta.transpose() << "  norm: " << delta.norm() << endl;
 
     T += delta;
+
+    GlobalTiming::gaussnewton.Stop();
 
     return delta.norm();
 }
@@ -105,15 +117,20 @@ Transformation findTransformationWithPyramid(
     // calculate image pyramid
     ///////////////////////////////////////////////////////////////////////
 
+	GlobalTiming::pyramid.Start();
+
     // we assume the keyframe pyramid was already built in previous iteration
     //buildImagePyramid(keyframe_intensities, params.max_pyramid_levels);
     buildImagePyramid(current_intensities, params.max_pyramid_levels);
     buildImagePyramid(current_depths,      params.max_pyramid_levels);
 
+    GlobalTiming::pyramid.Stop();
+
     // actually perform minimization
     ///////////////////////////////////////////////////////////////////////
 
     Matrix<float, 6, 1> T = params.T_init.value;
+    Warp::Parameters tmp_params = params;
 
     for (int level = params.max_pyramid_levels; level >= (int)params.min_pyramid_levels; level--) {
 
@@ -131,7 +148,13 @@ Transformation findTransformationWithPyramid(
                     T,
                     intrinsics[level],
                     level,
-                    params);
+                    tmp_params);
+
+            if (valid_percentage < params.valid_pixel_threshold) {
+                cout << "WARN: temporarily setting gradient norm threshold to 0" << endl;
+                // let's hope this first iteration didn't went astray too extremely...
+                tmp_params.gradient_norm_threshold = 0;
+            }
 
             if (delta < 0.0001) // found good enough solution
                 break;

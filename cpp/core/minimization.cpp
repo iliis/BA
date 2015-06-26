@@ -13,26 +13,25 @@ int iteration_count = 0;
 VectorXf errors;
 Matrix<float, Dynamic, 6> J;
 
+// TODO: clean this up, too lazy to implement this cleanly :P
+float valid_percentage = 0;
+float bad_percentage = 0;
+bool was_bad_last_step = false;
+
 ///////////////////////////////////////////////////////////////////////////////
 float IterGaussNewton(const CameraStep& step, Transformation& T, const Warp::Parameters& params)
 {
     ++iteration_count;
 
     if (params.use_streamlined) {
-#ifdef PRINT_DEBUG_MESSAGES
-        float total_error = WarpStreamlined::calcError(step.frame_first.intensities.data, step.frame_second.intensities.data, step.frame_second.depths.data, T.value, step.intrinsics, errors, J, step.scale, params);
-        cout << "[GN sl] " << T << " --> err: " << total_error;
-#else
-        WarpStreamlined::calcError(step.frame_first.intensities.data, step.frame_second.intensities.data, step.frame_second.depths.data, T.value, step.intrinsics, errors, J, step.scale, params);
-#endif
+        valid_percentage = WarpStreamlined::calcError(step.frame_first.intensities.data, step.frame_second.intensities.data, step.frame_second.depths.data, T.value, step.intrinsics, errors, J, step.scale, params);
     } else {
-#ifdef PRINT_DEBUG_MESSAGES
-        float total_error = Warp::calcError(step, T, errors, J, params);
-        cout << "[GN] " << T << " --> err: " << total_error;
-#else
-        Warp::calcError(step, T, errors, J, params);
-#endif
+        valid_percentage = Warp::calcError(step, T, errors, J, params);
     }
+
+#ifdef PRINT_DEBUG_MESSAGES
+    cout << "[GN] " << T << " --> err: " << errors.norm();
+#endif
 
     // step = - (J'*W*J) \ J' * W * err';
     VectorXf weights = (*params.weight_function)(errors);
@@ -57,11 +56,10 @@ float IterGradientDescent(const CameraStep& step, Transformation& T, const Matri
 {
     ++iteration_count;
 
+    valid_percentage = Warp::calcError(step, T, errors, J, params);
+
 #ifdef PRINT_DEBUG_MESSAGES
-    float total_error = Warp::calcError(step, T, errors, J, params);
-    cout << "[GD] " << T << " --> err: " << total_error;
-#else
-    Warp::calcError(step, T, errors, J, params);
+    cout << "[GD] " << T << " --> err: " << errors.norm();
 #endif
 
     // step = - step_size .* (J' * (w.^2 .* err)');
@@ -83,7 +81,7 @@ float IterGradientDescent(const CameraStep& step, Transformation& T, const Matri
     return delta.norm();
 }
 ///////////////////////////////////////////////////////////////////////////////
-Transformation findTransformation(const CameraStep& step, const Warp::Parameters& params)
+Transformation findTransformation(const CameraStep& step, Warp::Parameters& params)
 {
     Transformation T = params.T_init;
 
@@ -96,6 +94,13 @@ Transformation findTransformation(const CameraStep& step, const Warp::Parameters
         prev_delta = delta;
         delta = IterGaussNewton(step, T, params);
 
+        if (valid_percentage < params.valid_pixel_threshold) {
+            //cout << "WARN: temporarily setting gradient norm threshold to 0" << endl;
+            // let's hope this first iteration didn't went astray too extremely...
+            params.gradient_norm_threshold = 0;
+            bad_percentage = valid_percentage;
+        }
+
         if (delta < 0.0001) // found good enough solution
             break;
 
@@ -104,6 +109,9 @@ Transformation findTransformation(const CameraStep& step, const Warp::Parameters
 
         //cout << abs(prev_delta - delta) << " ";
     }
+
+    if (iterations == params.max_iterations)
+        cout << "MAX ITER! ";
 
 #ifdef PRINT_DEBUG_MESSAGES
     cout << " >>>>> found solution: " << T << endl;
@@ -123,6 +131,8 @@ Transformation findTransformationWithPyramid(const CameraStep& step, const Warp:
     boost::timer::cpu_timer timer;
 #endif
 
+
+
     for (unsigned int i = 1; i <= params.max_pyramid_levels; i++) {
         s.downsampleBy(1);
         pyramid.push_back(s);
@@ -131,9 +141,16 @@ Transformation findTransformationWithPyramid(const CameraStep& step, const Warp:
     iteration_count = 0;
 
     // actually process them
-    Warp::Parameters p = params;
+    Warp::Parameters tmp_params = params;
+
+    // if previous call to find transformation already had problems with too few pixels, use all of them from the start
+    if (was_bad_last_step) {
+        was_bad_last_step = false;
+        tmp_params.gradient_norm_threshold = 0;
+    }
+
     for (int level = params.max_pyramid_levels; level >= (int)params.min_pyramid_levels; level--) {
-        p.T_init = findTransformation(pyramid[level], p);
+        tmp_params.T_init = findTransformation(pyramid[level], tmp_params);
     }
 
 #if 0
@@ -145,11 +162,21 @@ Transformation findTransformationWithPyramid(const CameraStep& step, const Warp:
     cout << " >>>>> this is " << timer.elapsed().user / ((double) iteration_count * 1000 * 1000) << "ms per Iteration (on average, with " << params.pyramid_levels << " pyramid levels)" << endl;
 #else
 //#ifdef PRINT_DEBUG_MESSAGES
-    cout << " >>>>> found solution in " << iteration_count << " iterations: " << p.T_init << endl;
+    cout << " >>>>> found in " << iteration_count << " iterations: " << tmp_params.T_init
+        << " valid : " << (valid_percentage*100) << "%";
+
+    if (tmp_params.gradient_norm_threshold != params.gradient_norm_threshold)
+        cout << " G_THRESH! (" << bad_percentage << ")";
+
+    cout << endl;
 //#endif
 #endif
 
+    if (tmp_params.gradient_norm_threshold != params.gradient_norm_threshold) {
+        was_bad_last_step = true;
+    }
 
-    return p.T_init;
+
+    return tmp_params.T_init;
 }
 ///////////////////////////////////////////////////////////////////////////////

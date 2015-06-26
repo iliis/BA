@@ -3,6 +3,7 @@
 
 #include "image_data.h"
 #include "warp.h"
+#include "../utils/live_telemetry.h"
 
 namespace WarpStreamlined {
     float calcError(

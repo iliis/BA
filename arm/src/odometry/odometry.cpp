@@ -24,7 +24,7 @@ Odometry::Odometry(TcpServer& tcp_server)
     printf("initializing odometry...\n");
 
     minimization_parameters.min_pyramid_levels = 1;
-    minimization_parameters.max_pyramid_levels = 4;
+    minimization_parameters.max_pyramid_levels = 3;
     minimization_parameters.max_iterations = 100;
     minimization_parameters.T_init = Transformation(0,0,0,0,0,0);
     minimization_parameters.gradient_norm_threshold = 0.01; //0.1;
@@ -139,6 +139,11 @@ void Odometry::handleFrame()
             telemetry.transformation = findTransformationWithPyramid(step, minimization_parameters);
             */
 
+        	GlobalTiming::frame_total.Stop();
+        	GlobalTiming::frame_total.Start();
+
+        	GlobalTiming::odometry_total.Start();
+
             telemetry.transformation = Streamlined::findTransformationWithPyramid(
                     intensity_data[1-current_frame], // keyframe
                     intensity_data[  current_frame], // current frame
@@ -146,7 +151,11 @@ void Odometry::handleFrame()
                     intrinsics_pyramid,
                     minimization_parameters);
 
+            GlobalTiming::odometry_total.Stop();
+
             cout << telemetry.transformation << endl;
+
+            GlobalTiming::tcp.Start();
 
             // copy timestamp
             memcpy(debug_buffer0, (const void*) &intensity_timestamp[current_frame], 4);
@@ -160,6 +169,8 @@ void Odometry::handleFrame()
             header.data_size = BUFSIZE;
             header.data_id   = 2;
             tcp_server.sendNetworkData(debug_buffer0, header);
+
+            GlobalTiming::tcp.Stop();
         }
 
 

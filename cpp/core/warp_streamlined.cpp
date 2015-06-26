@@ -15,6 +15,8 @@ float WarpStreamlined::calcError(
         const float step_scale,
         const Warp::Parameters& params)
 {
+	GlobalTiming::warping.Start();
+
     const unsigned int W = intrinsics.getCameraWidth();
     const unsigned int H = intrinsics.getCameraHeight();
 
@@ -29,6 +31,7 @@ float WarpStreamlined::calcError(
     	return -1;
     }
 
+    GlobalTiming::warping_rotation.Start();
 
     const float cA = cos(T(3)), sA = sin(T(3));
     const float cB = cos(T(4)), sB = sin(T(4));
@@ -50,7 +53,9 @@ float WarpStreamlined::calcError(
         sC,  cC, 0,
         0, 0, 1;
 
-    Matrix3f R = Rx * Ry * Rz;
+    const Matrix3f R = Rx * Ry * Rz;
+
+    GlobalTiming::warping_rotation.Stop();
 
 
     if (params.filter_on_unwarped_gradient) {
@@ -66,8 +71,13 @@ float WarpStreamlined::calcError(
 
     //float total_error = 0;
 
+    GlobalTiming::warping_jacobian_init.Start();
+
+    // TODO: this might be costly!
     error_out.resize(W*H);
     J_out.resize(W*H, 6);
+
+    GlobalTiming::warping_jacobian_init.Stop();
 
     const float s = pow(2,step_scale);
 
@@ -93,6 +103,8 @@ float WarpStreamlined::calcError(
             // warp point
             ///////////////////////////////////////////////////////////////////
 
+            GlobalTiming::warping_warping.Start();
+
             const Vector3f world_point(
                     (x - intrinsics.getPrincipalPointX()) * intrinsics.getBaseline() / current_depth,
                     (y - intrinsics.getPrincipalPointY()) * intrinsics.getBaseline() / current_depth,
@@ -110,6 +122,8 @@ float WarpStreamlined::calcError(
             const float pkf_x_floor = floor(pkf_x);
             const float pkf_y_floor = floor(pkf_y);
 
+            GlobalTiming::warping_warping.Stop();
+
             // skip pixels that project outside the keyframe
             if (pkf_x < 0 || pkf_y < 0 || pkf_x_floor > W-2 || pkf_y_floor > H-2)
                 continue;
@@ -118,6 +132,8 @@ float WarpStreamlined::calcError(
             // sample image and image differential
             ///////////////////////////////////////////////////////////////////
 
+            GlobalTiming::warping_sampling.Start();
+
             // remember: data[row, col] = data[y, x]!
             const float v1 = keyframe_intensities(pkf_y_floor,   pkf_x_floor);
             const float v2 = keyframe_intensities(pkf_y_floor,   pkf_x_floor+1);
@@ -125,8 +141,10 @@ float WarpStreamlined::calcError(
             const float v4 = keyframe_intensities(pkf_y_floor+1, pkf_x_floor+1);
 
             // skip pixels which have invalid gradients
-            if (IS_INVALID(v1) || IS_INVALID(v2) || IS_INVALID(v3) || IS_INVALID(v4))
+            if (IS_INVALID(v1) || IS_INVALID(v2) || IS_INVALID(v3) || IS_INVALID(v4)) {
+            	GlobalTiming::warping_sampling.Stop();
                 continue;
+            }
 
             // weight (how close to img[ceil(x), ceil(y)] are we?
             const float sx = pkf_x - pkf_x_floor;
@@ -135,6 +153,19 @@ float WarpStreamlined::calcError(
             const float dx1 = v2 - v1,  dy1 = v3 - v1;
             const float dx2 = v4 - v3,  dy2 = v4 - v2;
 
+            // weighted average over pixel intensities
+			const float keyframe_intensity =
+				   v1 * ( (1-sx) * (1-sy) )
+				 + v2 * (    sx  * (1-sy) )
+				 + v3 * ( (1-sx) *    sy  )
+				 + v4 * (    sx  *    sy  );
+
+			GlobalTiming::warping_sampling.Stop();
+
+            // calculate Jacobians
+            ///////////////////////////////////////////////////////////////////
+
+            GlobalTiming::warping_jacobians.Start();
 
             const Eigen::Matrix<float, 1, 2> J_I(
                     dx1 * (1-sy)  +  dx2 * sy,
@@ -144,21 +175,11 @@ float WarpStreamlined::calcError(
             // skip pixels that don't provide a good gradient
             if (!params.filter_on_unwarped_gradient) {
                 const float J_norm = abs(J_I(0)) + abs(J_I(1));
-                if (J_norm < params.gradient_norm_threshold)
+                if (J_norm < params.gradient_norm_threshold) {
+                	GlobalTiming::warping_jacobians.Stop();
                     continue;
+                }
             }
-
-            // weighted average over pixel intensities
-            const float keyframe_intensity =
-                   v1 * ( (1-sx) * (1-sy) )
-                 + v2 * (    sx  * (1-sy) )
-                 + v3 * ( (1-sx) *    sy  )
-                 + v4 * (    sx  *    sy  );
-
-
-
-            // calculate Jacobian
-            ///////////////////////////////////////////////////////////////////
 
             const float& w_x = world_point.x();
             const float& w_y = world_point.y();
@@ -178,6 +199,7 @@ float WarpStreamlined::calcError(
 
             J_out.row(pixel_count) = J_I * J_P * J_T;
 
+            GlobalTiming::warping_jacobians.Stop();
 
             ///////////////////////////////////////////////////////////////////
 
@@ -206,7 +228,10 @@ float WarpStreamlined::calcError(
 
     //cout << "total error: " << total_error << "  =  " << sqrt(total_error) << endl;
 
-    return INVALID(); //sqrt(total_error);
+    GlobalTiming::warping.Stop();
+
+    //return INVALID(); //sqrt(total_error);
+    return pixel_count / ((float) (X_END-X_START)*(Y_END-Y_START));
 
 }
 ///////////////////////////////////////////////////////////////////////////////

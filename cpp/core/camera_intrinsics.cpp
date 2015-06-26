@@ -91,9 +91,12 @@ void CameraIntrinsics::downsample2()
 {
     this->camera_width  /= 2;
     this->camera_height /= 2;
-    this->focal_length  /= 2;
+
     this->principal_point_x /= 2;
     this->principal_point_y /= 2;
+
+    this->focal_length  /= 2;
+    this->baseline      *= 2;
 }
 ///////////////////////////////////////////////////////////////////////////////
 std::ostream& operator <<(std::ostream &output, const CameraIntrinsics &intrinsics)

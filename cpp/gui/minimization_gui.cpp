@@ -229,17 +229,18 @@ void plot_warp_debug_data(sf::RenderWindow& window, sf::Font& font, const Warp::
     if (show_keyframe)
         drawMatrixAt(window, step.frame_first.getIntensityData().data, sf::Vector2f(0,H+2), "keyframe", &font, Colormap::Colormap(), scale);
     else
-        drawMatrixAt(window, data.warped_image     , sf::Vector2f(0,H+2), "warped current frame", &font, Colormap::Colormap(), scale);
+        drawMatrixAt(window, data.warped_image, sf::Vector2f(0,H+2), "warped current frame", &font, Colormap::Colormap(), scale);
 
     drawMatrixAt(window, step.frame_second.getIntensityData().data, sf::Vector2f(W+2,0), "current frame [frame " + boost::lexical_cast<string>(step.index_second) + "]", &font, Colormap::Colormap(), scale);
     drawMatrixAt(window, step.frame_first .getIntensityData().data, sf::Vector2f(W+2,H+2), "keyframe [frame " + boost::lexical_cast<string>(step.index_first) + "]", &font, Colormap::Colormap(), scale);
-    //step.frame_second.getDepthData().drawAt( *plotTarget, sf::Vector2f(0,0));
-    //step.frame_first .getDepthData().drawAt( *plotTarget, sf::Vector2f(0,H+2));
+
+    drawMatrixAt(window, step.frame_second.getDepthData().data, sf::Vector2f(2*W+4,0),   "", NULL, Colormap::Colormap(), scale);
+    drawMatrixAt(window, step.frame_first .getDepthData().data, sf::Vector2f(2*W+4,H+2), "", NULL, Colormap::Colormap(), scale);
 
 
-    drawMatrixAt(window, data.weighted_errors,     sf::Vector2f(2*W+4, 0),     "weighted errors", &font, Colormap::Jet(), scale);
-    drawMatrixAt(window, data.J_norm,              sf::Vector2f(2*W+4, H+2),   "norm(J) [max: " + boost::lexical_cast<string>(data.J_norm.maxCoeff()) + "]", &font, Colormap::Jet(), scale);
-    drawMatrixAt(window, data.selection_heuristic, sf::Vector2f(2*W+4, 2*H+4), "image gradient [max: " + boost::lexical_cast<string>(data.selection_heuristic.maxCoeff()) + "]", &font, Colormap::Jet(), scale);
+    drawMatrixAt(window, data.weighted_errors,     sf::Vector2f(3*W+6, 0),     "weighted errors", &font, Colormap::Jet(), scale);
+    drawMatrixAt(window, data.J_norm,              sf::Vector2f(3*W+6, H+2),   "norm(J) [max: " + boost::lexical_cast<string>(data.J_norm.maxCoeff()) + "]", &font, Colormap::Jet(), scale);
+    drawMatrixAt(window, data.selection_heuristic, sf::Vector2f(3*W+6, 2*H+4), "image gradient [max: " + boost::lexical_cast<string>(data.selection_heuristic.maxCoeff()) + "]", &font, Colormap::Jet(), scale);
 }
 ///////////////////////////////////////////////////////////////////////////////
 bool min_paused = true; // start in paused state, global to keep value :P
@@ -290,6 +291,15 @@ void run_minimization(sf::RenderWindow& window, sf::Font& font, const Scene& sce
                     case sf::Keyboard::Escape:
                         exit(0);
                         return;
+
+                    case sf::Keyboard::F12:
+                        {
+                            window.resetGLStates();
+                            sf::View v = window.getView();
+                            v.reset(sf::FloatRect(0, 0, window.getSize().x, window.getSize().y));
+                            window.setView(v);
+                        }
+                        break;
 
                     // go to prev frame
                     case sf::Keyboard::B:
@@ -685,7 +695,7 @@ void run_minimization(sf::RenderWindow& window, sf::Font& font, const Scene& sce
             }
         }
 
-        float total_error = Warp::calcError(step, T, error_tmp, J_tmp, params, &warpdebugdata);
+        float valid_percentage = Warp::calcError(step, T, error_tmp, J_tmp, params, &warpdebugdata);
 
         plot_warp_debug_data(window, font, warpdebugdata, step, show_keyframe, view_scale);
 
@@ -705,7 +715,8 @@ void run_minimization(sf::RenderWindow& window, sf::Font& font, const Scene& sce
         t.setCharacterSize(12);
 
         ostringstream s;
-        s << "total error: " << sqrt(total_error) << endl;
+        s << "good pixels: " << 100*valid_percentage << "%" << endl;
+        s << "total error: " << error_tmp.norm() << endl;
         s << "abs max: " << (error_tmp.array().abs().maxCoeff()) << endl;
         s << "current: " << T << endl;
         s << "truth:   " << step.ground_truth << endl;

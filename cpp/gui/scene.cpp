@@ -42,38 +42,6 @@ void Scene::loadFromBagFile(const std::string& bag_path)
     cout << "bag is " << bag.getSize() << " bytes (?) big." << endl;
 
 
-#if 0
-    ofstream outfile("./ground_truth_trajectory.csv");
-
-    outfile << "x, y, z, X, Y, Z, W" << endl;
-
-    rosbag::View view(bag, rosbag::TopicQuery("/aslam/aslam_odometry"));
-
-    BOOST_FOREACH(const rosbag::MessageInstance m, view) {
-        // TODO: display ground truth data
-
-        nav_msgs::Odometry::Ptr p_odometry = m.instantiate<nav_msgs::Odometry>();
-
-        if (p_odometry) {
-            outfile << p_odometry->pose.pose.position.x << ", ";
-            outfile << p_odometry->pose.pose.position.y << ", ";
-            outfile << p_odometry->pose.pose.position.z << ", ";
-            outfile << p_odometry->pose.pose.orientation.x << ", ";
-            outfile << p_odometry->pose.pose.orientation.y << ", ";
-            outfile << p_odometry->pose.pose.orientation.z << ", ";
-            outfile << p_odometry->pose.pose.orientation.w << endl;
-        } else {
-            cerr << "couldn't get pose" << endl;
-        }
-    }
-
-    outfile.close();
-
-    cout << "wrote ground truth trajectory to CSV" << endl;
-#endif
-
-
-
     rosbag::View view_intensity(bag, rosbag::TopicQuery("/stereo_dense_reconstruction/image_fused"));
     rosbag::View view_depth    (bag, rosbag::TopicQuery("/stereo_dense_reconstruction/disparity"));
 
@@ -81,8 +49,8 @@ void Scene::loadFromBagFile(const std::string& bag_path)
     rosbag::View::const_iterator it_depth     = view_depth    .begin();
 
     //const unsigned int N = view_intensity.size();
-    int START = 50;
-    const unsigned int N = 50; // don't load the whole scene (would need a bit too much RAM)
+    int START = 250;
+    const unsigned int N = 100; // don't load the whole scene (would need a bit too much RAM)
 
     this->frames.resize(N);
     this->ground_truth.resize(N);
@@ -186,10 +154,11 @@ std::vector<Transformation> findTrajectory(const Scene& scene, const Warp::Param
     return traj;
 }
 ///////////////////////////////////////////////////////////////////////////////
-std::vector<Transformation> findTrajectoryFromRosbag(const string& rosbag_path, const Warp::Parameters& params)
+std::vector<Transformation> findTrajectoryFromRosbag(const string& rosbag_path, const Warp::Parameters& params, Scene& scene)
 {
     std::vector<Transformation> traj;
 
+    std::vector<CameraImage> bad_frames;
 
     rosbag::Bag bag;
     bag.open(rosbag_path, rosbag::bagmode::Read);
@@ -197,11 +166,47 @@ std::vector<Transformation> findTrajectoryFromRosbag(const string& rosbag_path, 
 
     rosbag::View view_intensity(bag, rosbag::TopicQuery("/stereo_dense_reconstruction/image_fused"));
     rosbag::View view_depth    (bag, rosbag::TopicQuery("/stereo_dense_reconstruction/disparity"));
+    rosbag::View aslam_view    (bag, rosbag::TopicQuery("/aslam/aslam_odometry"));
 
     if (view_intensity.size() == 0) {
         cerr << "ERROR: rosbag file '" << rosbag_path << "' doesn't contain /stereo_dense_reconstruction/image_fused." << endl;
         return traj;
     }
+
+
+    if (aslam_view.size() > 0) {
+
+        cout << "bag file contains ASLAM ground truth!" << endl;
+
+        ofstream outfile("./ground_truth_trajectory.csv");
+
+        outfile << "x, y, z, X, Y, Z, W" << endl;
+
+
+        BOOST_FOREACH(const rosbag::MessageInstance m, aslam_view) {
+            // TODO: display ground truth data
+
+            nav_msgs::Odometry::Ptr p_odometry = m.instantiate<nav_msgs::Odometry>();
+
+            if (p_odometry) {
+                outfile << p_odometry->pose.pose.position.x << ", ";
+                outfile << p_odometry->pose.pose.position.y << ", ";
+                outfile << p_odometry->pose.pose.position.z << ", ";
+                outfile << p_odometry->pose.pose.orientation.x << ", ";
+                outfile << p_odometry->pose.pose.orientation.y << ", ";
+                outfile << p_odometry->pose.pose.orientation.z << ", ";
+                outfile << p_odometry->pose.pose.orientation.w << endl;
+            } else {
+                cerr << "couldn't get pose" << endl;
+            }
+        }
+
+        outfile.close();
+
+        cout << "wrote ground truth trajectory to CSV" << endl;
+    }
+
+
 
     rosbag::View::const_iterator it_intensity = view_intensity.begin();
     rosbag::View::const_iterator it_depth     = view_depth    .begin();
@@ -236,10 +241,19 @@ std::vector<Transformation> findTrajectoryFromRosbag(const string& rosbag_path, 
 
             CameraStep step(prev_frame, current_frame, visensor_intrinsics, Transformation(0,0,0,0,0,0), i-1, i);
 
+            //printfProgress(i, 0, N);
+            cout << "iteration " << i << " ";
+
             traj.push_back(findTransformationWithPyramid(step, params));
+
+            if (iteration_count > 100 || (abs(traj.back().value(0)) > 0.05)) {
+                cout << "BAD STEP!" << endl;
+
+                bad_frames.push_back(prev_frame);
+                bad_frames.push_back(current_frame);
+            }
         }
 
-        printfProgress(i, 0, N);
 
         i++;
 
@@ -250,6 +264,8 @@ std::vector<Transformation> findTrajectoryFromRosbag(const string& rosbag_path, 
         it_depth++;
     }
 
+    scene.setIntrinsics(visensor_intrinsics);
+    scene.addFrames(bad_frames);
 
     return traj;
 }

@@ -26,6 +26,7 @@ namespace Warp {
         PADDING_TO_64BIT_T __padding;
 
         float gradient_norm_threshold; // keep only pixels with gradient >= this value
+        float valid_pixel_threshold; // if less than this many percent (0-1) of a pixel are invalid, use gradient_norm_threshold = 0
         bool filter_on_unwarped_gradient; // use gradient of image-to-be-warped instead of keyframe at warped points
         unsigned int min_pyramid_levels; // 0 to use max resolution
         unsigned int max_pyramid_levels; // 1 = use 1x downscaled image (and nothing smaller)
@@ -53,6 +54,7 @@ namespace Warp {
                 unsigned int max_iterations = 1000)
           : weight_function(weight_function),
             gradient_norm_threshold(gradient_norm_threshold),
+            valid_pixel_threshold(0.25),
             filter_on_unwarped_gradient(filter_on_unwarped_gradient),
             min_pyramid_levels(min_pyramid_levels),
             max_pyramid_levels(max_pyramid_levels),

@@ -2,7 +2,6 @@
 #include <iostream>
 #include <fstream>
 #include <boost/foreach.hpp>
-#include <boost/timer/timer.hpp>
 #include <SFML/Graphics.hpp>
 #include <sensor_msgs/Image.h>
 #include <stereo_msgs/DisparityImage.h>
@@ -22,11 +21,6 @@
 
 using namespace std;
 using namespace Eigen;
-
-//sf::RenderWindow window(sf::VideoMode(1280, 768), "dense odometry");
-//sf::RenderWindow window(sf::VideoMode(4*752+6, 3*480), "dense odometry");
-//sf::RenderWindow window(sf::VideoMode(256*4+2, 128*5), "dense odometry");
-//sf::RenderWindow window(sf::VideoMode(256*3+4, 128*4+4), "dense odometry");
 
 ///////////////////////////////////////////////////////////////////////////////
 void write_trajectory(const Scene& scene, const Warp::Parameters& params, string output_dir = "")
@@ -49,13 +43,13 @@ void write_trajectory(const Scene& scene, const Warp::Parameters& params, string
     outfile.close();
 }
 ///////////////////////////////////////////////////////////////////////////////
-void write_trajectory_rosbag(const string& rosbag_path, const Warp::Parameters& params, string output_dir = ".")
+void write_trajectory_rosbag(const string& rosbag_path, const Warp::Parameters& params, Scene& scene, string output_dir = ".")
 {
-    boost::timer::cpu_timer timer;
-    std::vector<Transformation> traj = findTrajectoryFromRosbag(rosbag_path, params);
-    timer.stop();
-    cout << "found trajectory of " << traj.size() << " steps in: " << timer.format();
-    cout << "this is an average of " << ((double) traj.size()) / timer.elapsed().user * 1000 * 1000 * 1000 << " FPS" << endl;
+    //boost::timer::cpu_timer timer;
+    std::vector<Transformation> traj = findTrajectoryFromRosbag(rosbag_path, params, scene);
+    //timer.stop();
+    //cout << "found trajectory of " << traj.size() << " steps in: " << timer.format();
+    //cout << "this is an average of " << ((double) traj.size()) / timer.elapsed().user * 1000 * 1000 * 1000 << " FPS" << endl;
 
     if (traj.empty()) {
         cout << "empty trajectory. maybe this is raw footage?" << endl;
@@ -87,7 +81,7 @@ int main(int argc, char* argv[])
 {
     sf::ContextSettings settings;
     settings.antialiasingLevel = 8;
-    sf::RenderWindow window(sf::VideoMode(1140, 730), "dense odometry", sf::Style::Default, settings);
+    sf::RenderWindow window(sf::VideoMode(1500, 730), "dense odometry", sf::Style::Default, settings);
 
     sf::Font font;
     font.loadFromFile("resources/fonts/default.otf");
@@ -107,31 +101,33 @@ int main(int argc, char* argv[])
     //const string raw_bag = "/home/samuel/REMOTE/home/samuel/data/visensor/path2.bag";
     //const string raw_bag = "/home/samuel/REMOTE/home/samuel/data/visensor/path1.bag";
     //const string raw_bag = "/home/samuel/data/visensor/lee_medium_circle.bag";
-    const string raw_bag = "/home/samuel/data/visensor/lee_short_circle.bag";
-    //testscene.loadFromBagFileRaw(raw_bag);
+    //const string raw_bag = "/home/samuel/data/visensor/lee_short_circle.bag";
+    const string raw_bag = "/home/samuel/data/slow.bag";
+    //const string raw_bag = "/home/samuel/data/fast.bag";
+    //write_trajectory_rosbag("/home/samuel/data/2015-06-11-16-30-01.bag", params, ".");
 
 
     //cout << testscene.getIntrinsics() << endl;
 
-    Warp::Parameters params(new ErrorWeightNone());
+    //Warp::Parameters params(new ErrorWeightNone());
+    Warp::Parameters params(new ErrorWeightHuber(1));
     params.min_pyramid_levels = 1;
-    params.max_pyramid_levels = 4;
+    params.max_pyramid_levels = 3;
     params.max_iterations = 100;
     params.T_init = Transformation(0,0,0,0,0,0);
     //params.gradient_norm_threshold = 0.01;
-    params.gradient_norm_threshold = 0;
-    //params.use_streamlined = true;
+    params.gradient_norm_threshold = 0.01;
+    params.use_streamlined = true;
 
-    //write_trajectory(testscene, params, ".");
-    //write_trajectory_rosbag("/home/samuel/data/2015-06-11-16-30-01.bag", params, ".");
-    //write_trajectory_rosbag(raw_bag, params, ".");
+    write_trajectory_rosbag(raw_bag, params, testscene, ".");
 
-    //run_minimization(window, font, testscene, params);
+    //testscene.loadFromBagFile(raw_bag);
+    run_minimization(window, font, testscene, params);
 
     //Warp::PlotRange range1(0,-5,5,201), range2(1,-5,5,201);
     //draw_error_surface(window, font, testscene.getStep(14), range1, range2, params);
 
-    show_live_data(window, font, argc, argv);
+    //show_live_data(window, font, argc, argv);
 
     delete params.weight_function;
 

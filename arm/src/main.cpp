@@ -48,6 +48,8 @@
 #include "odometry/utils/FakeCamSensor.h"
 #include "odometry/utils/system.h"
 
+#include "odometry/utils/timing/timer.hpp"
+
 #define TCP_IMU_PORT 13776
 #define TCP_DATA_PORT 13777
 #define TCP_CONFIG_PORT 13778
@@ -69,6 +71,8 @@ void printIrqStatisticsLoop(IrqScheduler* sched) {
 		sleep(1);
 	}
 }
+
+
 
 int main(void) {
 
@@ -361,10 +365,14 @@ int main(void) {
 				BOOST_FOREACH(const Sensor::Map::value_type& sensor_pair, sensors)
 					sensor_pair.second->off();
 
-				/*
+
+				printf("timing:\n");
+				printf("%s\n", timing::Timing::Print().c_str());
+
+
 				printf("exiting application\n");
 				break; // exit application (makes development easier)
-				*/
+
 
 			}
 
@@ -486,6 +494,7 @@ int main(void) {
 							odometry.handleNewData(sensor);
 
 #if 1
+							GlobalTiming::tcp.Start();
 							IpComm::Header header;
 							header.timestamp = sensor->data_mover()->current_timestamp();
 							// HACK(gohlp) something is wrong with the dense data mover
@@ -494,6 +503,7 @@ int main(void) {
 							header.data_id   = sensor->id();
 
 							tcp_server.sendNetworkData(sensor->data_mover()->data(), header);
+							GlobalTiming::tcp.Stop();
 #endif
 
 							/*

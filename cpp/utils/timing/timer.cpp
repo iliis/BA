@@ -236,7 +236,11 @@ void Timing::Print(std::ostream& out) {  //NOLINT
   out << "Timing\n";
 #endif
   out << "-----------\n";
-  out << "name   samples total (mean +/- stddev) [min max]\n";
+  out.width((std::streamsize) Instance().maxTagLength_);
+  out.setf(std::ios::left, std::ios::adjustfield);
+  out << "name";
+  out.width(7);
+  out << "samples total  " << "(mean +/- stddev)  " << "[min max]\n";
   for (typename map_t::value_type t : tagMap) {
     size_t i = t.second;
     out.width((std::streamsize) Instance().maxTagLength_);
