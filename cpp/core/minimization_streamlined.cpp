@@ -13,6 +13,7 @@ Matrix<float, Dynamic, 6> J;
 
 // TODO: clean this up, too lazy to implement this cleanly :P
 float valid_percentage = 0;
+bool was_bad_last_step = false;
 
 ///////////////////////////////////////////////////////////////////////////////
 void initIntrinsicsPyramid(std::vector<CameraIntrinsics>& pyramid, const unsigned int max_level)
@@ -114,10 +115,12 @@ Transformation findTransformationWithPyramid(
         const std::vector<CameraIntrinsics>& intrinsics,
         const Warp::Parameters& params)
 {
+    Warp::Parameters tmp_params = params;
+
     // calculate image pyramid
     ///////////////////////////////////////////////////////////////////////
 
-	GlobalTiming::pyramid.Start();
+    GlobalTiming::pyramid.Start();
 
     // we assume the keyframe pyramid was already built in previous iteration
     //buildImagePyramid(keyframe_intensities, params.max_pyramid_levels);
@@ -126,11 +129,21 @@ Transformation findTransformationWithPyramid(
 
     GlobalTiming::pyramid.Stop();
 
+    ///////////////////////////////////////////////////////////////////////
+
+    // if previous call to find transformation already had problems with too
+    // few pixels, use all of them from the start and use less downscaling
+    if (was_bad_last_step) {
+        was_bad_last_step = false;
+        tmp_params.gradient_norm_threshold = 0;
+        if (tmp_params.max_pyramid_levels > tmp_params.min_pyramid_levels)
+            tmp_params.max_pyramid_levels--;
+    }
+
     // actually perform minimization
     ///////////////////////////////////////////////////////////////////////
 
     Matrix<float, 6, 1> T = params.T_init.value;
-    Warp::Parameters tmp_params = params;
 
     for (int level = params.max_pyramid_levels; level >= (int)params.min_pyramid_levels; level--) {
 
@@ -169,6 +182,10 @@ Transformation findTransformationWithPyramid(
             cout << "MAX ITER! ";
 
         //cout << " [ " << level << " ] found solution: " << T.transpose() << endl;
+    }
+
+    if (tmp_params.gradient_norm_threshold != params.gradient_norm_threshold) {
+        was_bad_last_step = true;
     }
 
     //cout << " >>>>> found solution: " << T.transpose() << endl;

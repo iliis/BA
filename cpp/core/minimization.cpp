@@ -143,10 +143,13 @@ Transformation findTransformationWithPyramid(const CameraStep& step, const Warp:
     // actually process them
     Warp::Parameters tmp_params = params;
 
-    // if previous call to find transformation already had problems with too few pixels, use all of them from the start
+    // if previous call to find transformation already had problems with too
+    // few pixels, use all of them from the start and use less downscaling
     if (was_bad_last_step) {
         was_bad_last_step = false;
         tmp_params.gradient_norm_threshold = 0;
+        if (tmp_params.max_pyramid_levels > tmp_params.min_pyramid_levels)
+            tmp_params.max_pyramid_levels--;
     }
 
     for (int level = params.max_pyramid_levels; level >= (int)params.min_pyramid_levels; level--) {

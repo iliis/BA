@@ -110,7 +110,7 @@ int main(int argc, char* argv[])
     //cout << testscene.getIntrinsics() << endl;
 
     //Warp::Parameters params(new ErrorWeightNone());
-    Warp::Parameters params(new ErrorWeightHuber(1));
+    Warp::Parameters params(new ErrorWeightHuber(10));
     params.min_pyramid_levels = 1;
     params.max_pyramid_levels = 3;
     params.max_iterations = 100;
