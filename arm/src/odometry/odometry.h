@@ -37,6 +37,8 @@ public:
 	void handleNewData(const Sensor::Ptr sensor);
 	void handleFrame();
 
+	inline const Warp::Parameters& getParameters() { return minimization_parameters; }
+
 private:
 	unsigned int current_frame = 0;
 

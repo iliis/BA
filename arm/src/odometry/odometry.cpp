@@ -23,7 +23,7 @@ Odometry::Odometry(TcpServer& tcp_server)
 {
     printf("initializing odometry...\n");
 
-    minimization_parameters.min_pyramid_levels = 1;
+    minimization_parameters.min_pyramid_levels = 2;
     minimization_parameters.max_pyramid_levels = 3;
     minimization_parameters.max_iterations = 100;
     minimization_parameters.T_init = Transformation(0,0,0,0,0,0);
@@ -153,7 +153,7 @@ void Odometry::handleFrame()
 
             GlobalTiming::odometry_total.Stop();
 
-            cout << telemetry.transformation << endl;
+            //cout << telemetry.transformation << endl;
 
             GlobalTiming::tcp.Start();
 

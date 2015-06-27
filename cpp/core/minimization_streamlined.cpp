@@ -145,6 +145,8 @@ Transformation findTransformationWithPyramid(
 
     Matrix<float, 6, 1> T = params.T_init.value;
 
+    unsigned int total_iterations = 0;
+
     for (int level = params.max_pyramid_levels; level >= (int)params.min_pyramid_levels; level--) {
 
         float prev_delta = 0;
@@ -164,7 +166,7 @@ Transformation findTransformationWithPyramid(
                     tmp_params);
 
             if (valid_percentage < params.valid_pixel_threshold) {
-                cout << "WARN: temporarily setting gradient norm threshold to 0" << endl;
+                //cout << "WARN: temporarily setting gradient norm threshold to 0" << endl;
                 // let's hope this first iteration didn't went astray too extremely...
                 tmp_params.gradient_norm_threshold = 0;
             }
@@ -181,14 +183,20 @@ Transformation findTransformationWithPyramid(
         if (iterations == params.max_iterations)
             cout << "MAX ITER! ";
 
+        total_iterations += iterations;
+
         //cout << " [ " << level << " ] found solution: " << T.transpose() << endl;
     }
 
+    cout << " >>>>> found solution: " << T.transpose() << " in " << total_iterations << " iters.";
+
     if (tmp_params.gradient_norm_threshold != params.gradient_norm_threshold) {
         was_bad_last_step = true;
+        cout << " G_THRESH!";
     }
 
-    //cout << " >>>>> found solution: " << T.transpose() << endl;
+    cout << endl;
+
 
     return Transformation(T);
 }

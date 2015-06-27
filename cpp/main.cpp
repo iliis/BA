@@ -109,9 +109,9 @@ int main(int argc, char* argv[])
 
     //cout << testscene.getIntrinsics() << endl;
 
-    //Warp::Parameters params(new ErrorWeightNone());
-    Warp::Parameters params(new ErrorWeightHuber(10));
-    params.min_pyramid_levels = 1;
+    Warp::Parameters params(new ErrorWeightNone());
+    //Warp::Parameters params(new ErrorWeightHuber(10));
+    params.min_pyramid_levels = 2;
     params.max_pyramid_levels = 3;
     params.max_iterations = 100;
     params.T_init = Transformation(0,0,0,0,0,0);
@@ -119,15 +119,15 @@ int main(int argc, char* argv[])
     params.gradient_norm_threshold = 0.01;
     params.use_streamlined = true;
 
-    write_trajectory_rosbag(raw_bag, params, testscene, ".");
+    //write_trajectory_rosbag(raw_bag, params, testscene, ".");
 
     //testscene.loadFromBagFile(raw_bag);
-    run_minimization(window, font, testscene, params);
+    //run_minimization(window, font, testscene, params);
 
     //Warp::PlotRange range1(0,-5,5,201), range2(1,-5,5,201);
     //draw_error_surface(window, font, testscene.getStep(14), range1, range2, params);
 
-    //show_live_data(window, font, argc, argv);
+    show_live_data(window, font, argc, argv);
 
     delete params.weight_function;
 

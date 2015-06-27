@@ -369,9 +369,12 @@ int main(void) {
 				printf("timing:\n");
 				printf("%s\n", timing::Timing::Print().c_str());
 
+				printf("parameters:\n");
+				printf("%s\n", odometry.getParameters().toString().c_str());
 
-				printf("exiting application\n");
-				break; // exit application (makes development easier)
+
+				//printf("exiting application\n");
+				//break; // exit application (makes development easier)
 
 
 			}
