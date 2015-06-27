@@ -496,7 +496,7 @@ int main(void) {
 
 							odometry.handleNewData(sensor);
 
-#if 1
+#if 0
 							GlobalTiming::tcp.Start();
 							IpComm::Header header;
 							header.timestamp = sensor->data_mover()->current_timestamp();

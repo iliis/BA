@@ -67,7 +67,7 @@ namespace Warp {
 
         void setWeightFunction(ErrorWeightFunction* func) { if (weight_function) { delete weight_function; } weight_function = func; }
 
-        std::string toString();
+        std::string toString() const;
 
         // ensure this struct has a size of a multiple of 8 bytes, so that it
         // has the same size on 32bit and 64bit systems

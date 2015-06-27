@@ -12,6 +12,8 @@ CameraIntrinsics current_intrinsics = CameraIntrinsics(
         /* stereo baseline */ 0.110174);
 Telemetry telemetry;
 CameraState camera_state;
+
+sf::Clock fps_clock; sf::Time time_per_step;
 ///////////////////////////////////////////////////////////////////////////////
 void calibration_callback(const visensor_msgs::visensor_calibration::ConstPtr& m)
 {
@@ -39,6 +41,10 @@ void telemetry_callback(const sensor_msgs::Image::ConstPtr& m)
 
     telemetry.transformation.updateRotationMatrix();
     camera_state.apply(telemetry.transformation);
+
+
+    time_per_step = fps_clock.getElapsedTime();
+    fps_clock.restart();
 }
 ///////////////////////////////////////////////////////////////////////////////
 void image0_callback(const sensor_msgs::Image::ConstPtr& m)
@@ -208,6 +214,7 @@ void show_live_data(sf::RenderWindow& window, sf::Font& font, int argc, char* ar
 
         ostringstream s;
         s << telemetry.transformation << endl;
+        s << "time per step: " << time_per_step.asMilliseconds() << "ms = " << 1000.0f/time_per_step.asMilliseconds() << " FPS" << endl;
         s << "current position: " << camera_state.getPosition().transpose() << endl;
         s << camera_state.getOrientationMatrix() << endl;
         s << " ------------- " << endl;

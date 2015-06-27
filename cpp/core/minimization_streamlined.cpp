@@ -13,6 +13,7 @@ Matrix<float, Dynamic, 6> J;
 
 // TODO: clean this up, too lazy to implement this cleanly :P
 float valid_percentage = 0;
+float bad_percentage = 0;
 bool was_bad_last_step = false;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -165,10 +166,12 @@ Transformation findTransformationWithPyramid(
                     level,
                     tmp_params);
 
-            if (valid_percentage < params.valid_pixel_threshold) {
-                //cout << "WARN: temporarily setting gradient norm threshold to 0" << endl;
+            if (valid_percentage < params.valid_pixel_threshold && tmp_params.gradient_norm_threshold > 0) {
+                //cout << "WARN: temporarily setting gradient norm threshold to 0: valid = " << valid_percentage*100 << "%" << endl;
                 // let's hope this first iteration didn't went astray too extremely...
+            	bad_percentage = valid_percentage;
                 tmp_params.gradient_norm_threshold = 0;
+                was_bad_last_step = true;
             }
 
             if (delta < 0.0001) // found good enough solution
@@ -191,8 +194,7 @@ Transformation findTransformationWithPyramid(
     cout << " >>>>> found solution: " << T.transpose() << " in " << total_iterations << " iters.";
 
     if (tmp_params.gradient_norm_threshold != params.gradient_norm_threshold) {
-        was_bad_last_step = true;
-        cout << " G_THRESH!";
+        cout << " G_THRESH (" << bad_percentage*100 << "%)";
     }
 
     cout << endl;

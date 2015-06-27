@@ -4,7 +4,7 @@ using namespace std;
 using namespace Eigen;
 
 ///////////////////////////////////////////////////////////////////////////////
-std::string Warp::Parameters::toString()
+std::string Warp::Parameters::toString() const
 {
     return "Error weighting function: " + weight_function->toString()
        + "\npyramid levels: " + boost::lexical_cast<string>(min_pyramid_levels)

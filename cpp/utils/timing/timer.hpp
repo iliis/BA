@@ -8,7 +8,7 @@
 #include <string>
 #include <vector>
 
-//#define NO_TIMER
+#define NO_TIMER
 
 #define USE_PERF_COUNTER 1
 //#define USE_RDTSC 1

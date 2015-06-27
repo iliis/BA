@@ -99,6 +99,7 @@ Transformation findTransformation(const CameraStep& step, Warp::Parameters& para
             // let's hope this first iteration didn't went astray too extremely...
             params.gradient_norm_threshold = 0;
             bad_percentage = valid_percentage;
+            was_bad_last_step = true;
         }
 
         if (delta < 0.0001) // found good enough solution
@@ -174,10 +175,6 @@ Transformation findTransformationWithPyramid(const CameraStep& step, const Warp:
     cout << endl;
 //#endif
 #endif
-
-    if (tmp_params.gradient_norm_threshold != params.gradient_norm_threshold) {
-        was_bad_last_step = true;
-    }
 
 
     return tmp_params.T_init;
