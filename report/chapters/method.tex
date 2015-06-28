@@ -5,7 +5,38 @@ Hier kommt die ganze Mathe hin.
 
 explain warping:
 
-we have pixels with depth data, which in other word is a point cloud. I.e. we
+
+The goal of visual odometry is to estimate the ego-motion between two frames, often a keyframe ([todo: move this elsewhere] which is changed whenever the delta becomes too large) and a current frame.
+
+Each frame consists of a stereo pair of intensity data (camera is BW, but RGB could be used too, probably not much better, just more computation required) and a disparity image, which maps a pixel in the left image to a pixel on the right.
+
+Each frame consists of a stereo pair of intensity data [footnote BW] from which the FPGA calculates a disparity image.
+
+The odometry only works on the left image and the disparity data. Using an inverse projection, a point $ x = (u, v) $ in the camera image plane can be projected into R3:
+
+$ p = \pi^{-1}(x, D(x)) = b / D(x) * [ u - c_u # v - c_v # f ] $
+
+where $b$ is the stereo baseline, $f$ the focal length and $c$ the principal point of the camera.
+
+This point $p$ can now be moved into a new camera frame by translating and rotating it:
+
+$ p' = T_R * p + T_T $
+
+Where $T_R$ is a 3x3 rotation matrix and $T_T$ a three dimensional translation vector. Using affine coordinates, we can write this as:
+
+$ p' = T * p $
+
+Now, we project this point back onto the new camera image plane:
+
+$ x' = \pi(p') = f / Z * [ X Y ] + c $
+
+This whole warping operator can be summarized as:
+
+$ x' = \tau(x, D(x), T) = \pi( T * \pi^{-1} (x, D(x))) $
+
+
+
+we have pixels with depth data,  which we
 can project pixels into 3D space where they can be warped trough time and
 space. Then, we reproject them back onto the camera's image plane and get a new
 picture which is the old picture viewed from a different perspective ("warped").
