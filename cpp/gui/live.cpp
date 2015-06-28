@@ -13,7 +13,12 @@ CameraIntrinsics current_intrinsics = CameraIntrinsics(
 Telemetry telemetry;
 CameraState camera_state;
 
-sf::Clock fps_clock; sf::Time time_per_step;
+sf::Clock fps_clock;
+sf::Time time_per_step;
+
+// average over multiple frames
+sf::Time last_step_times_sum;
+std::queue<sf::Time> last_step_times;
 ///////////////////////////////////////////////////////////////////////////////
 void calibration_callback(const visensor_msgs::visensor_calibration::ConstPtr& m)
 {
@@ -44,6 +49,14 @@ void telemetry_callback(const sensor_msgs::Image::ConstPtr& m)
 
 
     time_per_step = fps_clock.getElapsedTime();
+
+    last_step_times.push(time_per_step);
+    last_step_times_sum += time_per_step;
+    if (last_step_times.size() > 30) {
+        last_step_times_sum -= last_step_times.front();
+        last_step_times.pop();
+    }
+
     fps_clock.restart();
 }
 ///////////////////////////////////////////////////////////////////////////////
@@ -96,14 +109,14 @@ void show_live_data(sf::RenderWindow& window, sf::Font& font, int argc, char* ar
         'individual_cam_config': 0, \
         'cam_agc_enable': 0, \
         'cam_aec_enable': 0,  \
-        'cam_coarse_shutter_width': 20, \
+        'cam_coarse_shutter_width': 300, \
         'penalty_1': 20, \
         'penalty_2': 200, \
         'threshold': 100, \
         'lr_check': 2 \
     }\"");
 
-    int shutter = 20;
+    int shutter = 300;
 
     // TODO: read this from ROS messages
 
@@ -218,6 +231,13 @@ void show_live_data(sf::RenderWindow& window, sf::Font& font, int argc, char* ar
         drawMatrixAt(window, depth.data, sf::Vector2f(cam0.getWidth(),0), "disparity", &font, Colormap::Jet(), 0.5);
 
 
+        // calculate average fps
+        float average_time_per_step = last_step_times_sum.asMilliseconds();
+        if (last_step_times.size() > 0)
+            average_time_per_step /= last_step_times.size();
+        if (average_time_per_step == 0)
+            average_time_per_step = -1;
+
         sf::Text t;
         t.setFont(font);
         t.setCharacterSize(12);
@@ -225,6 +245,7 @@ void show_live_data(sf::RenderWindow& window, sf::Font& font, int argc, char* ar
         ostringstream s;
         s << telemetry.transformation << endl;
         s << "time per step: " << time_per_step.asMilliseconds() << "ms = " << 1000.0f/time_per_step.asMilliseconds() << " FPS" << endl;
+        s << "average time per step: " << average_time_per_step << "ms = " << 1000/average_time_per_step << " FPS" << endl;
         s << "current position: " << camera_state.getPosition().transpose() << endl;
         s << camera_state.getOrientationMatrix() << endl;
         s << " ------------- " << endl;

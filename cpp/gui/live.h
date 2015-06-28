@@ -3,6 +3,7 @@
 
 #include <stdlib.h>
 #include <iostream>
+#include <queue>
 
 #include "state_tracker.h"
 

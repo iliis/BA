@@ -111,7 +111,7 @@ int main(int argc, char* argv[])
 
     Warp::Parameters params(new ErrorWeightNone());
     //Warp::Parameters params(new ErrorWeightHuber(10));
-    params.min_pyramid_levels = 2;
+    params.min_pyramid_levels = 0;
     params.max_pyramid_levels = 3;
     params.max_iterations = 100;
     params.T_init = Transformation(0,0,0,0,0,0);

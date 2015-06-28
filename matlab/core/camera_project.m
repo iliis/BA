@@ -36,7 +36,7 @@ assert(isa(intrinsics, 'CameraIntrinsics'));
 
 % Z-Axis points 'inwards' (away from viewer)
 %
-% [ u v ]' = [ x y ]' / z * focal + printcipal_point
+% [ u v ]' = [ x y ]' / z * focal + principal_point
 points_camera = points_world(1:2,:) ./ repmat(points_world(3,:),2,1) .* intrinsics.focal_length + repmat(intrinsics.principal_point,1,N);
 
 if nargout > 1

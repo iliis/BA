@@ -1,4 +1,4 @@
-function plot_relative_trajectory( path, varargin )
+function points = plot_relative_trajectory( path, in3d, varargin )
 % plots a 3D trajectory from list of relative transformations
 
 % INPUT
@@ -14,6 +14,8 @@ points = zeros(3, N+1);
 current_pos = [0 0 0]';
 current_rot = eye(3);
 
+current_rot = angle2dcm([deg2rad(0) deg2rad(0) deg2rad(0)]);
+
 for i = 1:N
     
     abs_delta = current_rot * path(1:3,i);
@@ -24,7 +26,7 @@ for i = 1:N
     points(:, i+1) = current_pos;
 end
 
-if false
+if in3d
     plot3(points(1,:), points(3,:), points(2,:), varargin{:});
     xlabel('X');
     ylabel('Z');

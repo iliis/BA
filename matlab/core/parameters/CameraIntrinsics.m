@@ -6,6 +6,7 @@ classdef CameraIntrinsics
         camera_height   % height of image [pixels]
         principal_point % [u,v]' center of image [pixels]
         focal_length    % [1/pixels or meter/pixels]
+        baseline % NOT REALLY USED
 
         % optional properties
         % TODO: use these values in load_image()

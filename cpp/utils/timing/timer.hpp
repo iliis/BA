@@ -10,8 +10,8 @@
 
 //#define NO_TIMER
 
-#define USE_PERF_COUNTER 1
-//#define USE_RDTSC 1
+//#define USE_PERF_COUNTER 1
+#define USE_RDTSC 1
 //#define __ARM_ARCH_7A__ 1
 
 #ifdef USE_PERF_COUNTER

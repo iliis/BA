@@ -25,8 +25,8 @@ k = 1;
 
     % do the actual calculations
     tic;
-    err = camera_warp(step, T, true);
-    %[err, J] = camera_warp(step, T, true);
+    %err = camera_warp(step, T, true);
+    [err, J] = camera_warp(step, T, true);
     toc;
 
     disp(['total error: ' num2str(norm(err))]);

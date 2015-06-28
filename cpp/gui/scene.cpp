@@ -8,6 +8,11 @@ CameraIntrinsics visensor_intrinsics = CameraIntrinsics(
         /* principal point */ Eigen::Vector2f(384.3624542696897, 240.639381314597),
         /* focal length    */ 466.1191501697315,
         /* stereo baseline */ 0.110174);
+CameraIntrinsics visensor_pascal_intrinsics = CameraIntrinsics(
+        /* sensor size     */ Eigen::Vector2f(752, 480),
+        /* principal point */ Eigen::Vector2f(371.835, 223.239),
+        /* focal length    */ 473,
+        /* stereo baseline */ 0.110174);
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
