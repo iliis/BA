@@ -9,6 +9,7 @@
 #define ODOMETRY_H_
 
 #include <string.h>
+#include <boost/program_options.hpp>
 
 #include "sensors/MT9V034.hpp"
 #include "sensors/DenseMatcher.hpp"
@@ -31,13 +32,15 @@ class Odometry
 {
 public:
 
-	Odometry(TcpServer& tcp_server);
+	Odometry(int argc, char* argv[], TcpServer& tcp_server);
 	~Odometry();
 
 	void handleNewData(const Sensor::Ptr sensor);
 	void handleFrame();
 
 	inline const Warp::Parameters& getParameters() { return minimization_parameters; }
+
+	bool send_image_data = true;
 
 private:
 	unsigned int current_frame = 0;

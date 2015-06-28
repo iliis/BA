@@ -74,7 +74,7 @@ void printIrqStatisticsLoop(IrqScheduler* sched) {
 
 
 
-int main(void) {
+int main(int argc, char* argv[]) {
 
 	ZynqStatus status = ZynqStatus(0x78440000);
 	ZynqStatus::BitstreamVersion fpga_version = status.getBitstreamVersion();
@@ -285,7 +285,7 @@ int main(void) {
 		AutoDiscovery discovery_service(io_service, TCP_DISCOVERY_PORT);
 		discovery_service.startService();
 
-		// TCP server: streams imu messages
+		// TCP server: strea0ms imu messages
 		TcpServer tcp_server(io_service, TCP_DATA_PORT);
 
 		// IMU server: streams imu messages
@@ -312,7 +312,7 @@ int main(void) {
 		// Work loop
 		///////////////////////////////////
 
-		Odometry odometry(tcp_server);
+		Odometry odometry(argc, argv, tcp_server);
 
 		printf("starting main loop...\n");
 
@@ -496,18 +496,18 @@ int main(void) {
 
 							odometry.handleNewData(sensor);
 
-#if 0
-							GlobalTiming::tcp.Start();
-							IpComm::Header header;
-							header.timestamp = sensor->data_mover()->current_timestamp();
-							// HACK(gohlp) something is wrong with the dense data mover
-							//             header.data_size = sensor->data_mover()->current_data_size();
-							header.data_size = sensor->data_mover()->data_size();
-							header.data_id   = sensor->id();
+							if (odometry.send_image_data) {
+								GlobalTiming::tcp.Start();
+								IpComm::Header header;
+								header.timestamp = sensor->data_mover()->current_timestamp();
+								// HACK(gohlp) something is wrong with the dense data mover
+								//             header.data_size = sensor->data_mover()->current_data_size();
+								header.data_size = sensor->data_mover()->data_size();
+								header.data_id   = sensor->id();
 
-							tcp_server.sendNetworkData(sensor->data_mover()->data(), header);
-							GlobalTiming::tcp.Stop();
-#endif
+								tcp_server.sendNetworkData(sensor->data_mover()->data(), header);
+								GlobalTiming::tcp.Stop();
+							}
 
 							/*
 							Transformation t(42,1,0.123,12345,-9999,0.42);

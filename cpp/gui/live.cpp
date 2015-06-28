@@ -126,6 +126,16 @@ void show_live_data(sf::RenderWindow& window, sf::Font& font, int argc, char* ar
                         exit(0);
                         return;
 
+                    // reset scaling of window
+                    case sf::Keyboard::F12:
+                        {
+                            window.resetGLStates();
+                            sf::View v = window.getView();
+                            v.reset(sf::FloatRect(0, 0, window.getSize().x, window.getSize().y));
+                            window.setView(v);
+                        }
+                        break;
+
                     // open camera shutter (for darker conditions)
                     case sf::Keyboard::PageUp:
                         shutter *= 1.5;

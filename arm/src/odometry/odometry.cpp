@@ -9,9 +9,10 @@
 
 using namespace std;
 using namespace Eigen;
+namespace opts = boost::program_options;
 
 ///////////////////////////////////////////////////////////////////////////////
-Odometry::Odometry(TcpServer& tcp_server)
+Odometry::Odometry(int argc, char* argv[], TcpServer& tcp_server)
   : visensor_intrinsics(
               /* sensor size     */ Eigen::Vector2f(752, 480),
               /* principal point */ Eigen::Vector2f(370.105, 226.664),
@@ -23,9 +24,12 @@ Odometry::Odometry(TcpServer& tcp_server)
 {
     printf("initializing odometry...\n");
 
-    minimization_parameters.min_pyramid_levels = 2;
+    // set default parameters
+    ///////////////////////////////////////////////////////////////////////////
+
+    minimization_parameters.min_pyramid_levels = 1;
     minimization_parameters.max_pyramid_levels = 3;
-    minimization_parameters.max_iterations = 100;
+    minimization_parameters.max_iterations = 40;
     minimization_parameters.T_init = Transformation(0,0,0,0,0,0);
     minimization_parameters.gradient_norm_threshold = 0.01; //0.1;
     minimization_parameters.use_streamlined = true;
@@ -46,6 +50,29 @@ Odometry::Odometry(TcpServer& tcp_server)
 
     memset(debug_buffer0, 0, BUFSIZE);
 
+    // override with values from command line
+    ///////////////////////////////////////////////////////////////////////////
+
+    opts::options_description opts_desc("dense odometry options");
+    opts_desc.add_options()
+    		("help", "show these options")
+    		("no-images,n", "don't send any camera images")
+    		("max-pyramid", opts::value<unsigned int>(&minimization_parameters.max_pyramid_levels)->default_value(minimization_parameters.max_pyramid_levels), "highest pyramid level (max. amount of 2x downsampling steps)")
+    		("min-pyramid", opts::value<unsigned int>(&minimization_parameters.min_pyramid_levels)->default_value(minimization_parameters.min_pyramid_levels), "lowest pyramid level (highest resolution that is taken into account)")
+    ;
+
+    // parse
+    opts::variables_map vm;
+    opts::store(opts::parse_command_line(argc, argv, opts_desc), vm);
+    opts::notify(vm);
+
+    if (vm.count("help")) {
+    	cout << opts_desc << endl;
+    }
+
+    if (vm.count("no-images")) {
+    	send_image_data = false;
+    }
 
     // initialize pyramids (empty)
     ///////////////////////////////////////////////////////////////////////////
