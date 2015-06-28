@@ -1,0 +1,17 @@
+\chapter{Method}
+\label{sec:method}
+
+Hier kommt die ganze Mathe hin.
+
+explain warping:
+
+we have pixels with depth data, which in other word is a point cloud. I.e. we
+can project pixels into 3D space where they can be warped trough time and
+space. Then, we reproject them back onto the camera's image plane and get a new
+picture which is the old picture viewed from a different perspective ("warped").
+
+Now we can compare this warped image with a previous frame (called 'The Keyframe') by simply calculating the squared error of the pixel intensities. We now have a function e(T) which we can minimize using classical approaches, like Gauss-Newton:
+
+Derive that thing ($ J_I * J_P * J_T $) and use $J^T*J*dT = J^T*e(T)$.
+
+To speed things up (and hopefully to increase convergence radius, but I somehow doubt this a bit), we use an image pyramid: scale down images, find minimum, scale up a bit again, improve transformation estimation, repeat.

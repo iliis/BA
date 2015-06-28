@@ -1,0 +1,24 @@
+\chapter{Introduction}
+\label{sec:introduction}
+
+Hier kommt die Einleitung! Yes, really.
+
+normally: odometry uses sparse features, often tracked over multiple frames
+
+here, we use full image and try to warp it so that it fits the previous frame
+this eliminates all that tedious search for good and consistent features and
+makes use of all available data we need depth data, so we use a stereo camera
+
+so far, this has all been done by others [sammy's stuff, comport et al.]
+
+one of the main points of this work is to do all this on an computationally
+constraint platform, namely the visensor [reference here]. This thing features
+a ZynQ board [moar reference] with a dualcore ARM processor and an FPGA, two
+synchronized global-shutter cameras and a few other nifty things we don't use
+here (or can't even use, as somebody screwed up the FPGA configuration xD).
+
+So, the goal is to make use of the disparity data provided by the FPGA and
+integrate this thing with the other, more general purpose thing. We want to
+determine how feasible such an approach is, and we therefore want to know how
+good the performance of this is. So expect to see some timing measurements soon
+(tm).
