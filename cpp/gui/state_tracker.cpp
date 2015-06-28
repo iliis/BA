@@ -155,3 +155,18 @@ void CameraState::reset()
     trajectory.push_back(position);
 }
 ///////////////////////////////////////////////////////////////////////////////
+void CameraState::saveToDisk(const std::string& filename)
+{
+    ofstream outfile(filename);
+
+    outfile << "x, y, z" << endl;
+
+    BOOST_FOREACH(const Eigen::Vector3f& pos, trajectory) {
+        outfile << pos.x() << ", ";
+        outfile << pos.y() << ", ";
+        outfile << pos.z() << endl;
+    }
+
+    outfile.close();
+}
+///////////////////////////////////////////////////////////////////////////////

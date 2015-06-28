@@ -122,6 +122,8 @@ void show_live_data(sf::RenderWindow& window, sf::Font& font, int argc, char* ar
 
     std::vector<CameraImage> recorded_frames;
 
+    int traj_files_count = 0;
+
     while (window.isOpen())
     {
         sf::Event event;
@@ -190,6 +192,12 @@ void show_live_data(sf::RenderWindow& window, sf::Font& font, int argc, char* ar
                             recorded_frames.push_back(frame);
                             recorded_frames.back().loadFromMatrices(cam0.data, depth.data);
                         }
+                        break;
+
+                    // save current trajectory to disk
+                    case sf::Keyboard::F1:
+                        camera_state.saveToDisk("traj_" + boost::lexical_cast<string>(traj_files_count) + ".csv");
+                        ++traj_files_count;
                         break;
 
                     // run normal minimization gui

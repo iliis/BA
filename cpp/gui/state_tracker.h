@@ -28,8 +28,10 @@ public:
 
     void reset();
 
-    inline Eigen::Vector3f getPosition() { return position; }
-    inline Eigen::Matrix3f getOrientationMatrix() { return orientation; }
+    inline Eigen::Vector3f getPosition() const { return position; }
+    inline Eigen::Matrix3f getOrientationMatrix() const { return orientation; }
+
+    void saveToDisk(const std::string& filename);
 
 private:
     void drawCamera() const;
