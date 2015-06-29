@@ -28,14 +28,14 @@ end
 
 if in3d
     plot3(points(1,:), points(3,:), points(2,:), varargin{:});
-    xlabel('X');
-    ylabel('Z');
-    zlabel('Y');
+    xlabel('X [m]');
+    ylabel('Z [m]');
+    zlabel('Y [m]');
     %set(gca, 'Zdir', 'reverse');
 else
     plot(points(1,:), points(3,:), varargin{:});
-    xlabel('X');
-    ylabel('Z');
+    xlabel('X [m]');
+    ylabel('Z [m]');
 end
 
 %hold on;
