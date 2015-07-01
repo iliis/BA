@@ -1,6 +1,48 @@
 \chapter{Introduction}
 \label{sec:introduction}
 
+\section{Motivation}
+\label{sec:motivation}
+
+Robots are computationally and power consumptionally contstraint. So, we need
+algos that run fast, even on weak processors. Promising approach: Use FPGAs.
+However, not as easy to use and integrate, not suitable for every sort of
+problem.
+
+In this work, a novel example is provided of leveraging the power of an FPGA to
+run things so far requring a huge PC on an embedded device. A semi-global
+stereo matching [ref to SGM?] core developed in [ref. to dominik] provides
+disparity data for a photometric visual odometry algorithm, running on a CPU.
+
+This approach of photometric odometry does not track a sparse set of features,
+as is usuallty done in visual odometry, but instead warps the full image to
+find a perspective where the warped image matches the previous frame.
+
+This approach is well suited for offloading to an FPGA, as most parts are
+highly parallelizable. Note tough, that this is not a very efficient approach,
+as a lot more data has to be processed. The main goal was to explore how an
+FPGA and a general purpose processor can be integrated on an embedded device
+and to ascertain the potential for further optimizations by offloading more
+code to the FPGA.
+
+In our case, a visensor developed by the ASL [ref to visensor] is used which
+features a Zynq board with a dual-core ARM and a XY FPGA [ref to zynq]. This
+sensor possesses a stereo camera with syncronized global shutters as
+well as a high-precision inertial measurement unit, which was not used tough.
+
+
+
+
+
+
+- embedded visual odometry feasible?
+- 
+
+
+
+
+
+
 Hier kommt die Einleitung! Yes, really.
 
 normally: odometry uses sparse features, often tracked over multiple frames
@@ -22,3 +64,20 @@ integrate this thing with the other, more general purpose thing. We want to
 determine how feasible such an approach is, and we therefore want to know how
 good the performance of this is. So expect to see some timing measurements soon
 (tm).
+
+
+main goal: explore embedded visual odometry
+
+how to offload computation onto an FPGA (here: visensor with XY FPGA and Z ARM (Zynq))
+
+in this case: FPGA runs stereo matching (already done by Pascal et al.), use this data to do odometry on ARM (specifically, 'dense' odometry)
+
+
+\section{Related Work}
+\label{sec:related_work}
+
+Hier kommt Comport und Sammy hin...
+
+vorallem: Marcin!
+
+TODO: googlen was es sonst noch so gibt?

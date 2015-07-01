@@ -3,9 +3,18 @@
 
 Kurzer Überblick/Zusammenfassung über alles was hier gemacht wird.
 
+\cite{Raibert1986LeggedRobotsThatBalance}
+
 main points:
 - dense odometry
 - embedded
 
 
-This work investigates how fancy visual algos. can leverage the power of an FPGA to run that thing on an computationally constrained platform. Here, a relatively recent way of doing visual odometry is implemented on an ARM core: Using disparity data caculated by an FPGA from a stereo camera, a frame is warped to the previous one by minimizing photometric error. This results in high precision, as the full information of a frame is taken into account. Though not the most efficient approach, it's highly parallelizable and makes good use of the FPGA ['s stereo data].
+This work investigates how fancy visual algos. can leverage the power of an
+FPGA to run that thing on an computationally constrained platform. Here, a
+relatively recent way of doing visual odometry is implemented on an ARM core:
+Using disparity data caculated by an FPGA from a stereo camera, a frame is
+warped to the previous one by minimizing photometric error. This results in
+high precision, as the full information of a frame is taken into account.
+Though not the most efficient approach, it's highly parallelizable and makes
+good use of the FPGA ['s stereo data].

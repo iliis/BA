@@ -1,37 +1,50 @@
 \chapter*{Symbols}
 \label{sec:symbols}
 \addcontentsline{toc}{chapter}{Symbols}
-%\chapter*{Symbolverzeichnis}
-%\label{sec:symbole}
-%\addcontentsline{toc}{chapter}{Symbolverzeichnis}
 
 \section*{Symbols}
-%\section*{Symbole}
 
 \begin{tabbing}
  \hspace*{1.6cm} \= \kill
- $\mathbf{I}_k(x)$          \> keyframe intensity image \\[0.5ex]
- $\mathbf{I}_c(x)$          \> current intensity image \\[0.5ex]
- $\mathbf{D}_c(x)$          \> current disparity image \\[0.5ex]
- $\mathbf{T}$            \> 6-DOF transformation \\[0.5ex]
- $\phi, \theta, \psi$    \> roll, pitch and yaw angle \\[0.5ex]
+ $\mathbf{I}(\vec{x})$          \> intensity image \\[0.5ex]
+ $\mathbf{D}(\vec{x})$          \> disparity image \\[0.5ex]
+ $\vec{T}$                      \> 6-DOF transformation \\[0.5ex]
+ $\phi, \theta, \psi$           \> roll, pitch and yaw angle \\[0.5ex]
+ \\
+ stereo camera intrinsics: \\
+ $f$                            \> focal length \\[0.5ex]
+ $\vec{c}$                      \> principal point \\[0.5ex]
+ $b$                            \> baseline \\[0.5ex]
+ \\
+ warping: \\
+ $\pi^{-1}$                     \> back-projection operator, mapping a pixel with corresponding disparity value into 3D space \\[0.5ex]
+ $\pi$                          \> projection operator, mapping a point in 3D space onto the camera plane \\[0.5ex]
+ $\mat{J_T}$                    \> $6 \times 3$ Jacobian of the transformation operator $\vec{T}$ \\[0.5ex]
+ $\mat{J_P}$                    \> $3 \times 2$ Jacobian of the projection function $\pi$ \\[0.5ex]
+ $\mat{J_I}$                    \> $2 \times 1$ Jacobian of the intensity image sampling \\[0.5ex]
 \end{tabbing}
 
 \section*{Indices}
 %\section*{Indizes}
 \begin{tabbing}
  \hspace*{1.6cm}  \= \kill
- $x$ \> x axis \\[0.5ex]
- $y$ \> y axis \\[0.5ex]
+ TODO \\
+ $c$ \> current frame \\[0.5ex]
+ $p$ \> previous frame \\[0.5ex]
+ $x, y, z$ \> world coordinates ($\in \mathbb{R}^3$, \unit{meters}) \\[0.5ex]
+ $u, v$ \> coordinates in camera plane ($\in \mathbb{R}^2$, \unit{pixels}) \\[0.5ex]
+
 \end{tabbing}
 
 \section*{Acronyms and Abbreviations}
 %\section*{Akronyme und Abkürzungen}
 \begin{tabbing}
  \hspace*{1.6cm}  \= \kill
+ TODO \\
  ETH \> Eidgenössische Technische Hochschule \\[0.5ex]
- EKF \> Extended Kalman Filter \\[0.5ex]
+ ASL \> Autonomous Systems Lab \\[0.5ex]
  IMU \> Inertial Measurement Unit \\[0.5ex]
+ SGM \> Semi-Global Matching \\[0.5ex]
+
  UAV \> Unmanned Aerial Vehicle \\[0.5ex]
- UKF \> Unscented Kalman Filter \\[0.5ex]
 \end{tabbing}

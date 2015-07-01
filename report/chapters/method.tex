@@ -1,48 +1,234 @@
 \chapter{Method}
 \label{sec:method}
 
-Hier kommt die ganze Mathe hin.
-
-explain warping:
 
 
-The goal of visual odometry is to estimate the ego-motion between two frames, often a keyframe ([todo: move this elsewhere] which is changed whenever the delta becomes too large) and a current frame.
+\section{Overview}
 
-Each frame consists of a stereo pair of intensity data (camera is BW, but RGB could be used too, probably not much better, just more computation required) and a disparity image, which maps a pixel in the left image to a pixel on the right.
-
-Each frame consists of a stereo pair of intensity data [footnote BW] from which the FPGA calculates a disparity image.
-
-The odometry only works on the left image and the disparity data. Using an inverse projection, a point $ x = (u, v) $ in the camera image plane can be projected into R3:
-
-$ p = \pi^{-1}(x, D(x)) = b / D(x) * [ u - c_u # v - c_v # f ] $
-
-where $b$ is the stereo baseline, $f$ the focal length and $c$ the principal point of the camera.
-
-This point $p$ can now be moved into a new camera frame by translating and rotating it:
-
-$ p' = T_R * p + T_T $
-
-Where $T_R$ is a 3x3 rotation matrix and $T_T$ a three dimensional translation vector. Using affine coordinates, we can write this as:
-
-$ p' = T * p $
-
-Now, we project this point back onto the new camera image plane:
-
-$ x' = \pi(p') = f / Z * [ X Y ] + c $
-
-This whole warping operator can be summarized as:
-
-$ x' = \tau(x, D(x), T) = \pi( T * \pi^{-1} (x, D(x))) $
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=\textwidth]{images/system_overview.pdf}
+    \caption{schematic overview of the whole system}
+    \label{fig:overview}
+\end{figure}
 
 
+The visensor provides a stream of frames, each of which consists of a stereo
+pair of intensity data \footnote{Grayscale instead of full-color images are
+used, because the information gain from colors is offset by the loss of
+resolution. However, the approach described here would work similarly colors.}.
 
-we have pixels with depth data,  which we
-can project pixels into 3D space where they can be warped trough time and
-space. Then, we reproject them back onto the camera's image plane and get a new
-picture which is the old picture viewed from a different perspective ("warped").
+A semiglobal stereo matching core developed by [todo: ref] running on the FPGA
+processes these and produces a disparity image which assigns every pixel the
+disparity between the two cameras. The FPGA also provides a rectified camera
+image.
 
-Now we can compare this warped image with a previous frame (called 'The Keyframe') by simply calculating the squared error of the pixel intensities. We now have a function e(T) which we can minimize using classical approaches, like Gauss-Newton:
+This pair of intensity and disparity images is conceptually equivalent to a
+three dimensional point-cloud, as we can calculate the distance to the camera
+for every pixel from the disparity data. This is in turn makes it possible to
+render the point-cloud from an arbitrary perspective, allowing us to look at an
+image as if it was recorded from a different angle.
 
-Derive that thing ($ J_I * J_P * J_T $) and use $J^T*J*dT = J^T*e(T)$.
+To estimate the ego-motion between two frames we can thus look for a
+perspective that looks the same as the previous frame.  The movement of the
+virtual camera will then correspond to the actual, physical movement of the
+sensor.
 
-To speed things up (and hopefully to increase convergence radius, but I somehow doubt this a bit), we use an image pyramid: scale down images, find minimum, scale up a bit again, improve transformation estimation, repeat.
+By subtracting the intensities from the previous frame with the
+intensities of the current frame sampled at the warped pixel locations a
+photometric error is calculated, measuring the similarity of the warped current
+frame with the previous one. The problem is now to minimize this error function.
+
+Note that this approach assumes photoconsistency: Points have the same
+intensity, regardless of viewing angle.
+
+
+\section{Warping Pipeline}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=\textwidth]{images/warp_pipeline.pdf}
+    \caption{the full warping pipeline (pink pixels are not sampled by any of the warped points)}
+    \label{fig:warp_pipeline}
+\end{figure}
+
+
+Using an inverse projection derived from the standard pinhole camera model, a
+point $ \vec{x} $ in the camera image plane can be back-projected into a point
+$ \vec{p} $ in $ \mathbb{R}^3 $:
+
+\begin{equation}
+    \vec{p} = \pi^{-1}(\vec{x}, D(\vec{x})) := \frac{b}{D(x)}
+    \begin{bmatrix}
+        \vec{x_u} - \vec{c_u} \\
+        \vec{x_v} - \vec{c_v} \\
+        f
+    \end{bmatrix}
+\end{equation}
+
+where $b$ is the stereo baseline, $f$ the focal length and $\vec{c}$ the principal point of the camera.
+
+This point $\vec{p}$ can now be moved into a new camera frame by translating and rotating it:
+
+\begin{equation}
+    \vec{p'} = \mat{T_R} \cdot \vec{p} + \vec{T_T}
+\end{equation}
+
+Where $T_R$ is a 3x3 rotation matrix and $T_T$ a three dimensional translation
+vector. Using affine coordinates, we can write this as:
+
+\begin{equation}
+    \vec{p'} = \mat{T} \vec{p}
+\end{equation}
+
+A point in 3D space can be projected back onto the (now moved) camera image plane:
+
+\begin{equation}
+    \vec{x'} = \pi(\vec{p'}) := \frac{f}{\vec{p'}_z}
+    \begin{bmatrix}
+        \vec{p'}_x \\
+        \vec{p'}_y \\
+    \end{bmatrix}
+    + \vec{c}
+\end{equation}
+
+This whole warping operator can be summarized in a warping operator $\tau$:
+
+\begin{equation}
+    \vec{x'} = \tau(\vec{x}, D(\vec{x}), T) := \pi( \mat{T} \cdot \pi^{-1} (\vec{x}, D(\vec{x})))
+\end{equation}
+
+
+
+TODO:
+we have pixels with depth data, which we can project pixels into 3D space where
+they can be warped trough time and space. Then, we reproject them back onto the
+camera's image plane and get a new picture which is the old picture viewed from
+a different perspective ("warped").
+
+Now we can compare this warped image with a previous frame (called 'The
+Keyframe') by simply calculating the squared error of the pixel intensities. We
+now have a function e(T) which we can minimize using classical approaches, like
+Gauss-Newton:
+
+Derive that thing ($ J_I * J_P * J_T $) and use $J^T*J*\Delta T = J^T*e(T)$.
+
+To speed things up (and hopefully to increase convergence radius, but I somehow
+doubt this a bit), we use an image pyramid: scale down images, find minimum,
+scale up a bit again, improve transformation estimation, repeat.
+
+- note on occlusions -> could use a Z-Buffer or something, but how to actually implement? (open question!)
+- still would need to handle outliers due to noise and moving things (people...)
+
+
+
+
+\section{Minimization}
+
+
+
+\section{Optimizations and other improvements}
+\label{sec:optimizations}
+
+Works, but not real-time capable so far. Too much data to process...
+
+\subsection{Image pyramids}
+
+A common optimization technique is the use of multiple resolutions: Images are
+repeatedly downscaled by a factor of two (essentially quartering the number of
+pixels) by averaging over a 2 x 2 block to generate a stack of increasingly
+smaller images (a 'pyramid').
+
+The minimization is run on the smallest set of images and the resulting value
+is used as an initial value for the next bigger set of images.
+
+This greatly reduces the number of iterations required and enhances the
+convergence radius.
+
+The image pyramid can also be used to trade a bit of accuracy for even more
+performance gain by simply aborting early and not using the full resolution at
+all. Throwing out the one or two uppermost levels usually incurs negligible
+loss of accuracy. See also section~[TODO: ref to results] 
+
+
+\subsection{Pixel selection by image gradient}
+\label{subsec:gradient_filtering}
+
+We can further optimize away pixels which do not strongly influence the
+minimization such as points in homogenous image regions where $\nabla
+\mathbf{I} \approx 0$ and therefore $\mat{J_I} \approx 0$.
+
+This is already provided to some extent by the semi-global matching alorithm,
+as pixels without strong gradients are usally hard to match and therefore often
+don't provide a disparity value.
+
+\subsection{Weighting of errors}
+
+By robustly weighting the photometric error terms outliers can be dampened to
+reduce the influence of occlusions, moving scenery or other noise, such as
+errors from the semi-global matcher. This improves quality and stability with
+negligible performance penalty.
+
+\subsection{Keyframes}
+
+Instead of matching the previous frame, a keyframe can be used which is only
+updated when the relative motion gets too big. This way, drift can be reduced
+and even completely eliminated when being more or less stationary.
+
+This has not been investigated in this work.
+
+
+
+
+\section{Implementation details}
+
+A few things that are only tangentially related to the core algorithm but which
+nevertheless might be encountered in an actual implementation:
+
+\subsection{Representation of transformation}
+
+A six degree of freedom transformation can be represented in multiple ways.
+While translations are very straightforward, rotations can be represented in
+numerous ways (Euler-angles, quaternions, rotation matrices, etc.) and proper
+derivation of the Jacobians can be tricky.
+
+Fortunately, odometry works in a relative fashion without any absolute
+orientation and steps are very incremental as photometric odometry cannot
+handle more than a few degrees of rotation. This implies we do not have to deal
+with gimbal-lock and other mathematical hurdles of working in $SO(3)$.
+
+\subsection{Image scaling}
+
+Care has to be taken to properly downscale image coordinates when working with
+image pyramids. This can be done by scaling the camera intrinsics properly:
+Halving the image width also means halving the focal length and doubling the
+baseline.
+
+Downscaling usually implies filtering and doing so alters the 3D structure. For
+this reason, [ref to comport ICP] does not downscale the disparity values and
+samples them at the full resolution. When matching pose on the camera plane
+instead of in 3D space, downscaling the disparity values works as well
+\footnote{It might be worth investigating how much of an effect on performance
+and quality downscaling the disparity images has. Disparity values are only
+read at integer coordinates and downscaling them might not be worth the runtime
+penalty.}.
+
+\subsection{Ignore invalid pixels}
+
+Pixels that do not have a disparity value (because the SGM algorithm couldn't
+find any correspondence) can obviously be ignored. So can pixels which are
+saturated or underexposed: They do not provide valid disparity data and are
+often not photoconsistent either.
+
+\subsection{Don't remove too many pixels}
+
+The optimizations described in section~\ref{sec:optimizations} can
+substantially reduce the pixel count, so much so that there are not enough for
+stable performance. Especially filtering pixels based on their image gradient
+as explained in section~\ref{subsec:gradient_filtering} requires a well-chosen
+threshold, as image gradients depend on the scene. [ref to ICP] proposes the
+calculation of a histogram to select the $N$ best pixels. An easier approach is
+to simply restart the current iteration with a lower threshold when the number
+of pixels gets too low and increasing it after a step with enough pixels. The
+same problem also applies to other optimization parameters such as the size of
+the image pyramid.
