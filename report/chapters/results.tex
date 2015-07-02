@@ -24,13 +24,13 @@ SGM from OpenCV and run trough both the very accurate ASLAM algorithm
 this work.
 
 After a traveled distance of about \unit[12]{m} a drift of about \unit[20]{cm}
-has been found. On faster trajectories with larger movement between frames, the
-Gauss-Newton optimization can diverge resulting in a completely wrong
-trajectory.
+has been accumulated. On faster trajectories with larger movement between
+frames, the Gauss-Newton optimization can diverge resulting in a completely
+wrong trajectory.
 
 An important finding, which was already noted in [TODO: can't find a paper
 mentioning this], is that processing the camera images in their full resolution
-is not a necessity and as can be seen in figure~\ref{fig:trajectory} even using
+is not a necessity. As can be seen in figure~\ref{fig:trajectory}, even using
 only a twice downscaled image still results in precise tracking while
 drastically improving performance.
 
@@ -45,9 +45,9 @@ drastically improving performance.
     \label{fig:timing}
 \end{figure}
 
-Perfomance of the different parts of the algorithm have been timed by counting
-cpu cycles while running the full photometric odometry on a single ARM core on
-the vi-sensor while moving around slowly. The time for the SGM is not shown in
+The different parts of the algorithm have been timed by counting CPU cycles
+while running the full photometric odometry on a single ARM core on the
+vi-sensor while moving around slowly. The time for the SGM is not shown in
 figure~\ref{fig:timing}, as this part is running on the FPGA with the full 30
 FPS provided by the cameras.
 
@@ -57,7 +57,7 @@ This value not only depends on the algorithm's parameters such as max. pyramid
 levels, but also on the scene (more 'dense' environments which provide more
 structure converge faster) and on the movement speed. The bigger the steps, the
 more iterations are required for convergence, which is counterproductive as a
-longer running time implies an even bigger step when moving. This could
+longer running time implies an even bigger step while moving. This could
 potentially be addressed by incorporating integrated acceleration values of an
 IMU.
 

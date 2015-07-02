@@ -14,14 +14,13 @@
 
 
 The visensor provides a stream of frames, each of which consists of a stereo
-pair of intensity data \footnote{Grayscale instead of full-color images are
-used, because the information gain from colors is offset by the loss of
-resolution. However, the approach described here would work similarly colors.}.
-
-A semiglobal stereo matching core developed in \cite{honegger2014sgmcore}
-running on the FPGA processes these and produces a disparity image which
-assigns every pixel the disparity between the two cameras. The FPGA also
-provides a rectified camera image.
+pair of grayscale intensity data \footnote{Grayscale instead of full-color
+images are used, because the information gain from colors is offset by the loss
+of resolution. However, the approach described here would work similarly
+with colored images.}.  A semiglobal stereo matching core developed in
+\cite{honegger2014sgmcore} running on the FPGA processes these and produces a
+disparity image which assigns every pixel the disparity between the two
+cameras. The FPGA also provides a rectified camera image.
 
 This pair of intensity and disparity images is conceptually equivalent to a
 three dimensional point-cloud, as we can calculate the distance to the camera
@@ -30,16 +29,17 @@ render the point-cloud from an arbitrary perspective, allowing us to look at an
 image as if it was recorded from a different angle.
 
 To estimate the ego-motion between two frames we can thus look for a
-perspective that looks the same as the previous frame.  The movement of the
-virtual camera will then correspond to the actual, physical movement of the
-sensor.
+perspective where the re-rendered image looks the same as the previous frame.
+The movement of the virtual camera will then correspond to the actual, physical
+movement of the sensor.
 
-By subtracting the intensities from the previous frame with the
-intensities of the current frame sampled at the warped pixel locations a
-photometric error is calculated, measuring the similarity of the warped current
-frame with the previous one. The problem is now to minimize this error function.
+The problem is formulized as a minimization problem, by subtracting the
+intensities from the previous frame with the intensities of the current frame
+sampled at the warped pixel locations. This way, a photometric error is
+calculated, measuring the similarity of the warped current frame with the
+previous one.
 
-Note that this approach assumes photoconsistency: Points have the same
+Note that this approach assumes photoconsistency: Points should have the same
 intensity, regardless of viewing angle.
 
 
@@ -55,7 +55,7 @@ intensity, regardless of viewing angle.
 This section closely follows \cite{omaridenseodometry}.
 
 Using an inverse projection derived from the standard pinhole camera model, a
-point $ \vec{x} $ in the camera image plane can be back-projected into a point
+point $ \vec{x} $ in the camera image plane is be back-projected into a point
 $ \vec{p} $ in $ \mathbb{R}^3 $:
 
 \begin{equation}
@@ -76,8 +76,8 @@ This point $\vec{p}$ can now be moved into a new camera frame by translating and
     \vec{p'} = \mat{T_R} \cdot \vec{p} + \vec{T_T}
 \end{equation}
 
-Where $T_R$ is a 3x3 rotation matrix and $T_T$ a three dimensional translation
-vector. Using affine coordinates, we can write this as:
+Here, $\mat{T_R}$ is a $3 \times 3$ rotation matrix and $\vec{T_T}$ a three dimensional translation
+vector. Using affine coordinates, we can write this with a $4 \times 4$ transformation matrix:
 
 \begin{equation}
     \vec{p'} = \mat{T} \vec{p}
@@ -95,7 +95,7 @@ A point in 3D space can be projected back onto the (now moved) camera image plan
     + \vec{c}
 \end{equation}
 
-This whole warping operator can be summarized in a warping operator $\tau$:
+This whole warping operator is summarized in a warping operator $\tau$:
 
 \begin{equation}
     \vec{x'} = \tau(\vec{x}, D(\vec{x}), \vec{T}) := \pi( \mat{T} \cdot \pi^{-1} (\vec{x}, D(\vec{x})))
@@ -105,15 +105,16 @@ This whole warping operator can be summarized in a warping operator $\tau$:
 
 \section{Minimization}
 
-Using $\tau$, the error between the previous frame and the warped current frame can be defined as:
+Using $\tau$, the error between the previous frame and the warped current frame is be defined as:
 
 \begin{equation}
+    \label{eq:error}
     e(\vec{x}, \vec{T}) := I_p(\tau(\vec{x}, \vec{T})) - I_c(\vec{x})
 \end{equation}
 
 
 To estimate the motion between two frames, this photometric error term should
-be minimal for every pixel:
+be minimized for every pixel:
 
 \begin{equation}
     \vec{\hat{T}} = \operatornamewithlimits{argmin}_{\vec{T}} \sum_{\vec{x} \in I_p} e(\vec{x}, \vec{T})^2
@@ -121,19 +122,19 @@ be minimal for every pixel:
 
 
 This equation can be solved for the estimated motion by applying standard
-optimization techniques, for exmple Gauss-Newton:
+optimization techniques, for example Gauss-Newton:
 
 \begin{equation}
     \mat{J}^T \mat{J} \Delta \vec{T} = - \mat{J}^T \vec{e(\vec{T})}
 \end{equation}
 
-Here, $\mat{J} \in \mathbb{R}^{N \times 6}$ is the stacked Jacobian matrices
+Here, $\mat{J} \in \mathbb{R}^{N \times 6}$ are the stacked Jacobian matrices
 and $\vec{e(\vec{T})} \in \mathbb{R}^N$ the vector of the error terms of all
 $N$ pixels.  This equation is iteratively solved for the increment $\Delta
 \vec{T}$ of the motion estimation after recalculating the error term and
 Jacobians from the new estimation.
 
-The Jacobian is derived by applying the chain rule to photometric error term.
+The Jacobian is derived by applying the chain rule to the photometric error term \ref{eq:error}.
 For a single pixel, we get a $1 \times 6$ Jacobian:
 
 \begin{equation}

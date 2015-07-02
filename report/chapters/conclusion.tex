@@ -1,18 +1,10 @@
 \chapter{Conclusion}
 \label{sec:conclusion}
 
-Embedded odometry is feasible, but needs more optimization to run in realtime. E.g. by offloading XY to FPGA.
-
-- better error rejection
-- use IMU
-- user arm neon / more of fpga
-- use keyframes
-
-
 This work has shown that running photometric odometry on a computationally
 constrained platform is feasible and a perfomance of 5 Hz can be achieved by
 running semi-global matching on the FPGA and a few optimizations, mainly early
 abort in the image pyramid.
 
 It also shows clearly, that there is still a big potential for moving even more
-parts onto the FPGA and achieving odometry out-of-the (small and lightweight) box.
+parts onto the FPGA to one day achieve odometry out-of-the (small and lightweight) box.

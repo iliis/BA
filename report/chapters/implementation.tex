@@ -1,14 +1,13 @@
-\chapter{Implementation details}
+\chapter{Implementation Details}
 
 A few things that are only tangentially related to the core algorithm but which
 nevertheless might be encountered in an actual implementation:
 
 \section{Representation of transformation}
 
-A six degree of freedom transformation can be represented in multiple ways.
-While translations are very straightforward, rotations can be represented in
-numerous ways (Euler-angles, quaternions, rotation matrices, etc.) and proper
-derivation of the Jacobians can be tricky.
+While translations are mathematically very straightforward, rotations can be
+represented in numerous ways (Euler-angles, quaternions, rotation matrices,
+etc.) and proper derivation of the Jacobians can be tricky.
 
 Fortunately, odometry works in a relative fashion without any absolute
 orientation and steps are very incremental as photometric odometry cannot
@@ -23,8 +22,8 @@ Halving the image width also means halving the focal length and doubling the
 baseline.
 
 Downscaling usually implies filtering and doing so alters the 3D structure. For
-this reason, [ref to comport ICP] does not downscale the disparity values and
-samples them at the full resolution. When matching pose on the camera plane
+this reason, \cite{comport2007odometry} does not downscale the disparity values and
+samples them at the full resolution. Though when matching pose on the camera plane
 instead of in 3D space, downscaling the disparity values works as well
 \footnote{It might be worth investigating how much of an effect on performance
 and quality downscaling the disparity images has. Disparity values are only
@@ -35,8 +34,8 @@ penalty.}.
 
 Pixels that do not have a disparity value (because the SGM algorithm couldn't
 find any correspondence) can obviously be ignored. So can pixels which are
-saturated or underexposed: They do not provide valid disparity data and are
-often not photoconsistent either.
+saturated or underexposed: They provide neither a good gradient nor valid
+disparity data and are often not photoconsistent.
 
 \section{Don't remove too many pixels}
 
@@ -44,9 +43,9 @@ The optimizations described in section~\ref{sec:optimizations} can
 substantially reduce the pixel count, so much so that there are not enough for
 stable performance. Especially filtering pixels based on their image gradient
 as explained in section~\ref{sec:gradient_filtering} requires a well-chosen
-threshold, as image gradients depend on the scene. [ref to ICP] proposes the
-calculation of a histogram to select the $N$ best pixels. An easier approach is
-to simply restart the current iteration with a lower threshold when the number
-of pixels gets too low and increasing it after a step with enough pixels. The
-same problem also applies to other optimization parameters such as the size of
-the image pyramid.
+threshold, as image gradients depend on the scene. \cite{comport2007odometry}
+computes a histogram to select the $N$ best pixels. An easier approach is to
+simply restart the current iteration with a lower threshold when the number of
+pixels gets too low and increasing it after a step with enough pixels, as in
+\cite{omaridenseodometry}. The same problem also applies to other optimization
+parameters such as the size of the image pyramid.

@@ -8,8 +8,6 @@
  \hspace*{1.6cm} \= \kill
  $\mathbf{I}(\vec{x})$          \> intensity image \\[0.5ex]
  $\mathbf{D}(\vec{x})$          \> disparity image \\[0.5ex]
- $\vec{T}$                      \> 6-DOF transformation \\[0.5ex]
- $\phi, \theta, \psi$           \> roll, pitch and yaw angle \\[0.5ex]
  \\
  stereo camera intrinsics: \\
  $f$                            \> focal length \\[0.5ex]
@@ -19,6 +17,7 @@
  warping: \\
  $\pi^{-1}$                     \> back-projection operator, mapping a pixel with corresponding disparity value into 3D space \\[0.5ex]
  $\pi$                          \> projection operator, mapping a point in 3D space onto the camera plane \\[0.5ex]
+ $\vec{T}$                      \> 6-DOF transformation \\[0.5ex]
  $\mat{J_T}$                    \> $3 \times 6$ Jacobian of the transformation operator $\vec{T}$ \\[0.5ex]
  $\mat{J_{\pi}}$                    \> $2 \times 3$ Jacobian of the projection function $\pi$ \\[0.5ex]
  $\mat{J_I}$                    \> $1 \times 2$ Jacobian of the intensity image sampling \\[0.5ex]
@@ -28,7 +27,6 @@
 %\section*{Indizes}
 \begin{tabbing}
  \hspace*{1.6cm}  \= \kill
- TODO \\
  $c$ \> current frame \\[0.5ex]
  $p$ \> previous frame \\[0.5ex]
  $x, y, z$ \> world coordinates ($\in \mathbb{R}^3$, \unit{meters}) \\[0.5ex]
@@ -40,7 +38,6 @@
 %\section*{Akronyme und Abkürzungen}
 \begin{tabbing}
  \hspace*{1.6cm}  \= \kill
- TODO \\
  ETH \> Eidgenössische Technische Hochschule \\[0.5ex]
  ASL \> Autonomous Systems Lab at ETH \\[0.5ex]
  IMU \> Inertial Measurement Unit \\[0.5ex]
