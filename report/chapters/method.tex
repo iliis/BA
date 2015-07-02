@@ -52,6 +52,7 @@ intensity, regardless of viewing angle.
     \label{fig:warp_pipeline}
 \end{figure}
 
+This section closely follows \cite{omaridenseodometry}.
 
 Using an inverse projection derived from the standard pinhole camera model, a
 point $ \vec{x} $ in the camera image plane can be back-projected into a point
@@ -176,6 +177,8 @@ the most costly term to compute:
 
 
 
+
+
 \section{Optimizations and other improvements}
 \label{sec:optimizations}
 
@@ -184,6 +187,7 @@ slow performance and does not nearly run in realtime on an embedded device.
 Therefore, some optimization strategies are applied:
 
 \subsection{Image pyramids}
+\label{sec:pyramids}
 
 A common optimization technique is the use of multiple resolutions: Images are
 repeatedly downscaled by a factor of two (essentially quartering the number of
@@ -199,7 +203,7 @@ convergence radius.
 The image pyramid can also be used to trade a bit of accuracy for even more
 performance gain by simply aborting early and not using the full resolution at
 all. Throwing out the one or two uppermost levels usually incurs negligible
-loss of accuracy. See also section~[TODO: ref to results] 
+loss of accuracy. See also section~\ref{sec:results_qualitative}.
 
 
 \subsection{Pixel selection by image gradient}
@@ -223,14 +227,34 @@ negligible performance penalty.
 Another idea (which wasn't fully investigated) to handle occlusions is to use a
 Z-buffer to eliminate points which are behind others when warped.
 
-\subsection{Keyframes}
 
-Instead of matching the previous frame, a keyframe can be used which is only
+\subsection{Further possible optmiziations}
+
+A few things which have not been investigated in this work but which provide
+good avenues for further optimizations:
+
+\subsubsection{integration of IMU}
+
+Modern visual odometry and SLAM systems such as \cite{leutenegger2013keyframe}
+incorporate data from an inertial measurement unit using various complicated
+filtering schemes to increase accuracy.
+
+In contrast, using integrated acceleration values for pohotometric odometry
+would be trivial by providing a good initial guess for the minimization process
+and could greatly speed up perfomance by reducing the number of required
+optimization iterations.
+
+\subsubsection{Keyframes}
+
+Instead of matching the previous frame, keyframes can be used which are only
 updated when the relative motion gets too big. This way, drift can be reduced
 and even completely eliminated when being more or less stationary.
 
-This has not been investigated in this work.
+\subsubsection{Offload more work to FPGA}
 
+Large parts of the photometric odometry algorithm are highly parallelizable and
+would profit from an implementation running on the FPGA. This is the main point
+of this work and is further discussed in section~\ref{sec:timing}.
 
 
 

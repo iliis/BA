@@ -1,10 +1,69 @@
 \chapter{Results}
 \label{sec:results}
 
-Hier kommen:
-- timings
-- a few notes about simulation
-- qualitiative evaluation
-    - circles
 
-    To assess the accuracy of photometric odoemtry, [We/I] ran in circles and measured the final offset. For high quality depth images, generated offline by OpenCV [insert exact algo here] we get an error of [about 10-20cm for a circle with diam 3.5m/length=???]. Using the more noisy depth output of the FPGA, we get an error of [TODO].
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{images/traj_aslam_downscaled.pdf}
+    \caption{qualitative comparison of photometric odometry to ASLAM. The red
+    trajectory was computed using full image resolution, while the orange one
+    only uses $\nicefrac{1}{16}^{th}$ of the available pixels by aborting early in
+the image pyramid, thus greatly speeding up runtime performance at negligible
+loss of accuracy.}
+    \label{fig:trajectory}
+\end{figure}
+
+\section{Qualitative assessment}
+\label{sec:results_qualitative}
+
+To assess the quality of photometric approach to visual odometry, a circual
+trajectory of an indoor office scene was processed offline with a high quality
+SGM from OpenCV and run trough both the very accurate ASLAM algorithm
+\cite{leutenegger2013keyframe} and the photometric odometry method described in
+this work.
+
+After a traveled distance of about \unit[12]{m} a drift of about \unit[20]{cm}
+has been found. On faster trajectories with larger movement between frames, the
+Gauss-Newton optimization can diverge resulting in a completely wrong
+trajectory.
+
+An important finding, which was already noted in [TODO: can't find a paper
+mentioning this], is that processing the camera images in their full resolution
+is not a necessity and as can be seen in figure~\ref{fig:trajectory} even using
+only a twice downscaled image still results in precise tracking while
+drastically improving performance.
+
+
+\section{Timing}
+\label{sec:timing}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{images/timing.pdf}
+    \caption{perfomance breakdown using early abort of the image pyramid}
+    \label{fig:timing}
+\end{figure}
+
+Perfomance of the different parts of the algorithm have been timed by counting
+cpu cycles while running the full photometric odometry on a single ARM core on
+the vi-sensor while moving around slowly. The time for the SGM is not shown in
+figure~\ref{fig:timing}, as this part is running on the FPGA with the full 30
+FPS provided by the cameras.
+
+Using early abort in the image pyramid we can achieve an average run-time
+performance of about 5 Hz.
+
+This value not only depends on the algorithm's parameters such as max. pyramid
+levels, but also on the scene (more 'dense' environments which provide more
+structure converge faster) and on the movement speed. The bigger the steps, the
+more iterations are required for convergence, which is counterproductive as a
+longer running time implies an even bigger step when moving. This could
+potentially be addressed by incorporating integrated acceleration values of an
+IMU.
+
+Another important point is that at least half the time is spent on calculating
+the image pyramid, warping pixels and computing the Jacobians. These parts are
+highly parallelizable because every pixel is completely independent of each
+other. This offers great potential for offloading further work onto the FPGA,
+or the second ARM core.
