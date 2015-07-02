@@ -18,10 +18,10 @@ pair of intensity data \footnote{Grayscale instead of full-color images are
 used, because the information gain from colors is offset by the loss of
 resolution. However, the approach described here would work similarly colors.}.
 
-A semiglobal stereo matching core developed by [todo: ref] running on the FPGA
-processes these and produces a disparity image which assigns every pixel the
-disparity between the two cameras. The FPGA also provides a rectified camera
-image.
+A semiglobal stereo matching core developed in \cite{honegger2014sgmcore}
+running on the FPGA processes these and produces a disparity image which
+assigns every pixel the disparity between the two cameras. The FPGA also
+provides a rectified camera image.
 
 This pair of intensity and disparity images is conceptually equivalent to a
 three dimensional point-cloud, as we can calculate the distance to the camera

@@ -53,7 +53,6 @@ FPS provided by the cameras.
 
 Using early abort in the image pyramid we can achieve an average run-time
 performance of about 5 Hz.
-
 This value not only depends on the algorithm's parameters such as max. pyramid
 levels, but also on the scene (more 'dense' environments which provide more
 structure converge faster) and on the movement speed. The bigger the steps, the
@@ -62,8 +61,8 @@ longer running time implies an even bigger step when moving. This could
 potentially be addressed by incorporating integrated acceleration values of an
 IMU.
 
-Another important point is that at least half the time is spent on calculating
-the image pyramid, warping pixels and computing the Jacobians. These parts are
+Another important point is that at least half the time is spent on building the
+image pyramid, warping pixels and computing the Jacobians. These parts are
 highly parallelizable because every pixel is completely independent of each
 other. This offers great potential for offloading further work onto the FPGA,
 or the second ARM core.
