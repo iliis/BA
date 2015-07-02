@@ -58,6 +58,7 @@ point $ \vec{x} $ in the camera image plane can be back-projected into a point
 $ \vec{p} $ in $ \mathbb{R}^3 $:
 
 \begin{equation}
+    \label{eq:backprojection}
     \vec{p} = \pi^{-1}(\vec{x}, D(\vec{x})) := \frac{b}{D(x)}
     \begin{bmatrix}
         \vec{x_u} - \vec{c_u} \\
@@ -84,6 +85,7 @@ vector. Using affine coordinates, we can write this as:
 A point in 3D space can be projected back onto the (now moved) camera image plane:
 
 \begin{equation}
+    \label{eq:projection}
     \vec{x'} = \pi(\vec{p'}) := \frac{f}{\vec{p'}_z}
     \begin{bmatrix}
         \vec{p'}_x \\
@@ -95,42 +97,91 @@ A point in 3D space can be projected back onto the (now moved) camera image plan
 This whole warping operator can be summarized in a warping operator $\tau$:
 
 \begin{equation}
-    \vec{x'} = \tau(\vec{x}, D(\vec{x}), T) := \pi( \mat{T} \cdot \pi^{-1} (\vec{x}, D(\vec{x})))
+    \vec{x'} = \tau(\vec{x}, D(\vec{x}), \vec{T}) := \pi( \mat{T} \cdot \pi^{-1} (\vec{x}, D(\vec{x})))
 \end{equation}
 
 
 
-TODO:
-we have pixels with depth data, which we can project pixels into 3D space where
-they can be warped trough time and space. Then, we reproject them back onto the
-camera's image plane and get a new picture which is the old picture viewed from
-a different perspective ("warped").
-
-Now we can compare this warped image with a previous frame (called 'The
-Keyframe') by simply calculating the squared error of the pixel intensities. We
-now have a function e(T) which we can minimize using classical approaches, like
-Gauss-Newton:
-
-Derive that thing ($ J_I * J_P * J_T $) and use $J^T*J*\Delta T = J^T*e(T)$.
-
-To speed things up (and hopefully to increase convergence radius, but I somehow
-doubt this a bit), we use an image pyramid: scale down images, find minimum,
-scale up a bit again, improve transformation estimation, repeat.
-
-- note on occlusions -> could use a Z-Buffer or something, but how to actually implement? (open question!)
-- still would need to handle outliers due to noise and moving things (people...)
-
-
-
-
 \section{Minimization}
+
+Using $\tau$, the error between the previous frame and the warped current frame can be defined as:
+
+\begin{equation}
+    e(\vec{x}, \vec{T}) := I_p(\tau(\vec{x}, \vec{T})) - I_c(\vec{x})
+\end{equation}
+
+
+To estimate the motion between two frames, this photometric error term should
+be minimal for every pixel:
+
+\begin{equation}
+    \vec{\hat{T}} = \operatornamewithlimits{argmin}_{\vec{T}} \sum_{\vec{x} \in I_p} e(\vec{x}, \vec{T})^2
+\end{equation}
+
+
+This equation can be solved for the estimated motion by applying standard
+optimization techniques, for exmple Gauss-Newton:
+
+\begin{equation}
+    \mat{J}^T \mat{J} \Delta \vec{T} = - \mat{J}^T \vec{e(\vec{T})}
+\end{equation}
+
+Here, $\mat{J} \in \mathbb{R}^{N \times 6}$ is the stacked Jacobian matrices
+and $\vec{e(\vec{T})} \in \mathbb{R}^N$ the vector of the error terms of all
+$N$ pixels.  This equation is iteratively solved for the increment $\Delta
+\vec{T}$ of the motion estimation after recalculating the error term and
+Jacobians from the new estimation.
+
+The Jacobian is derived by applying the chain rule to photometric error term.
+For a single pixel, we get a $1 \times 6$ Jacobian:
+
+\begin{equation}
+    \mat{J} := \mat{J_I} \mat{J_{\pi}} \mat{J_T}
+\end{equation}
+
+where $\mat{J_I} \in \mathbb{R}^{1 \times 2}$ is the image derivative of the warped previous frame and is
+approximated using the image's gradient:
+
+\begin{equation}
+    \mat{J_I} := \frac{\partial \mathbf{I_p}(\vec{x})} {\partial \vec{x}} \bigg|_{\vec{x} = \tau(\vec{x}, \vec{T})}
+    \approx
+    \begin{bmatrix}
+        \nabla{}_x \mathbf{I_p} & \nabla{}_y \mathbf{I_p}
+    \end{bmatrix}
+\end{equation}
+
+The term $\mat{J_{\pi}}$ is the $2 \times 3$ Jacobian of the projection
+function \ref{eq:projection}, evaluated at the warped 3D point:
+
+\begin{equation}
+    \mat{J_{\pi}} := \frac{\partial \pi(\vec{p})}{\partial \vec{p}}
+    \bigg|_{\vec{p} = \vec{T}\cdot\pi^{-1}(\vec{x},\mathbf{D}(\vec{x}))}
+    =
+    \begin{bmatrix}
+        \nicefrac{f}{\vec{p_z}} & 0 & -f \nicefrac{\vec{p_x}}{\vec{p_z}^2} \\
+        0 & \nicefrac{f}{\vec{p_z}} & -f \nicefrac{\vec{p_y}}{\vec{p_z}^2}
+    \end{bmatrix}
+\end{equation}
+
+$\mat{J_T}$ is the $3 \times 6$ Jacobian of the transformation operator $T$ and
+the most costly term to compute:
+
+\begin{equation}
+    \mat{J_T} := \frac{\partial (\vec{T} \vec{p})}{\partial \vec{T}}
+    \bigg|_{\vec{p} = \pi^{-1}(\vec{x}, \mathbf{D}(\vec{x}))}
+\end{equation}
+
+
+
 
 
 
 \section{Optimizations and other improvements}
 \label{sec:optimizations}
 
-Works, but not real-time capable so far. Too much data to process...
+The algorithm described in the previous section works well but suffers from
+slow performance and does not nearly run in realtime on an embedded device.
+Therefore, some optimization strategies are applied:
 
 \subsection{Image pyramids}
 
@@ -162,12 +213,15 @@ This is already provided to some extent by the semi-global matching alorithm,
 as pixels without strong gradients are usally hard to match and therefore often
 don't provide a disparity value.
 
-\subsection{Weighting of errors}
+\subsection{Handling outliers}
 
 By robustly weighting the photometric error terms outliers can be dampened to
 reduce the influence of occlusions, moving scenery or other noise, such as
 errors from the semi-global matcher. This improves quality and stability with
 negligible performance penalty.
+
+Another idea (which wasn't fully investigated) to handle occlusions is to use a
+Z-buffer to eliminate points which are behind others when warped.
 
 \subsection{Keyframes}
 
