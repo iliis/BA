@@ -122,10 +122,20 @@ int main(int argc, char* argv[])
     //write_trajectory_rosbag(raw_bag, params, testscene, ".");
 
     //testscene.loadFromBagFile(raw_bag);
-    run_minimization(window, font, testscene, params);
+    //run_minimization(window, font, testscene, params);
 
-    //Warp::PlotRange range1(0,-5,5,201), range2(1,-5,5,201);
-    //draw_error_surface(window, font, testscene.getStep(14), range1, range2, params);
+    Warp::PlotRange range1(0,-1,1,41),
+        //range2(1,-1,1,41);
+        range2(4,-0.0,0.2,41);
+
+    const CameraStep& step = testscene.getStep(33);
+    if (true) {
+        Transformation T = step.ground_truth;
+        range1.from += T.value(range1.dim); range1.to += T.value(range1.dim);
+        range2.from += T.value(range2.dim); range2.to += T.value(range2.dim);
+    }
+
+    draw_error_surface(window, font, step, range1, range2, params);
 
     //show_live_data(window, font, argc, argv);
 

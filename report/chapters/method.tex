@@ -45,6 +45,7 @@ have the same brightness, regardless of viewing angle.
 
 
 \section{Warping Pipeline}
+\label{sec:warping}
 
 \begin{figure}[h]
     \centering
@@ -55,14 +56,24 @@ have the same brightness, regardless of viewing angle.
 
 \begin{figure}
     \begin{minipage}[t]{0.48\textwidth}
-        \includegraphics[width = \textwidth]{images/coordinate_system_camera.pdf}
+        \includegraphics[width = \textwidth]{images/cost_surface/error_xy_4.png}
     \end{minipage}
     \hfill
     \begin{minipage}[t]{0.48\textwidth}
-        \includegraphics[width = \textwidth]{images/coordinate_systems_3d.pdf}
+        \includegraphics[width = \textwidth]{images/cost_surface/error_xb_4.png}
     \end{minipage}
-    \caption{The coordinate systems used in this work.}
-    \label{fig:coordinate_systems}
+    \begin{minipage}[t]{0.48\textwidth}
+        \includegraphics[width = \textwidth]{images/cost_surface/error_xy_1.png}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[t]{0.48\textwidth}
+        \includegraphics[width = \textwidth]{images/cost_surface/error_xb_1.png}
+    \end{minipage}
+    \caption{A visualization of the photometric error surface described by $e$
+    generated from simulated camera data. Note how displacements of about half
+a meter or about \unit[5]{\degree} still lead to the correct minimum. Also
+note, that there are many local minima further out.}
+    \label{fig:costsurface_big}
 \end{figure}
 
 This section closely follows \cite{omaridenseodometry}.

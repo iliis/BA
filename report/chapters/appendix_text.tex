@@ -1,5 +1,5 @@
-\chapter{Irgendwas}
-\label{sec:irgendwas}
+\chapter{Usage of Handed-In Data [TODO: title]}
+\label{sec:usage}
 
 Do you want doku for the code here? how to compile, configure and run?
 
@@ -10,3 +10,52 @@ How to use [sub-]apps written in C++.
 Organization and usage guide for Matlab.
 
 how to compile and use C++ code.
+
+\section{Directory Overview}
+
+All figures, LaTeX and LibreOffice files for the presentation and this report
+are in the respectively named directories. Other important folders are:
+
+\begin{description}
+    \item[matlab]
+        Contains the full warping pipeline implemented in Matlab. Slow, but useful for debugging and automatic derivation of the Jacobians.
+    \item[matlab/input]
+        Contains various example scenes for the simulation.
+        The courtyard scene was downloaded from \texttt{http://www.luxrender.net/forum/viewtopic.php?f=14\&t=6015} and can be used with LuxRenderer
+    \item[cpp] Implementation of all warping code in C++ and a few helpful GUIs to visualize things (including a client for the vi-sensor application).
+    \item[arm] Plumbing to run photometric odometry on vi-sensor. All my code is in the 'src/odometry' subdirectory.
+\end{description}
+
+
+\section{Blender Simulation}
+
+For debugging and testing purposes, Blender was used to render images with
+disparity data and perfect ground truth.  There are several scenes in
+\texttt{matlab/input}. Upon first opening a scene, the ground truth
+recording script must be registered once by running the
+\texttt{output\_frame\_pos.py} once (or by unsafely reloading the .blend-file by
+clicking on the warning in the Blender header menu).
+
+This script will now run every time an animation is rendered and will output
+relative camera poses into a CSV file called
+\texttt{camera\_trajectory\_relative.csv} in the same directory. Upon first
+execution, it will also generate \texttt{camera\_intrinsics.csv} containing all
+important parameters of the virtual camera such as focal length and how to
+scale the raw disparity values.
+
+The generated CSV files and the rendered images can be read by both the C++ and
+the Matlab implementation.
+
+
+\section{Matlab Implementation}
+
+All Matlab functions generally expect their input data in column matrices (for
+example, a list of 100 3D points would have 3 rows and 100 columns).
+
+Everything directly implementing warping as described in
+section~\ref{sec:warping} can be found in \texttt{core}. This warping pipeline
+uses Matlab's matrix operations for speed, but analytically derives the
+Jacobians for every iteration, which obviously slows down things immensely.
+
+A good starting point are the scripts in \texttt{test\_scripts}, which provide
+various examples of how to use the code: \texttt{run\_minimization.m}

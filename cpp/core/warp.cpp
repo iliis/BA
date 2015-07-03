@@ -241,7 +241,7 @@ void Warp::renderErrorSurface(MatrixXf& target_out, Matrix<float,Dynamic,6>& gra
             Matrix<float, Eigen::Dynamic, 6> J;
             VectorXf errs;
 
-            float error = calcError(step, T, errs, J, params);
+            calcError(step, T, errs, J, params);
 
             //Matrix<float, 1, 6> gradient = J.transpose() * errs;
             gradients_out.row(y*range1.steps +x) = J.transpose() * errs;
@@ -249,7 +249,7 @@ void Warp::renderErrorSurface(MatrixXf& target_out, Matrix<float,Dynamic,6>& gra
             //for (int i = 0; i < 6; i++)
                 //gradients_out(y * range1.steps + x, i) = gradient(i);
 
-            target_out(y, x) = error;
+            target_out(y, x) = errs.norm();
 
             //cout << x << " " << y << "  --> " << xv << " " << yv << endl;
             //cout << T << "  -->  " << error << endl;

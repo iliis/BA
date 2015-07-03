@@ -41,17 +41,17 @@ void render_error_surface(
         const Eigen::Matrix<float, Eigen::Dynamic, 6>& errorgradients,
         const Warp::PlotRange& range1,
         const Warp::PlotRange& range2,
-        const bool show_gradient,
+        const float gradient_factor,
         sf::Font& font,
         const Colormap::Colormap& colormap)
 {
     std::vector<std::string> dimension_labels;
-    dimension_labels.push_back("X");
-    dimension_labels.push_back("Y");
-    dimension_labels.push_back("Z");
-    dimension_labels.push_back("alpha / pitch");
-    dimension_labels.push_back("beta / yaw");
-    dimension_labels.push_back("gamma / roll");
+    dimension_labels.push_back("X [m]");
+    dimension_labels.push_back("Y [m]");
+    dimension_labels.push_back("Z [m]");
+    dimension_labels.push_back("alpha / pitch [deg]");
+    dimension_labels.push_back("beta / yaw [deg]");
+    dimension_labels.push_back("gamma / roll [deg]");
 
     sf::Image img;
     matrix_to_image(errorsurface, img, colormap);
@@ -64,11 +64,11 @@ void render_error_surface(
 
     drawImageAt(target, img, sf::Vector2f(border_x,border_y), "", NULL, sf::Vector2f(scale_x, scale_y));
 
-    if (show_gradient) {
+    if (gradient_factor > 0) {
         for (unsigned int y = 0; y < errorsurface.rows(); ++y) {
             for (unsigned int x = 0; x < errorsurface.cols(); ++x) {
                 unsigned int idx = y*errorsurface.cols()+x;
-                float factor = -0.004; // point *down*
+                float factor = -gradient_factor; //-0.004; // point *down*
                 drawArrow(target,
                         x*scale_x + scale_x/2 + border_x,
                         y*scale_y + scale_y/2 + border_y,
@@ -114,7 +114,12 @@ void render_error_surface(
         r.setPosition(border_x-1-10, y);
         target.draw(r);
 
-        t.setString(float_to_string( i*(range2.to-range2.from)/(range2.steps-1) + range2.from ));
+        float v =  i*(range2.to-range2.from)/(range2.steps-1) + range2.from ;
+
+        if (range2.dim >= 3) // it's an angle
+            v = rad2deg(v); // convert to degrees
+
+        t.setString(float_to_string(v));
         t.setPosition(border_x-1-10-3-t.getLocalBounds().width, y-t.getLocalBounds().height/2-2);
 
         target.draw(t);
@@ -133,7 +138,12 @@ void render_error_surface(
         r.setPosition(x, y);
         target.draw(r);
 
-        t.setString(float_to_string( i*(range1.to-range1.from)/(range1.steps-1) + range1.from ));
+        float v =  i*(range1.to-range1.from)/(range1.steps-1) + range1.from;
+
+        if (range1.dim >= 3) // it's an angle
+            v = rad2deg(v); // convert to degrees
+
+        t.setString(float_to_string(v));
         t.setPosition(x-1-t.getLocalBounds().width/2, y+10+2);
 
         target.draw(t);
@@ -145,10 +155,11 @@ void render_error_surface(
     t.setPosition(border_x-1+frame.getSize().x/2-t.getLocalBounds().width/2, y+10+t.getLocalBounds().height*2);
     target.draw(t);
 
-    // Y label
+    // Y label (on other side!)
     t.setString(dimension_labels[range2.dim]);
     t.setRotation(-90);
-    t.setPosition(border_x-1-10-t.getLocalBounds().height*4, border_y-1+frame.getSize().y/2 + t.getLocalBounds().width/2);
+    //t.setPosition(border_x-1-10-t.getLocalBounds().height*4, border_y-1+frame.getSize().y/2 + t.getLocalBounds().width/2);
+    t.setPosition(border_x-1 + 10 + frame.getSize().x + t.getLocalBounds().height*2, border_y-1+frame.getSize().y/2 + t.getLocalBounds().width/2);
     target.draw(t);
 }
 ///////////////////////////////////////////////////////////////////////////////
@@ -166,20 +177,19 @@ void draw_error_surface(sf::RenderWindow& window, sf::Font& font, const CameraSt
 
     cout << "rendered surface in " << ms << "ms (" << ((float) ms) / (errorsurface.rows() * errorsurface.cols()) << "ms per point)" << endl;
 
-    save_matrix_to_image(errorsurface, "error_surface_raw.png", Colormap::Hot());
+    save_matrix_to_image(errorsurface, "error_surface_raw.png", Colormap::Jet());
 
     sf::RenderTexture surfaceplot;
     surfaceplot.create(1300,1300);
     surfaceplot.clear(sf::Color(255,255,255,0));
-    render_error_surface(surfaceplot, errorsurface, errorgradients, range1, range2, false, font, Colormap::Hot());
+    render_error_surface(surfaceplot, errorsurface, errorgradients, range1, range2, false, font, Colormap::Jet());
     surfaceplot.getTexture().copyToImage().saveToFile("error_surface.png");
-    // TODO: store to disk
 
     window.setVisible(true);
 
     bool run = true;
 
-    bool show_gradient = true;
+    float gradient_factor = 0.004;
 
     while (window.isOpen() && run)
     {
@@ -197,7 +207,23 @@ void draw_error_surface(sf::RenderWindow& window, sf::Font& font, const CameraSt
                         break;
 
                     case sf::Keyboard::G:
-                        show_gradient = !show_gradient;
+                        gradient_factor *= -1;
+                        break;
+
+                    case sf::Keyboard::Add:
+                        gradient_factor *= 1.5;
+                        break;
+
+                    case sf::Keyboard::Subtract:
+                        gradient_factor /= 1.5;
+                        break;
+
+                    // save current view
+                    case sf::Keyboard::F1:
+                    case sf::Keyboard::S:
+                        surfaceplot.clear(sf::Color(255,255,255,0));
+                        render_error_surface(surfaceplot, errorsurface, errorgradients, range1, range2, gradient_factor, font, Colormap::Jet());
+                        surfaceplot.getTexture().copyToImage().saveToFile("error_surface.png");
                         break;
 
                     default:
@@ -208,7 +234,7 @@ void draw_error_surface(sf::RenderWindow& window, sf::Font& font, const CameraSt
 
         window.clear(sf::Color(255,255,255));
 
-        render_error_surface(window, errorsurface, errorgradients, range1, range2, show_gradient, font, Colormap::Hot());
+        render_error_surface(window, errorsurface, errorgradients, range1, range2, gradient_factor, font, Colormap::Jet());
 
         window.display();
 
