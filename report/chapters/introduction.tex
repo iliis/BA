@@ -41,13 +41,21 @@ it is also power-efficient, consuming around \unit[5]{W}.
 
 Photometric odometry as initially developed by Comport et al. in
 \cite{comport2007odometry} has been implemented in \cite{omaridenseodometry} to
-use data from the SGM core but running on a powerful PC instead.
+use data from the SGM core but running on a powerful PC instead. They show that
+photometric odometry is very robust against various perturbations, such as
+blur, occlusions or changes in lighting \cite{comport2011asymmetric}.
 
-In \cite{marcin2014odometry}, feature-based odometry running on the visensor is
-developed, which uses the FPGA for corner detection.
+In \cite{marcin2014odometry}, feature-based odometry running on the vi-sensor
+is developed, which uses the FPGA for corner detection. While very similar in
+result and method, a completely different and much more 'sparse' algorithm is
+used. A real-time perfomance of 10 Hz is achieved by using vector instructions
+and fusing inertial measurements.  A similiar implementation
+\cite{goldberg2011stereo} uses a Texas Instrument SoC, developed for
+smartphones.
 
-
-
-TODO: googlen was es sonst noch so gibt?
-
-TODO: compare other approaches to photometric odometry
+Other approaches to photometric odoemtry rely on different means to get depth
+data, such as an RGB-D sensor \cite{kerl2013robust}. Usually, active systems
+are used which increase power consumption, are either expensive (Laser), low
+resolution (time of flight) or work only in constrained scenery (structured
+light). Howevery, RGB-D sensors can be more accurate, cover longer ranges and
+consume less computing power.

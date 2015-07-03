@@ -39,8 +39,9 @@ sampled at the warped pixel locations. This way, a photometric error is
 calculated, measuring the similarity of the warped current frame with the
 previous one.
 
-Note that this approach assumes photoconsistency: Points should have the same
-intensity, regardless of viewing angle.
+Note that this approach assumes Lambertian reflectance and constant
+illumination (also known as photo-consitency), which implies that points should
+have the same brightness, regardless of viewing angle.
 
 
 \section{Warping Pipeline}
