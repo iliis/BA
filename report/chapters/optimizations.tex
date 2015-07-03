@@ -33,7 +33,7 @@ minimization such as points in homogenous image regions where $\nabla
 
 This is already provided to some extent by the semi-global matching alorithm,
 as pixels without strong gradients are usually hard to match and therefore often
-don't provide a disparity value.
+do not provide a disparity value.
 
 \section{Handling outliers}
 
@@ -42,7 +42,7 @@ reduce the influence of occlusions, moving scenery or other noise, such as
 errors from the semi-global matcher. This improves quality and stability with
 negligible performance penalty.
 
-Another idea (which wasn't fully investigated) to handle occlusions is to use a
+Another idea (which was not fully investigated) to handle occlusions is to use a
 Z-buffer to eliminate points which are behind others when warped. However, as
 photometric odometry works very incrementally, large occlusions are scarce.
 

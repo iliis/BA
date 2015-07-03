@@ -52,32 +52,42 @@ intensity, regardless of viewing angle.
     \label{fig:warp_pipeline}
 \end{figure}
 
+\begin{figure}
+    \begin{minipage}[t]{0.48\textwidth}
+        \includegraphics[width = \textwidth]{images/coordinate_system_camera.pdf}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[t]{0.48\textwidth}
+        \includegraphics[width = \textwidth]{images/coordinate_systems_3d.pdf}
+    \end{minipage}
+    \caption{The coordinate systems used in this work.}
+    \label{fig:coordinate_systems}
+\end{figure}
+
 This section closely follows \cite{omaridenseodometry}.
 
 Using an inverse projection derived from the standard pinhole camera model, a
 point $ \vec{x} $ in the camera image plane is be back-projected into a point
-$ \vec{p} $ in $ \mathbb{R}^3 $:
+$ \vec{p} \in \mathbb{R}^3 $ written using homogeneous coordinates:
 
 \begin{equation}
     \label{eq:backprojection}
     \vec{p} = \pi^{-1}(\vec{x}, D(\vec{x})) := \frac{b}{D(x)}
     \begin{bmatrix}
-        \vec{x_u} - \vec{c_u} \\
-        \vec{x_v} - \vec{c_v} \\
-        f
+        x_u - c_u \\
+        x_v - c_v \\
+        f \\
+        1
     \end{bmatrix}
 \end{equation}
 
 where $b$ is the stereo baseline, $f$ the focal length and $\vec{c}$ the principal point of the camera.
 
-This point $\vec{p}$ can now be moved into a new camera frame by translating and rotating it:
+This point $\vec{p}$ can now be moved into a new camera frame by translating
+and rotating it, by writing $\vec{T}$ as a $4 \times 4$ homogeneous
+transformation matrix:
 
-\begin{equation}
-    \vec{p'} = \mat{T_R} \cdot \vec{p} + \vec{T_T}
-\end{equation}
-
-Here, $\mat{T_R}$ is a $3 \times 3$ rotation matrix and $\vec{T_T}$ a three dimensional translation
-vector. Using affine coordinates, we can write this with a $4 \times 4$ transformation matrix:
+[TODO: soll ich das explizit als $f(\vec{T})\vec{p}$ schreiben?]
 
 \begin{equation}
     \vec{p'} = \mat{T} \vec{p}
@@ -87,10 +97,10 @@ A point in 3D space can be projected back onto the (now moved) camera image plan
 
 \begin{equation}
     \label{eq:projection}
-    \vec{x'} = \pi(\vec{p'}) := \frac{f}{\vec{p'}_z}
+    \vec{x'} = \pi(\vec{p'}) := \frac{f}{p'_z}
     \begin{bmatrix}
-        \vec{p'}_x \\
-        \vec{p'}_y \\
+        p'_x \\
+        p'_y \\
     \end{bmatrix}
     + \vec{c}
 \end{equation}
@@ -145,10 +155,10 @@ where $\mat{J_I} \in \mathbb{R}^{1 \times 2}$ is the image derivative of the war
 approximated using the image's gradient:
 
 \begin{equation}
-    \mat{J_I} := \frac{\partial \mathbf{I_p}(\vec{x})} {\partial \vec{x}} \bigg|_{\vec{x} = \tau(\vec{x}, \vec{T})}
+    \mat{J_I} := \frac{\partial I_p(\vec{x})} {\partial \vec{x}} \bigg|_{\vec{x} = \tau(\vec{x}, \vec{T})}
     \approx
     \begin{bmatrix}
-        \nabla{}_x \mathbf{I_p} & \nabla{}_y \mathbf{I_p}
+        \nabla{}_x I_p & \nabla{}_y I_p
     \end{bmatrix}
 \end{equation}
 
@@ -157,7 +167,7 @@ function \ref{eq:projection}, evaluated at the warped 3D point:
 
 \begin{equation}
     \mat{J_{\pi}} := \frac{\partial \pi(\vec{p})}{\partial \vec{p}}
-    \bigg|_{\vec{p} = \vec{T}\cdot\pi^{-1}(\vec{x},\mathbf{D}(\vec{x}))}
+    \bigg|_{\vec{p} = \vec{T}\cdot\pi^{-1}(\vec{x},D(\vec{x}))}
     =
     \begin{bmatrix}
         \nicefrac{f}{\vec{p_z}} & 0 & -f \nicefrac{\vec{p_x}}{\vec{p_z}^2} \\
@@ -170,5 +180,5 @@ the most costly term to compute:
 
 \begin{equation}
     \mat{J_T} := \frac{\partial (\vec{T} \vec{p})}{\partial \vec{T}}
-    \bigg|_{\vec{p} = \pi^{-1}(\vec{x}, \mathbf{D}(\vec{x}))}
+    \bigg|_{\vec{p} = \pi^{-1}(\vec{x}, D(\vec{x}))}
 \end{equation}

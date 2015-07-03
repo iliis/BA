@@ -32,12 +32,12 @@ penalty.}.
 
 \section{Ignore invalid pixels}
 
-Pixels that do not have a disparity value (because the SGM algorithm couldn't
+Pixels that do not have a disparity value (because the SGM algorithm could not
 find any correspondence) can obviously be ignored. So can pixels which are
 saturated or underexposed: They provide neither a good gradient nor valid
 disparity data and are often not photoconsistent.
 
-\section{Don't remove too many pixels}
+\section{Do not remove too many pixels}
 
 The optimizations described in section~\ref{sec:optimizations} can
 substantially reduce the pixel count, so much so that there are not enough for
