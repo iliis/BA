@@ -122,8 +122,9 @@ int main(int argc, char* argv[])
     //write_trajectory_rosbag(raw_bag, params, testscene, ".");
 
     //testscene.loadFromBagFile(raw_bag);
-    //run_minimization(window, font, testscene, params);
+    run_minimization(window, font, testscene, params);
 
+    /*
     Warp::PlotRange range1(0,-1,1,41),
         //range2(1,-1,1,41);
         range2(4,-0.0,0.2,41);
@@ -136,6 +137,7 @@ int main(int argc, char* argv[])
     }
 
     draw_error_surface(window, font, step, range1, range2, params);
+    */
 
     //show_live_data(window, font, argc, argv);
 

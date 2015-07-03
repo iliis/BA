@@ -18,13 +18,3 @@ To compile the code, cmake is used:
     ./dense_odometry
 
 Specifying CMAKE_BUILD_TYPE=Release is optional, but greatly speeds up the code.
-
-
-TODO
-====
-
-* write tests for the important functions
-    -> test target
-* clean up mess in Warp (this is currently more of a playground to try out numerical things)
-* implement minimization algorithms
-* add more UI to quickly try out stuff?

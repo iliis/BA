@@ -272,7 +272,7 @@ void plot_warp_debug_data(sf::RenderWindow& window, sf::Font& font, const Warp::
 bool min_paused = true; // start in paused state, global to keep value :P
 void run_minimization(sf::RenderWindow& window, sf::Font& font, const Scene& scene, Warp::Parameters params)
 {
-    const sf::Vector2u window_size = window.getSize();
+    sf::Vector2u window_size = window.getSize();
 
     Warp::WarpDebugData warpdebugdata;
 
@@ -318,12 +318,14 @@ void run_minimization(sf::RenderWindow& window, sf::Font& font, const Scene& sce
                         exit(0);
                         return;
 
+                    // rescale GUI to non-steched state after manually resizing window
                     case sf::Keyboard::F12:
                         {
                             window.resetGLStates();
                             sf::View v = window.getView();
                             v.reset(sf::FloatRect(0, 0, window.getSize().x, window.getSize().y));
                             window.setView(v);
+                            window_size = window.getSize();
                         }
                         break;
 
