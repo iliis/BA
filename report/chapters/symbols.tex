@@ -6,20 +6,20 @@
 
 \begin{tabbing}
  \hspace*{1.6cm} \= \kill
- $\mathbf{I}(\vec{x})$          \> intensity image \\[0.5ex]
- $\mathbf{D}(\vec{x})$          \> disparity image \\[0.5ex]
+ $I(\vec{x})$          \> intensity image \\[0.5ex]
+ $D(\vec{x})$          \> disparity image \\[0.5ex]
  \\
  stereo camera intrinsics: \\
  $f$                            \> focal length \\[0.5ex]
  $\vec{c}$                      \> principal point \\[0.5ex]
  $b$                            \> baseline \\[0.5ex]
  \\
- transformation:
- $\vec{T}$                      \> 6-DOF transformation \\[0.5ex]
+ transformation:\\
+ $\vec{T}$                      \> 6-DOF transformation (rotation and translation) \\[0.5ex]
  $\phi, \theta, \psi$           \> roll, pitch and yaw angle \\[0.5ex]
  \\
  warping: \\
- $\pi^{-1}$                     \> back-projection operator, mapping a pixel with corresponding disparity value into 3D space \\[0.5ex]
+ $\pi^{-1}$                     \> back-projection operator, mapping a pixel with disparity value into 3D space \\[0.5ex]
  $\pi$                          \> projection operator, mapping a point in 3D space onto the camera plane \\[0.5ex]
  $\mat{J_T}$                    \> $3 \times 6$ Jacobian of the transformation operator $\vec{T}$ \\[0.5ex]
  $\mat{J_{\pi}}$                    \> $2 \times 3$ Jacobian of the projection function $\pi$ \\[0.5ex]

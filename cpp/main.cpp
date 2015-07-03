@@ -90,7 +90,7 @@ int main(int argc, char* argv[])
     //testscene.loadFromSceneDirectory("../matlab/input/test_wide");
     //testscene.loadFromSceneDirectory("../matlab/input/trajectory1");
     //testscene.loadFromSceneDirectory("../matlab/input/testscene1");
-    //testscene.loadFromSceneDirectory("../matlab/input/courtyard/lux");
+    testscene.loadFromSceneDirectory("../matlab/input/courtyard/lux");
     //testscene.loadFromSceneDirectory("../matlab/input/courtyard_circle");
     //testscene.loadFromSceneDirectory("../matlab/input/courtyard/normal"); // step 22 is nice!
     //testscene.loadFromBagFile("/home/samuel/data/2015-06-11-16-30-01.bag");
@@ -111,18 +111,18 @@ int main(int argc, char* argv[])
 
     Warp::Parameters params(new ErrorWeightNone());
     //Warp::Parameters params(new ErrorWeightHuber(10));
-    params.min_pyramid_levels = 2;
+    params.min_pyramid_levels = 0;
     params.max_pyramid_levels = 3;
     params.max_iterations = 100;
     params.T_init = Transformation(0,0,0,0,0,0);
-    params.gradient_norm_threshold = 0.01;
-    //params.gradient_norm_threshold = 0;
-    params.use_streamlined = true;
+    //params.gradient_norm_threshold = 0.01;
+    params.gradient_norm_threshold = 0;
+    //params.use_streamlined = true;
 
-    write_trajectory_rosbag(raw_bag, params, testscene, ".");
+    //write_trajectory_rosbag(raw_bag, params, testscene, ".");
 
     //testscene.loadFromBagFile(raw_bag);
-    //run_minimization(window, font, testscene, params);
+    run_minimization(window, font, testscene, params);
 
     //Warp::PlotRange range1(0,-5,5,201), range2(1,-5,5,201);
     //draw_error_surface(window, font, testscene.getStep(14), range1, range2, params);

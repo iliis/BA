@@ -1,15 +1,15 @@
-\chapter{Optimizations and other improvements}
+\chapter{Optimizations and Other Improvements}
 \label{sec:optimizations}
 
 The algorithm described in the chapter~\ref{sec:method} works well but suffers from
 slow performance and is not nearly realtime capable on an embedded device.
 Therefore, some optimization strategies are applied:
 
-\section{Image pyramids}
+\section{Image Pyramids}
 \label{sec:pyramids}
 
 A common optimization technique is the use of multiple resolutions: Images are
-repeatedly filtered and downscaled by a factor of two (essentially quartering
+repeatedly filtered and downscaled by a factor of two (effectively quartering
 the number of pixels) by averaging over a $2 \times 2$ pixel block to generate
 a stack of increasingly smaller images (a 'pyramid').
 
@@ -24,7 +24,7 @@ all. Throwing out the one or two lowermost levels usually incurs negligible
 loss of accuracy (see also section~\ref{sec:results_qualitative}).
 
 
-\section{Pixel selection by image gradient}
+\section{Pixel Selection by Image Gradient}
 \label{sec:gradient_filtering}
 
 We can further optimize away pixels which do not strongly influence the
@@ -35,7 +35,7 @@ This is already provided to some extent by the semi-global matching alorithm,
 as pixels without strong gradients are usually hard to match and therefore often
 do not provide a disparity value.
 
-\section{Handling outliers}
+\section{Handling Outliers}
 
 By robustly weighting the photometric error terms outliers can be dampened to
 reduce the influence of occlusions, moving scenery or other noise, such as
@@ -46,7 +46,7 @@ Another idea (which was not fully investigated) to handle occlusions is to use a
 Z-buffer to eliminate points which are behind others when warped. However, as
 photometric odometry works very incrementally, large occlusions are scarce.
 
-\section{Further possible optmiziations}
+\section{Further Possible Optmiziations}
 
 A few things which have not been investigated in this work but which provide
 good avenues for further optimizations:
@@ -68,7 +68,7 @@ which are only updated when the relative motion grows above some threshold.
 This way, drift can be reduced and even completely eliminated when being more
 or less stationary.
 
-\subsection{Offload more work to FPGA}
+\subsection{Offload More Work to FPGA or Multi-Core}
 
 Large parts of the photometric odometry algorithm are highly parallelizable and
 would profit from an implementation running on the FPGA. As this is one of the

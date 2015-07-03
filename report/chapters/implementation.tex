@@ -3,7 +3,7 @@
 A few things that are only tangentially related to the core algorithm but which
 nevertheless might be encountered in an actual implementation:
 
-\section{Representation of transformation}
+\section{Representation of Transformation}
 
 While translations are mathematically very straightforward, rotations can be
 represented in numerous ways (Euler-angles, quaternions, rotation matrices,
@@ -14,7 +14,7 @@ orientation and steps are very incremental as photometric odometry cannot
 handle more than a few degrees of rotation. This implies we do not have to deal
 with gimbal-lock and other mathematical hurdles of working in $SO(3)$.
 
-\section{Image scaling}
+\section{Image Scaling}
 
 Care has to be taken to properly downscale image coordinates when working with
 image pyramids. This can be done by scaling the camera intrinsics properly:
@@ -30,14 +30,14 @@ and quality downscaling the disparity images has. Disparity values are only
 read at integer coordinates and downscaling them might not be worth the runtime
 penalty.}.
 
-\section{Ignore invalid pixels}
+\section{Ignore Invalid Pixels}
 
 Pixels that do not have a disparity value (because the SGM algorithm could not
 find any correspondence) can obviously be ignored. So can pixels which are
 saturated or underexposed: They provide neither a good gradient nor valid
 disparity data and are often not photoconsistent.
 
-\section{Do not remove too many pixels}
+\section{Keeping Pixel Numbers Stable}
 
 The optimizations described in section~\ref{sec:optimizations} can
 substantially reduce the pixel count, so much so that there are not enough for
