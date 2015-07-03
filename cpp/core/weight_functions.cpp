@@ -26,9 +26,9 @@ float ErrorWeightHuber::operator()(float x) const
         a = -a;
 
     if (a <= delta) {
-        return 0.5 * x * x;
+        return 1;
     } else {
-        return (a - delta/2) * delta;
+        return delta / a;
     }
 }
 ///////////////////////////////////////////////////////////////////////////////
