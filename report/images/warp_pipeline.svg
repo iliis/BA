@@ -15,7 +15,7 @@
    viewBox="0 0 236.99611 113.84138"
    id="svg4394"
    version="1.1"
-   inkscape:version="0.91+devel r13964"
+   inkscape:version="0.91 r13725"
    sodipodi:docname="warp_pipeline.svg">
   <defs
      id="defs4396">
@@ -374,6 +374,15 @@
          id="path6087"
          d="m 360,27 0,0 0,487.1 0,0 0,-487.1 z" />
     </clipPath>
+    <clipPath
+       id="clipPath5375-1"
+       clipPathUnits="userSpaceOnUse">
+      <path
+         style="clip-rule:evenodd"
+         inkscape:connector-curvature="0"
+         id="path5377-8"
+         d="m 58.5,328.3 183,0 0,34.8 -183,0 0,-34.8 z" />
+    </clipPath>
   </defs>
   <sodipodi:namedview
      id="base"
@@ -382,9 +391,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.98994949"
-     inkscape:cx="542.90852"
-     inkscape:cy="124.27123"
+     inkscape:zoom="3.959798"
+     inkscape:cx="629.68416"
+     inkscape:cy="45.281602"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -393,13 +402,14 @@
      fit-margin-right="0"
      fit-margin-bottom="0"
      inkscape:window-width="1920"
-     inkscape:window-height="1116"
-     inkscape:window-x="1080"
-     inkscape:window-y="231"
+     inkscape:window-height="1027"
+     inkscape:window-x="0"
+     inkscape:window-y="31"
      inkscape:window-maximized="1"
      inkscape:snap-bbox="true"
      inkscape:bbox-nodes="true"
-     inkscape:bbox-paths="false">
+     inkscape:bbox-paths="false"
+     inkscape:snap-global="false">
     <inkscape:grid
        type="xygrid"
        id="grid7181"
@@ -490,15 +500,18 @@
          style="fill:none;stroke:none" />
     </g>
     <text
-       y="67.447502"
-       x="92.498337"
+       y="69.728203"
+       x="90.075096"
        style="font-variant:normal;font-weight:bold;font-size:6.3499999px;font-family:'Liberation Sans';-inkscape-font-specification:LiberationSans-Bold;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.35277778"
        id="text5125">
       <tspan
-         x="92.498337"
-         y="67.447502"
+         x="90.075096"
+         y="69.728203"
          id="tspan5127"
-         style="stroke-width:0.35277778">T</tspan>
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:9.87777805px;font-family:'Liberation Serif';-inkscape-font-specification:'Liberation Serif Bold';stroke-width:0.35277778">T<tspan
+   style="font-size:5.64444447px;baseline-shift:sub"
+   id="tspan7213">PC</tspan>
+</tspan>
     </text>
     <g
        id="g5129"
@@ -674,7 +687,8 @@
               <tspan
                  id="tspan5243"
                  y="0"
-                 x="0">D</tspan>
+                 x="0"
+                 style="-inkscape-font-specification:'Liberation Serif Italic';font-family:'Liberation Serif';font-weight:normal;font-style:italic;font-stretch:normal;font-variant:normal">D</tspan>
             </text>
           </g>
           <g
@@ -682,11 +696,14 @@
             <text
                id="text5247"
                style="font-style:italic;font-variant:normal;font-weight:bold;font-size:16.79999924px;font-family:'Liberation Serif';-inkscape-font-specification:LiberationSerif-BoldItalic;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-               transform="matrix(1,0,0,-1,528,368.8)">
+               transform="scale(1,-1)"
+               x="524.80005"
+               y="-368.79999">
               <tspan
                  id="tspan5249"
-                 y="0"
-                 x="0">c</tspan>
+                 y="-368.79999"
+                 x="524.80005"
+                 style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Liberation Serif';-inkscape-font-specification:'Liberation Serif Italic'">C</tspan>
             </text>
           </g>
           <g
@@ -702,17 +719,7 @@
             </text>
           </g>
           <g
-             id="g5257">
-            <text
-               id="text5259"
-               style="font-variant:normal;font-weight:normal;font-size:28px;font-family:OpenSymbol;-inkscape-font-specification:OpenSymbol;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-               transform="matrix(1,0,0,-1,548.2,374.9)">
-              <tspan
-                 id="tspan5261"
-                 y="0"
-                 x="0">⃗</tspan>
-            </text>
-          </g>
+             id="g5257" />
           <g
              id="g5263">
             <text
@@ -722,7 +729,8 @@
               <tspan
                  id="tspan5267"
                  y="0"
-                 x="0">x</tspan>
+                 x="0"
+                 style="-inkscape-font-specification:'Liberation Serif Bold';font-family:'Liberation Serif';font-weight:bold;font-style:normal;font-stretch:normal;font-variant:normal">x</tspan>
             </text>
           </g>
           <g
@@ -786,7 +794,8 @@
               <tspan
                  id="tspan5313"
                  y="0"
-                 x="0">I</tspan>
+                 x="0"
+                 style="-inkscape-font-specification:'Liberation Serif Italic';font-family:'Liberation Serif';font-weight:normal;font-style:italic;font-stretch:normal;font-variant:normal">I</tspan>
             </text>
           </g>
           <g
@@ -794,11 +803,14 @@
             <text
                id="text5317"
                style="font-style:italic;font-variant:normal;font-weight:bold;font-size:16.79999924px;font-family:'Liberation Serif';-inkscape-font-specification:LiberationSerif-BoldItalic;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-               transform="matrix(1,0,0,-1,638.8,289.5)">
+               transform="scale(1,-1)"
+               x="635.60004"
+               y="-289.5">
               <tspan
                  id="tspan5319"
-                 y="0"
-                 x="0">c</tspan>
+                 y="-289.5"
+                 x="635.60004"
+                 style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Liberation Serif';-inkscape-font-specification:'Liberation Serif Italic'">C</tspan>
             </text>
           </g>
           <g
@@ -814,17 +826,7 @@
             </text>
           </g>
           <g
-             id="g5327">
-            <text
-               id="text5329"
-               style="font-variant:normal;font-weight:normal;font-size:28px;font-family:OpenSymbol;-inkscape-font-specification:OpenSymbol;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-               transform="matrix(1,0,0,-1,659.8,295.5)">
-              <tspan
-                 id="tspan5331"
-                 y="0"
-                 x="0">⃗</tspan>
-            </text>
-          </g>
+             id="g5327" />
           <g
              id="g5333">
             <text
@@ -834,7 +836,8 @@
               <tspan
                  id="tspan5337"
                  y="0"
-                 x="0">x</tspan>
+                 x="0"
+                 style="-inkscape-font-specification:'Liberation Serif Bold';font-family:'Liberation Serif';font-weight:bold;font-style:normal;font-stretch:normal;font-variant:normal">x</tspan>
             </text>
           </g>
           <g
@@ -897,7 +900,8 @@
             <tspan
                x="0"
                y="0"
-               id="tspan5383">T</tspan>
+               id="tspan5383"
+               style="-inkscape-font-specification:'Liberation Serif Bold';font-family:'Liberation Serif';font-weight:bold;font-style:normal;font-stretch:normal;font-variant:normal">T</tspan>
           </text>
         </g>
         <g
@@ -961,17 +965,7 @@
           </text>
         </g>
         <g
-           id="g5415">
-          <text
-             transform="matrix(1,0,0,-1,139.6,336.2)"
-             style="font-variant:normal;font-weight:normal;font-size:28px;font-family:OpenSymbol;-inkscape-font-specification:OpenSymbol;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-             id="text5417">
-            <tspan
-               x="0"
-               y="0"
-               id="tspan5419">⃗</tspan>
-          </text>
-        </g>
+           id="g5415" />
         <g
            id="g5421">
           <text
@@ -981,7 +975,8 @@
             <tspan
                x="0"
                y="0"
-               id="tspan5425">x</tspan>
+               id="tspan5425"
+               style="-inkscape-font-specification:'Liberation Serif Bold';font-family:'Liberation Serif';font-weight:bold;font-style:normal;font-stretch:normal;font-variant:normal">x</tspan>
           </text>
         </g>
         <g
@@ -1005,7 +1000,8 @@
             <tspan
                x="0"
                y="0"
-               id="tspan5437">D</tspan>
+               id="tspan5437"
+               style="-inkscape-font-specification:'Liberation Serif Italic';font-family:'Liberation Serif';font-weight:normal;font-style:italic;font-stretch:normal;font-variant:normal">D</tspan>
           </text>
         </g>
         <g
@@ -1021,17 +1017,7 @@
           </text>
         </g>
         <g
-           id="g5445">
-          <text
-             transform="matrix(1,0,0,-1,203.3,336.2)"
-             style="font-variant:normal;font-weight:normal;font-size:28px;font-family:OpenSymbol;-inkscape-font-specification:OpenSymbol;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-             id="text5447">
-            <tspan
-               x="0"
-               y="0"
-               id="tspan5449">⃗</tspan>
-          </text>
-        </g>
+           id="g5445" />
         <g
            id="g5451">
           <text
@@ -1041,7 +1027,8 @@
             <tspan
                x="0"
                y="0"
-               id="tspan5455">x</tspan>
+               id="tspan5455"
+               style="-inkscape-font-specification:'Liberation Serif Bold';font-family:'Liberation Serif';font-weight:bold;font-style:normal;font-stretch:normal;font-variant:normal">x</tspan>
           </text>
         </g>
         <g
@@ -1071,198 +1058,30 @@
       </g>
     </g>
     <g
-       id="g7578"
-       transform="translate(7.4083337)">
+       id="g5469"
+       transform="matrix(0.35277777,0,0,-0.35277777,15.723808,207.79762)">
       <g
-         transform="matrix(0.35277777,0,0,-0.35277777,8.3154743,207.79762)"
-         id="g5469">
+         id="g5471"
+         clip-path="url(#clipPath5473)">
         <g
-           clip-path="url(#clipPath5473)"
-           id="g5471">
+           id="g5477">
           <g
-             id="g5477">
-            <g
-               id="g5479" />
-            <g
-               id="g5485">
-              <g
-                 style="opacity:0.8"
-                 id="g5487"
-                 clip-path="url(#clipPath5481)" />
-            </g>
-          </g>
+             id="g5479" />
           <g
-             id="g5491">
-            <path
-               inkscape:connector-curvature="0"
-               id="path5493"
-               style="fill:#ffffff;fill-opacity:0.7254902;stroke:#4c4c4c;stroke-width:0.7924;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
-               d="m 263.7,364.6 155.3,0 0,-35.6 -155.3,0 0,35.6 z" />
+             id="g5485">
+            <g
+               clip-path="url(#clipPath5481)"
+               id="g5487"
+               style="opacity:0.8" />
           </g>
         </g>
-      </g>
-      <g
-         transform="matrix(0.35277777,0,0,-0.35277777,8.3154743,207.79762)"
-         id="g5495">
         <g
-           clip-path="url(#clipPath5499)"
-           id="g5497">
-          <g
-             id="g5503">
-            <g
-               transform="matrix(1,0,0,-1,267.8,337.2)"
-               style="font-variant:normal;font-weight:normal;font-size:28px;font-family:OpenSymbol;-inkscape-font-specification:OpenSymbol;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-               id="text5505">
-              <path
-                 d="m 11.238281,-10.445313 q 0,0.08203 -0.01367,0.314454 -0.01367,0.2187496 -0.01367,0.3554684 -0.08203,2.5703125 -0.08203,4.1972656 l 0,1.1210938 q 0,2.3242187 0.246094,2.9667968 0.246094,0.62890627 0.916016,0.62890627 0.820312,0 1.216797,-0.80664057 0.396484,-0.8203126 0.478515,-2.4882813 l 0.560547,0 0,0.068359 q 0,2.2148437 -0.710937,3.25390622 -0.697266,1.03906251 -2.1875,1.03906251 -1.558594,0 -2.1875005,-1.06640626 -0.6289062,-1.08007807 -0.6289062,-4.56640627 0,-0.4238281 0.027344,-1.3125 l 0.082031,-3.8554682 -0.068359,0 q -0.5058594,-0.02734 -1.3945313,-0.04102 -0.8886719,-0.02734 -2.1601562,-0.04101 l -0.068359,0 0,0.06836 q 0,6.4667965 -0.6289063,8.6406246 -0.6289062,2.17382813 -2.1874999,2.17382813 -0.9433594,0 -1.4218751,-0.765625 Q 0.546875,-1.3398437 0.546875,-2.9394531 l 0,-0.4648438 0.5332031,0 q 0.041016,0.7382813 0.2871094,1.1074219 0.2597656,0.3554688 0.8203125,0.3554688 1.203125,0 1.6816406,-1.7636719 0.4921875,-1.7773438 0.5605469,-6.9042969 l 0,-0.06836 -0.6835937,0 q -1.0664063,0 -1.6953125,0.382812 -0.6289063,0.3691407 -0.7929688,1.0937501 l -0.51953125,0 q 0.109375,-1.8320311 1.05273435,-2.5703121 0.9433594,-0.738282 3.3359375,-0.738282 0.4785156,0 2.84375,0.0957 2.3789059,0.08203 4.2656249,0.08203 0.94336,0 1.435547,-0.205078 0.451172,-0.205079 0.478516,-0.615235 l 0.505859,0 0,0.01367 q 0,1.408203 -0.628906,2.037109 -0.628906,0.615235 -2.03711,0.615235 -0.259765,0 -0.410156,0 -0.136719,-0.01367 -0.273437,-0.02734 l -0.06836,-0.01367 0,0.08203 z m 2.91211,-2.707031 q 0,-0.01367 0,-0.04101 l 0,-0.02734 -0.06836,0.06836 0.06836,0 z"
-                 id="path7733"
-                 inkscape:connector-curvature="0" />
-            </g>
-          </g>
-          <g
-             id="g5509">
-            <g
-               transform="matrix(1,0,0,-1,282.8,349.3)"
-               style="font-variant:normal;font-weight:normal;font-size:16.79999924px;font-family:OpenSymbol;-inkscape-font-specification:OpenSymbol;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-               id="text5511">
-              <path
-                 d="m 1.8128905,-4.4542967 0,-0.8039062 9.7124995,0 0,0.8039062 -9.7124995,0 z"
-                 id="path7736"
-                 inkscape:connector-curvature="0" />
-            </g>
-          </g>
-          <g
-             id="g5515">
-            <g
-               transform="matrix(1,0,0,-1,296.3,349.3)"
-               style="font-variant:normal;font-weight:normal;font-size:16.79999924px;font-family:'Liberation Serif';-inkscape-font-specification:LiberationSerif;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-               id="text5517">
-              <path
-                 d="m 5.1433591,-0.65624997 2.2476562,0.22148436 0,0.43476561 -5.9144529,0 0,-0.43476561 2.2558593,-0.22148436 0,-8.97421833 -2.2230468,0.7957031 0,-0.4347656 3.2074218,-1.8210932 0.4265624,0 0,10.43437403 z"
-                 id="path7739"
-                 inkscape:connector-curvature="0" />
-            </g>
-          </g>
-          <g
-             id="g5521">
-            <g
-               transform="matrix(1,0,0,-1,306.1,337.2)"
-               style="font-variant:normal;font-weight:normal;font-size:28px;font-family:OpenSymbol;-inkscape-font-specification:OpenSymbol;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-               id="text5523">
-              <path
-                 d="m 7.8339844,5.9335937 0,0.6699219 q -5.4824219,-4.59375 -5.4824219,-15.3671875 0,-10.8964841 5.4824219,-15.3945311 l 0,0.697266 q -3.9921875,3.9375 -3.9921875,14.6972651 0,10.8691407 3.9921875,14.6972656 z"
-                 id="path7742"
-                 inkscape:connector-curvature="0" />
-            </g>
-          </g>
-          <g
-             id="g5527">
-            <g
-               transform="matrix(1,0,0,-1,316.5,337.2)"
-               style="font-variant:normal;font-weight:normal;font-size:28px;font-family:OpenSymbol;-inkscape-font-specification:OpenSymbol;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-               id="text5529">
-              <path
-                 d="m 1.3398437,-17.951172 0,-1.53125 8.0390626,0 -0.5605469,-2.050781 5.2089846,2.830078 -5.2089846,2.802734 0.5605469,-2.050781 -8.0390626,0 z"
-                 id="path7745"
-                 inkscape:connector-curvature="0" />
-            </g>
-          </g>
-          <g
-             id="g5533">
-            <g
-               transform="matrix(1,0,0,-1,318.8,337.2)"
-               style="font-style:italic;font-variant:normal;font-size:28px;font-family:'Liberation Serif';-inkscape-font-specification:LiberationSerif-Italic;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-               id="text5535">
-              <path
-                 d="m 3.390625,-3.2265625 q -0.4375,0.4238281 -0.7246094,0.7382812 -0.2734375,0.3144532 -0.4375,0.5605469 -0.1640625,0.2324219 -0.2324219,0.4238282 -0.054687,0.1914062 -0.054687,0.3554687 0,0.21875 0.1503907,0.34179687 0.1640625,0.12304688 0.4238281,0.19140626 L 2.40625,0 -0.12304687,0 q -0.0820313,-0.06835937 -0.15039063,-0.21875 -0.0683594,-0.1640625 -0.0683594,-0.36914062 0,-0.19140625 0.109375,-0.41015626 0.0957031,-0.23242182 0.31445313,-0.51953122 0.21875,-0.2871094 0.57421875,-0.65625 Q 1.0117187,-2.5429688 1.53125,-3.0214844 l 3.7324219,-3.4726562 -2.3515625,-5.4003904 -1.4628907,-0.341797 0.109375,-0.615235 3.390625,0 1.9824219,4.8945318 1.6953125,-1.6132813 q 0.875,-0.8339845 1.2304688,-1.3125005 0.3554691,-0.478515 0.3554691,-0.820312 0,-0.109375 -0.08203,-0.191406 -0.06836,-0.08203 -0.1914059,-0.136719 -0.1230468,-0.06836 -0.2734375,-0.109375 -0.1367187,-0.05469 -0.2597656,-0.0957 l 0.109375,-0.615235 2.419922,0 q 0.123047,0.0957 0.205078,0.246094 0.08203,0.136719 0.08203,0.341797 0,0.806641 -1.886718,2.5976564 l -2.9257818,2.7480469 2.6249998,6.01562495 1.585938,0.28710938 L 11.511719,0 8.0117188,0 5.7285156,-5.46875 3.390625,-3.2265625 Z"
-                 id="path7748"
-                 inkscape:connector-curvature="0" />
-            </g>
-          </g>
-          <g
-             id="g5539">
-            <g
-               transform="matrix(1,0,0,-1,335.3,337.2)"
-               style="font-style:italic;font-variant:normal;font-size:28px;font-family:'Liberation Serif';-inkscape-font-specification:LiberationSerif-Italic;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-               id="text5541">
-              <path
-                 d="m 5.2363281,-0.57421875 q 0,0.80664063 -0.2460937,1.54492188 Q 4.7441406,1.7089844 4.2109375,2.3378906 3.6914063,2.9667969 2.8710938,3.4726563 2.0644531,3.9785156 0.9296875,4.3066406 l 0,-1.0527343 q 1.2441406,-0.3964844 1.8867188,-0.9707032 0.65625,-0.5742187 0.65625,-1.32617185 0,-0.3828125 -0.2734375,-0.57421875 Q 2.9394531,0.19140625 2.6113281,0 2.296875,-0.20507813 2.0234375,-0.4921875 q -0.2597656,-0.30078125 -0.2597656,-0.875 0,-0.7382813 0.4648437,-1.1210938 0.4648438,-0.3964843 1.1894532,-0.3964843 0.3828125,0 0.7109374,0.1503906 0.3417969,0.1367187 0.5878907,0.4238281 0.2460937,0.2871094 0.3828125,0.7246094 0.1367187,0.4375 0.1367187,1.01171875 z"
-                 id="path7751"
-                 inkscape:connector-curvature="0" />
-            </g>
-          </g>
-          <g
-             id="g5545">
-            <g
-               transform="matrix(1,0,0,-1,346.5,337.2)"
-               style="font-style:italic;font-variant:normal;font-weight:bold;font-size:28px;font-family:'Liberation Serif';-inkscape-font-specification:LiberationSerif-BoldItalic;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-               id="text5547">
-              <path
-                 d="m 15.3125,-10.582031 q 0,-1.708985 -0.410156,-2.898438 -0.410156,-1.189453 -1.16211,-1.927734 -0.738281,-0.751953 -1.791015,-1.080078 -1.039063,-0.341797 -2.3105471,-0.341797 l -0.5058594,0 -2.6933594,15.2714843 q 0.4375,0.041016 0.8339844,0.082031 0.4101562,0.027344 0.8613281,0.027344 1.7089844,0 3.0351564,-0.6425782 1.339844,-0.65625 2.255859,-1.8457031 0.929688,-1.203125 1.408203,-2.8847656 0.478516,-1.6816407 0.478516,-3.7597654 z m -5.167969,-7.751953 q 2.296875,0 4.046875,0.492187 1.763672,0.492188 2.953125,1.462891 1.189453,0.957031 1.804688,2.365234 0.615234,1.408203 0.615234,3.240234 0,2.4472661 -0.779297,4.4433599 -0.779297,1.9960937 -2.255859,3.4179687 -1.462891,1.421875 -3.582031,2.2011719 -2.105469,0.765625 -4.7578129,0.765625 -1.6132812,0 -3.1171875,-0.02734375 Q 3.5683594,0 2.4609375,0 L -0.20507813,0 -0.04101562,-0.99804688 2.3789063,-1.3671875 5.1269531,-16.980469 2.84375,-17.335937 l 0.1777344,-0.998047 7.1230466,0 z"
-                 id="path7754"
-                 inkscape:connector-curvature="0" />
-            </g>
-          </g>
-          <g
-             id="g5551">
-            <g
-               transform="matrix(1,0,0,-1,369.8,337.2)"
-               style="font-variant:normal;font-weight:normal;font-size:28px;font-family:OpenSymbol;-inkscape-font-specification:OpenSymbol;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-               id="text5553">
-              <path
-                 d="m 7.8339844,5.9335937 0,0.6699219 q -5.4824219,-4.59375 -5.4824219,-15.3671875 0,-10.8964841 5.4824219,-15.3945311 l 0,0.697266 q -3.9921875,3.9375 -3.9921875,14.6972651 0,10.8691407 3.9921875,14.6972656 z"
-                 id="path7757"
-                 inkscape:connector-curvature="0" />
-            </g>
-          </g>
-          <g
-             id="g5557">
-            <g
-               transform="matrix(1,0,0,-1,380.3,337.2)"
-               style="font-variant:normal;font-weight:normal;font-size:28px;font-family:OpenSymbol;-inkscape-font-specification:OpenSymbol;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-               id="text5559">
-              <path
-                 d="m 1.3398437,-17.951172 0,-1.53125 8.0390626,0 -0.5605469,-2.050781 5.2089846,2.830078 -5.2089846,2.802734 0.5605469,-2.050781 -8.0390626,0 z"
-                 id="path7760"
-                 inkscape:connector-curvature="0" />
-            </g>
-          </g>
-          <g
-             id="g5563">
-            <g
-               transform="matrix(1,0,0,-1,381.8,337.2)"
-               style="font-style:italic;font-variant:normal;font-size:28px;font-family:'Liberation Serif';-inkscape-font-specification:LiberationSerif-Italic;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-               id="text5565">
-              <path
-                 d="m 3.390625,-3.2265625 q -0.4375,0.4238281 -0.7246094,0.7382812 -0.2734375,0.3144532 -0.4375,0.5605469 -0.1640625,0.2324219 -0.2324219,0.4238282 -0.054687,0.1914062 -0.054687,0.3554687 0,0.21875 0.1503907,0.34179687 0.1640625,0.12304688 0.4238281,0.19140626 L 2.40625,0 -0.12304687,0 q -0.0820313,-0.06835937 -0.15039063,-0.21875 -0.0683594,-0.1640625 -0.0683594,-0.36914062 0,-0.19140625 0.109375,-0.41015626 0.0957031,-0.23242182 0.31445313,-0.51953122 0.21875,-0.2871094 0.57421875,-0.65625 Q 1.0117187,-2.5429688 1.53125,-3.0214844 l 3.7324219,-3.4726562 -2.3515625,-5.4003904 -1.4628907,-0.341797 0.109375,-0.615235 3.390625,0 1.9824219,4.8945318 1.6953125,-1.6132813 q 0.875,-0.8339845 1.2304688,-1.3125005 0.3554691,-0.478515 0.3554691,-0.820312 0,-0.109375 -0.08203,-0.191406 -0.06836,-0.08203 -0.1914059,-0.136719 -0.1230468,-0.06836 -0.2734375,-0.109375 -0.1367187,-0.05469 -0.2597656,-0.0957 l 0.109375,-0.615235 2.419922,0 q 0.123047,0.0957 0.205078,0.246094 0.08203,0.136719 0.08203,0.341797 0,0.806641 -1.886718,2.5976564 l -2.9257818,2.7480469 2.6249998,6.01562495 1.585938,0.28710938 L 11.511719,0 8.0117188,0 5.7285156,-5.46875 3.390625,-3.2265625 Z"
-                 id="path7763"
-                 inkscape:connector-curvature="0" />
-            </g>
-          </g>
-          <g
-             id="g5569">
-            <g
-               transform="matrix(1,0,0,-1,396.8,337.2)"
-               style="font-variant:normal;font-weight:normal;font-size:28px;font-family:OpenSymbol;-inkscape-font-specification:OpenSymbol;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-               id="text5571">
-              <path
-                 d="M 1.6816406,5.9335937 Q 5.6875,2.078125 5.6875,-8.7636719 q 0,-10.6914061 -4.0058594,-14.6972651 l 0,-0.697266 q 2.9941406,2.378906 4.3613281,7.027344 1.1210938,3.664062 1.1210938,8.3671871 0,10.9101563 -5.4824219,15.3671875 l 0,-0.6699219 z"
-                 id="path7766"
-                 inkscape:connector-curvature="0" />
-            </g>
-          </g>
-          <g
-             id="g5575">
-            <g
-               transform="matrix(1,0,0,-1,406.5,337.2)"
-               style="font-variant:normal;font-weight:normal;font-size:28px;font-family:OpenSymbol;-inkscape-font-specification:OpenSymbol;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-               id="text5577">
-              <path
-                 d="M 1.6816406,5.9335937 Q 5.6875,2.078125 5.6875,-8.7636719 q 0,-10.6914061 -4.0058594,-14.6972651 l 0,-0.697266 q 2.9941406,2.378906 4.3613281,7.027344 1.1210938,3.664062 1.1210938,8.3671871 0,10.9101563 -5.4824219,15.3671875 l 0,-0.6699219 z"
-                 id="path7769"
-                 inkscape:connector-curvature="0" />
-            </g>
-          </g>
+           id="g5491">
+          <path
+             d="m 263.7,364.6 155.3,0 0,-35.6 -155.3,0 0,35.6 z"
+             style="fill:#ffffff;fill-opacity:0.7254902;stroke:#4c4c4c;stroke-width:0.7924;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:10;stroke-dasharray:none;stroke-opacity:1"
+             id="path5493"
+             inkscape:connector-curvature="0" />
         </g>
       </g>
     </g>
@@ -1298,336 +1117,322 @@
         </g>
       </g>
       <g
-         transform="matrix(0.35277777,0,0,-0.35277777,8.3154743,207.79762)"
-         id="g5607">
-        <g
-           clip-path="url(#clipPath5611)"
-           id="g5609">
-          <g
-             id="g5615">
-            <text
-               id="text5617"
-               style="font-variant:normal;font-weight:normal;font-size:21.89999962px;font-family:OpenSymbol;-inkscape-font-specification:OpenSymbol;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-               transform="matrix(1,0,0,-1,32.9,145.6)">
-              <tspan
-                 id="tspan5619"
-                 y="0"
-                 x="0">τ</tspan>
-            </text>
-          </g>
-          <g
-             id="g5621">
-            <text
-               id="text5623"
-               style="font-variant:normal;font-weight:normal;font-size:21.89999962px;font-family:OpenSymbol;-inkscape-font-specification:OpenSymbol;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-               transform="matrix(1,0,0,-1,44.8,145.6)">
-              <tspan
-                 id="tspan5625"
-                 y="0"
-                 x="0">(</tspan>
-            </text>
-          </g>
-          <g
-             id="g5627">
-            <text
-               id="text5629"
-               style="font-style:italic;font-variant:normal;font-size:21.89999962px;font-family:'Liberation Serif';-inkscape-font-specification:LiberationSerif-Italic;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-               transform="matrix(1,0,0,-1,53.1,145.6)">
-              <tspan
-                 id="tspan5631"
-                 y="0"
-                 x="0">T</tspan>
-            </text>
-          </g>
-          <g
-             id="g5633">
-            <text
-               id="text5635"
-               style="font-style:italic;font-variant:normal;font-size:21.89999962px;font-family:'Liberation Serif';-inkscape-font-specification:LiberationSerif-Italic;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-               transform="matrix(1,0,0,-1,69.6,145.6)">
-              <tspan
-                 id="tspan5637"
-                 y="0"
-                 x="0">,</tspan>
-            </text>
-          </g>
-          <g
-             id="g5639">
-            <text
-               id="text5641"
-               style="font-variant:normal;font-weight:normal;font-size:21.89999962px;font-family:OpenSymbol;-inkscape-font-specification:OpenSymbol;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-               transform="matrix(1,0,0,-1,77.8,145.6)">
-              <tspan
-                 id="tspan5643"
-                 y="0"
-                 x="0">⃗</tspan>
-            </text>
-          </g>
-          <g
-             id="g5645">
-            <text
-               id="text5647"
-               style="font-style:italic;font-variant:normal;font-size:21.89999962px;font-family:'Liberation Serif';-inkscape-font-specification:LiberationSerif-Italic;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-               transform="matrix(1,0,0,-1,78.6,145.6)">
-              <tspan
-                 id="tspan5649"
-                 y="0"
-                 x="0">x</tspan>
-            </text>
-          </g>
-          <g
-             id="g5651">
-            <text
-               id="text5653"
-               style="font-variant:normal;font-weight:normal;font-size:21.89999962px;font-family:OpenSymbol;-inkscape-font-specification:OpenSymbol;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-               transform="matrix(1,0,0,-1,90.6,145.6)">
-              <tspan
-                 id="tspan5655"
-                 y="0"
-                 x="0">)</tspan>
-            </text>
-          </g>
-          <g
-             id="g5657">
-            <text
-               id="text5659"
-               style="font-variant:normal;font-weight:normal;font-size:21.89999962px;font-family:'Liberation Serif';-inkscape-font-specification:LiberationSerif;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-               transform="matrix(1,0,0,-1,104.1,145.6)">
-              <tspan
-                 id="tspan5661"
-                 y="0"
-                 x="0">:</tspan>
-            </text>
-          </g>
-          <g
-             id="g5663">
-            <text
-               id="text5665"
-               style="font-variant:normal;font-weight:normal;font-size:21.89999962px;font-family:OpenSymbol;-inkscape-font-specification:OpenSymbol;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-               transform="matrix(1,0,0,-1,110.8,145.6)">
-              <tspan
-                 id="tspan5667"
-                 y="0"
-                 x="0">=</tspan>
-            </text>
-          </g>
-          <g
-             id="g5669">
-            <text
-               id="text5671"
-               style="font-variant:normal;font-weight:normal;font-size:21.89999962px;font-family:OpenSymbol;-inkscape-font-specification:OpenSymbol;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-               transform="matrix(1,0,0,-1,32.1,117.1)">
-              <tspan
-                 id="tspan5673"
-                 y="0"
-                 x="0">π</tspan>
-            </text>
-          </g>
-          <g
-             id="g5675">
-            <text
-               id="text5677"
-               style="font-variant:normal;font-weight:normal;font-size:21.89999962px;font-family:OpenSymbol;-inkscape-font-specification:OpenSymbol;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-               transform="matrix(1,0,0,-1,45.6,117.1)">
-              <tspan
-                 id="tspan5679"
-                 y="0"
-                 x="0">(</tspan>
-            </text>
-          </g>
-          <g
-             id="g5681">
-            <text
-               id="text5683"
-               style="font-style:italic;font-variant:normal;font-weight:bold;font-size:21.89999962px;font-family:'Liberation Serif';-inkscape-font-specification:LiberationSerif-BoldItalic;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-               transform="matrix(1,0,0,-1,53.9,117.1)">
-              <tspan
-                 id="tspan5685"
-                 y="0"
-                 x="0">T</tspan>
-            </text>
-          </g>
-          <g
-             id="g5687">
-            <text
-               id="text5689"
-               style="font-variant:normal;font-weight:normal;font-size:21.89999962px;font-family:OpenSymbol;-inkscape-font-specification:OpenSymbol;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-               transform="matrix(1,0,0,-1,66.6,117.1)">
-              <tspan
-                 id="tspan5691"
-                 y="0"
-                 x="0">⋅</tspan>
-            </text>
-          </g>
-          <g
-             id="g5693">
-            <text
-               id="text5695"
-               style="font-variant:normal;font-weight:normal;font-size:21.89999962px;font-family:OpenSymbol;-inkscape-font-specification:OpenSymbol;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-               transform="matrix(1,0,0,-1,77.1,117.1)">
-              <tspan
-                 id="tspan5697"
-                 y="0"
-                 x="0">π</tspan>
-            </text>
-          </g>
-          <g
-             id="g5699">
-            <text
-               id="text5701"
-               style="font-variant:normal;font-weight:normal;font-size:13.10000038px;font-family:OpenSymbol;-inkscape-font-specification:OpenSymbol;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-               transform="matrix(1,0,0,-1,89.1,126.8)">
-              <tspan
-                 id="tspan5703"
-                 y="0"
-                 x="0">−</tspan>
-            </text>
-          </g>
-          <g
-             id="g5705">
-            <text
-               id="text5707"
-               style="font-variant:normal;font-weight:normal;font-size:13.10000038px;font-family:'Liberation Serif';-inkscape-font-specification:LiberationSerif;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-               transform="matrix(1,0,0,-1,99.6,126.8)">
-              <tspan
-                 id="tspan5709"
-                 y="0"
-                 x="0">1</tspan>
-            </text>
-          </g>
-          <g
-             id="g5711">
-            <text
-               id="text5713"
-               style="font-variant:normal;font-weight:normal;font-size:21.89999962px;font-family:OpenSymbol;-inkscape-font-specification:OpenSymbol;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-               transform="matrix(1,0,0,-1,107.1,117.1)">
-              <tspan
-                 id="tspan5715"
-                 y="0"
-                 x="0">(</tspan>
-            </text>
-          </g>
-          <g
-             id="g5717">
-            <text
-               id="text5719"
-               style="font-variant:normal;font-weight:normal;font-size:21.89999962px;font-family:OpenSymbol;-inkscape-font-specification:OpenSymbol;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-               transform="matrix(1,0,0,-1,116.1,117.1)">
-              <tspan
-                 id="tspan5721"
-                 y="0"
-                 x="0">⃗</tspan>
-            </text>
-          </g>
-          <g
-             id="g5723">
-            <text
-               id="text5725"
-               style="font-style:italic;font-variant:normal;font-size:21.89999962px;font-family:'Liberation Serif';-inkscape-font-specification:LiberationSerif-Italic;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-               transform="matrix(1,0,0,-1,116.8,117.1)">
-              <tspan
-                 id="tspan5727"
-                 y="0"
-                 x="0">x</tspan>
-            </text>
-          </g>
-          <g
-             id="g5729">
-            <text
-               id="text5731"
-               style="font-style:italic;font-variant:normal;font-size:21.89999962px;font-family:'Liberation Serif';-inkscape-font-specification:LiberationSerif-Italic;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-               transform="matrix(1,0,0,-1,130.3,117.1)">
-              <tspan
-                 id="tspan5733"
-                 y="0"
-                 x="0">,</tspan>
-            </text>
-          </g>
-          <g
-             id="g5735">
-            <text
-               id="text5737"
-               style="font-style:italic;font-variant:normal;font-weight:bold;font-size:21.89999962px;font-family:'Liberation Serif';-inkscape-font-specification:LiberationSerif-BoldItalic;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-               transform="matrix(1,0,0,-1,139.4,117.1)">
-              <tspan
-                 id="tspan5739"
-                 y="0"
-                 x="0">D</tspan>
-            </text>
-          </g>
-          <g
-             id="g5741">
-            <text
-               id="text5743"
-               style="font-variant:normal;font-weight:normal;font-size:21.89999962px;font-family:OpenSymbol;-inkscape-font-specification:OpenSymbol;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-               transform="matrix(1,0,0,-1,157.4,117.1)">
-              <tspan
-                 id="tspan5745"
-                 y="0"
-                 x="0">(</tspan>
-            </text>
-          </g>
-          <g
-             id="g5747">
-            <text
-               id="text5749"
-               style="font-variant:normal;font-weight:normal;font-size:21.89999962px;font-family:OpenSymbol;-inkscape-font-specification:OpenSymbol;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-               transform="matrix(1,0,0,-1,165.6,117.1)">
-              <tspan
-                 id="tspan5751"
-                 y="0"
-                 x="0">⃗</tspan>
-            </text>
-          </g>
-          <g
-             id="g5753">
-            <text
-               id="text5755"
-               style="font-style:italic;font-variant:normal;font-size:21.89999962px;font-family:'Liberation Serif';-inkscape-font-specification:LiberationSerif-Italic;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-               transform="matrix(1,0,0,-1,167.1,117.1)">
-              <tspan
-                 id="tspan5757"
-                 y="0"
-                 x="0">x</tspan>
-            </text>
-          </g>
-          <g
-             id="g5759">
-            <text
-               id="text5761"
-               style="font-variant:normal;font-weight:normal;font-size:21.89999962px;font-family:OpenSymbol;-inkscape-font-specification:OpenSymbol;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-               transform="matrix(1,0,0,-1,178.4,117.1)">
-              <tspan
-                 id="tspan5763"
-                 y="0"
-                 x="0">)</tspan>
-            </text>
-          </g>
-          <g
-             id="g5765">
-            <text
-               id="text5767"
-               style="font-variant:normal;font-weight:normal;font-size:21.89999962px;font-family:OpenSymbol;-inkscape-font-specification:OpenSymbol;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-               transform="matrix(1,0,0,-1,185.8,117.1)">
-              <tspan
-                 id="tspan5769"
-                 y="0"
-                 x="0">)</tspan>
-            </text>
-          </g>
-          <g
-             id="g5771">
-            <text
-               id="text5773"
-               style="font-variant:normal;font-weight:normal;font-size:21.89999962px;font-family:OpenSymbol;-inkscape-font-specification:OpenSymbol;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-               transform="matrix(1,0,0,-1,193.4,117.1)">
-              <tspan
-                 id="tspan5775"
-                 y="0"
-                 x="0">)</tspan>
-            </text>
-          </g>
-        </g>
+         id="g5615"
+         transform="matrix(0.35277777,0,0,-0.35277777,8.3154743,207.79762)">
+        <text
+           id="text5617"
+           style="font-variant:normal;font-weight:normal;font-size:21.89999962px;font-family:OpenSymbol;-inkscape-font-specification:OpenSymbol;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+           transform="matrix(1,0,0,-1,32.9,145.6)">
+          <tspan
+             id="tspan5619"
+             y="0"
+             x="0">τ</tspan>
+        </text>
+      </g>
+      <g
+         id="g5621"
+         transform="matrix(0.35277777,0,0,-0.35277777,8.3154743,207.79762)">
+        <text
+           id="text5623"
+           style="font-variant:normal;font-weight:normal;font-size:21.89999962px;font-family:OpenSymbol;-inkscape-font-specification:OpenSymbol;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+           transform="matrix(1,0,0,-1,44.8,145.6)">
+          <tspan
+             id="tspan5625"
+             y="0"
+             x="0">(</tspan>
+        </text>
+      </g>
+      <g
+         id="g5627"
+         transform="matrix(0.35277777,0,0,-0.35277777,8.3154743,207.79762)">
+        <text
+           id="text5629"
+           style="font-style:italic;font-variant:normal;font-size:21.89999962px;font-family:'Liberation Serif';-inkscape-font-specification:LiberationSerif-Italic;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+           transform="matrix(1,0,0,-1,53.1,145.6)">
+          <tspan
+             id="tspan5631"
+             y="0"
+             x="0"
+             style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:'Liberation Serif';-inkscape-font-specification:'Liberation Serif Bold'">T</tspan>
+        </text>
+      </g>
+      <g
+         id="g5633"
+         transform="matrix(0.35277777,0,0,-0.35277777,8.3154743,207.79762)">
+        <text
+           id="text5635"
+           style="font-style:italic;font-variant:normal;font-size:21.89999962px;font-family:'Liberation Serif';-inkscape-font-specification:LiberationSerif-Italic;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+           transform="matrix(1,0,0,-1,69.6,145.6)">
+          <tspan
+             id="tspan5637"
+             y="0"
+             x="0">,</tspan>
+        </text>
+      </g>
+      <g
+         id="g5645"
+         transform="matrix(0.35277777,0,0,-0.35277777,8.3154743,207.79762)">
+        <text
+           id="text5647"
+           style="font-style:italic;font-variant:normal;font-size:21.89999962px;font-family:'Liberation Serif';-inkscape-font-specification:LiberationSerif-Italic;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+           transform="matrix(1,0,0,-1,78.6,145.6)">
+          <tspan
+             id="tspan5649"
+             y="0"
+             x="0"
+             style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:'Liberation Serif';-inkscape-font-specification:'Liberation Serif Bold'">x</tspan>
+        </text>
+      </g>
+      <g
+         id="g5651"
+         transform="matrix(0.35277777,0,0,-0.35277777,8.3154743,207.79762)">
+        <text
+           id="text5653"
+           style="font-variant:normal;font-weight:normal;font-size:21.89999962px;font-family:OpenSymbol;-inkscape-font-specification:OpenSymbol;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+           transform="matrix(1,0,0,-1,90.6,145.6)">
+          <tspan
+             id="tspan5655"
+             y="0"
+             x="0">)</tspan>
+        </text>
+      </g>
+      <g
+         id="g5657"
+         transform="matrix(0.35277777,0,0,-0.35277777,8.3154743,207.79762)">
+        <text
+           id="text5659"
+           style="font-variant:normal;font-weight:normal;font-size:21.89999962px;font-family:'Liberation Serif';-inkscape-font-specification:LiberationSerif;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+           transform="matrix(1,0,0,-1,104.1,145.6)">
+          <tspan
+             id="tspan5661"
+             y="0"
+             x="0">:</tspan>
+        </text>
+      </g>
+      <g
+         id="g5663"
+         transform="matrix(0.35277777,0,0,-0.35277777,8.3154743,207.79762)">
+        <text
+           id="text5665"
+           style="font-variant:normal;font-weight:normal;font-size:21.89999962px;font-family:OpenSymbol;-inkscape-font-specification:OpenSymbol;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+           transform="matrix(1,0,0,-1,110.8,145.6)">
+          <tspan
+             id="tspan5667"
+             y="0"
+             x="0">=</tspan>
+        </text>
+      </g>
+      <g
+         id="g5669"
+         transform="matrix(0.35277777,0,0,-0.35277777,8.3154743,207.79762)">
+        <text
+           id="text5671"
+           style="font-variant:normal;font-weight:normal;font-size:21.89999962px;font-family:OpenSymbol;-inkscape-font-specification:OpenSymbol;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+           transform="matrix(1,0,0,-1,32.1,117.1)">
+          <tspan
+             id="tspan5673"
+             y="0"
+             x="0">π</tspan>
+        </text>
+      </g>
+      <g
+         id="g5675"
+         transform="matrix(0.35277777,0,0,-0.35277777,8.3154743,207.79762)">
+        <text
+           id="text5677"
+           style="font-variant:normal;font-weight:normal;font-size:21.89999962px;font-family:OpenSymbol;-inkscape-font-specification:OpenSymbol;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+           transform="matrix(1,0,0,-1,45.6,117.1)">
+          <tspan
+             id="tspan5679"
+             y="0"
+             x="0">(</tspan>
+        </text>
+      </g>
+      <g
+         id="g5681"
+         transform="matrix(0.35277777,0,0,-0.35277777,8.3154743,207.79762)">
+        <text
+           id="text5683"
+           style="font-style:italic;font-variant:normal;font-weight:bold;font-size:21.89999962px;font-family:'Liberation Serif';-inkscape-font-specification:LiberationSerif-BoldItalic;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+           transform="matrix(1,0,0,-1,53.9,117.1)">
+          <tspan
+             id="tspan5685"
+             y="0"
+             x="0"
+             style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:'Liberation Serif';-inkscape-font-specification:'Liberation Serif Bold'">T</tspan>
+        </text>
+      </g>
+      <g
+         id="g5687"
+         transform="matrix(0.35277777,0,0,-0.35277777,8.3154743,207.79762)">
+        <text
+           id="text5689"
+           style="font-variant:normal;font-weight:normal;font-size:21.89999962px;font-family:OpenSymbol;-inkscape-font-specification:OpenSymbol;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+           transform="matrix(1,0,0,-1,66.6,117.1)">
+          <tspan
+             id="tspan5691"
+             y="0"
+             x="0">⋅</tspan>
+        </text>
+      </g>
+      <g
+         id="g5693"
+         transform="matrix(0.35277777,0,0,-0.35277777,8.3154743,207.79762)">
+        <text
+           id="text5695"
+           style="font-variant:normal;font-weight:normal;font-size:21.89999962px;font-family:OpenSymbol;-inkscape-font-specification:OpenSymbol;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+           transform="matrix(1,0,0,-1,77.1,117.1)">
+          <tspan
+             id="tspan5697"
+             y="0"
+             x="0">π</tspan>
+        </text>
+      </g>
+      <g
+         id="g5699"
+         transform="matrix(0.35277777,0,0,-0.35277777,8.3154743,207.79762)">
+        <text
+           id="text5701"
+           style="font-variant:normal;font-weight:normal;font-size:13.10000038px;font-family:OpenSymbol;-inkscape-font-specification:OpenSymbol;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+           transform="matrix(1,0,0,-1,89.1,126.8)">
+          <tspan
+             id="tspan5703"
+             y="0"
+             x="0">−</tspan>
+        </text>
+      </g>
+      <g
+         id="g5705"
+         transform="matrix(0.35277777,0,0,-0.35277777,8.3154743,207.79762)">
+        <text
+           id="text5707"
+           style="font-variant:normal;font-weight:normal;font-size:13.10000038px;font-family:'Liberation Serif';-inkscape-font-specification:LiberationSerif;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+           transform="matrix(1,0,0,-1,99.6,126.8)">
+          <tspan
+             id="tspan5709"
+             y="0"
+             x="0">1</tspan>
+        </text>
+      </g>
+      <g
+         id="g5711"
+         transform="matrix(0.35277777,0,0,-0.35277777,8.3154743,207.79762)">
+        <text
+           id="text5713"
+           style="font-variant:normal;font-weight:normal;font-size:21.89999962px;font-family:OpenSymbol;-inkscape-font-specification:OpenSymbol;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+           transform="matrix(1,0,0,-1,107.1,117.1)">
+          <tspan
+             id="tspan5715"
+             y="0"
+             x="0">(</tspan>
+        </text>
+      </g>
+      <g
+         id="g5723"
+         transform="matrix(0.35277777,0,0,-0.35277777,8.3154743,207.79762)">
+        <text
+           id="text5725"
+           style="font-style:italic;font-variant:normal;font-size:21.89999962px;font-family:'Liberation Serif';-inkscape-font-specification:LiberationSerif-Italic;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+           transform="matrix(1,0,0,-1,116.8,117.1)">
+          <tspan
+             id="tspan5727"
+             y="0"
+             x="0"
+             style="-inkscape-font-specification:'Liberation Serif Bold';font-family:'Liberation Serif';font-weight:bold;font-style:normal;font-stretch:normal;font-variant:normal">x</tspan>
+        </text>
+      </g>
+      <g
+         id="g5729"
+         transform="matrix(0.35277777,0,0,-0.35277777,8.3154743,207.79762)">
+        <text
+           id="text5731"
+           style="font-style:italic;font-variant:normal;font-size:21.89999962px;font-family:'Liberation Serif';-inkscape-font-specification:LiberationSerif-Italic;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+           transform="matrix(1,0,0,-1,130.3,117.1)">
+          <tspan
+             id="tspan5733"
+             y="0"
+             x="0">,</tspan>
+        </text>
+      </g>
+      <g
+         id="g5735"
+         transform="matrix(0.35277777,0,0,-0.35277777,8.3154743,207.79762)">
+        <text
+           id="text5737"
+           style="font-style:italic;font-variant:normal;font-weight:bold;font-size:21.89999962px;font-family:'Liberation Serif';-inkscape-font-specification:LiberationSerif-BoldItalic;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+           transform="matrix(1,0,0,-1,139.4,117.1)">
+          <tspan
+             id="tspan5739"
+             y="0"
+             x="0"
+             style="-inkscape-font-specification:'Liberation Serif Italic';font-family:'Liberation Serif';font-weight:normal;font-style:italic;font-stretch:normal;font-variant:normal">D</tspan>
+        </text>
+      </g>
+      <g
+         id="g5741"
+         transform="matrix(0.35277777,0,0,-0.35277777,8.3154743,207.79762)">
+        <text
+           id="text5743"
+           style="font-variant:normal;font-weight:normal;font-size:21.89999962px;font-family:OpenSymbol;-inkscape-font-specification:OpenSymbol;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+           transform="matrix(1,0,0,-1,157.4,117.1)">
+          <tspan
+             id="tspan5745"
+             y="0"
+             x="0">(</tspan>
+        </text>
+      </g>
+      <g
+         id="g5753"
+         transform="matrix(0.35277777,0,0,-0.35277777,8.3154743,207.79762)">
+        <text
+           id="text5755"
+           style="font-style:italic;font-variant:normal;font-size:21.89999962px;font-family:'Liberation Serif';-inkscape-font-specification:LiberationSerif-Italic;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+           transform="matrix(1,0,0,-1,167.1,117.1)">
+          <tspan
+             id="tspan5757"
+             y="0"
+             x="0"
+             style="-inkscape-font-specification:'Liberation Serif Bold';font-family:'Liberation Serif';font-weight:bold;font-style:normal;font-stretch:normal;font-variant:normal">x</tspan>
+        </text>
+      </g>
+      <g
+         id="g5759"
+         transform="matrix(0.35277777,0,0,-0.35277777,8.3154743,207.79762)">
+        <text
+           id="text5761"
+           style="font-variant:normal;font-weight:normal;font-size:21.89999962px;font-family:OpenSymbol;-inkscape-font-specification:OpenSymbol;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+           transform="matrix(1,0,0,-1,178.4,117.1)">
+          <tspan
+             id="tspan5763"
+             y="0"
+             x="0">)</tspan>
+        </text>
+      </g>
+      <g
+         id="g5765"
+         transform="matrix(0.35277777,0,0,-0.35277777,8.3154743,207.79762)">
+        <text
+           id="text5767"
+           style="font-variant:normal;font-weight:normal;font-size:21.89999962px;font-family:OpenSymbol;-inkscape-font-specification:OpenSymbol;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+           transform="matrix(1,0,0,-1,185.8,117.1)">
+          <tspan
+             id="tspan5769"
+             y="0"
+             x="0">)</tspan>
+        </text>
+      </g>
+      <g
+         id="g5771"
+         transform="matrix(0.35277777,0,0,-0.35277777,8.3154743,207.79762)">
+        <text
+           id="text5773"
+           style="font-variant:normal;font-weight:normal;font-size:21.89999962px;font-family:OpenSymbol;-inkscape-font-specification:OpenSymbol;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+           transform="matrix(1,0,0,-1,193.4,117.1)">
+          <tspan
+             id="tspan5775"
+             y="0"
+             x="0">)</tspan>
+        </text>
       </g>
     </g>
     <g
@@ -1676,7 +1481,8 @@
               <tspan
                  id="tspan5815"
                  y="0"
-                 x="0">I</tspan>
+                 x="0"
+                 style="-inkscape-font-specification:'Liberation Serif';font-family:'Liberation Serif';font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal">I</tspan>
             </text>
           </g>
           <g
@@ -1684,11 +1490,14 @@
             <text
                id="text5819"
                style="font-style:italic;font-variant:normal;font-weight:bold;font-size:16.79999924px;font-family:'Liberation Serif';-inkscape-font-specification:LiberationSerif-BoldItalic;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-               transform="matrix(1,0,0,-1,283.5,116.6)">
+               transform="scale(1,-1)"
+               x="280.29999"
+               y="-116.6">
               <tspan
                  id="tspan5821"
-                 y="0"
-                 x="0">p</tspan>
+                 y="-116.6"
+                 x="280.29999"
+                 style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Liberation Serif';-inkscape-font-specification:'Liberation Serif Italic'">C</tspan>
             </text>
           </g>
           <g
@@ -1812,7 +1621,8 @@
               <tspan
                  id="tspan5897"
                  y="0"
-                 x="0">T</tspan>
+                 x="0"
+                 style="-inkscape-font-specification:'Liberation Serif Bold';font-family:'Liberation Serif';font-weight:bold;font-style:normal;font-stretch:normal;font-variant:normal">T</tspan>
             </text>
           </g>
           <g
@@ -1828,17 +1638,7 @@
             </text>
           </g>
           <g
-             id="g5905">
-            <text
-               id="text5907"
-               style="font-variant:normal;font-weight:normal;font-size:22px;font-family:OpenSymbol;-inkscape-font-specification:OpenSymbol;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-               transform="matrix(1,0,0,-1,549.7,147.2)">
-              <tspan
-                 id="tspan5909"
-                 y="0"
-                 x="0">⃗</tspan>
-            </text>
-          </g>
+             id="g5905" />
           <g
              id="g5911">
             <text
@@ -1848,7 +1648,8 @@
               <tspan
                  id="tspan5915"
                  y="0"
-                 x="0">x</tspan>
+                 x="0"
+                 style="-inkscape-font-specification:'Liberation Serif Bold';font-family:'Liberation Serif';font-weight:bold;font-style:normal;font-stretch:normal;font-variant:normal">x</tspan>
             </text>
           </g>
           <g
@@ -1896,7 +1697,8 @@
               <tspan
                  id="tspan5939"
                  y="0"
-                 x="0">I</tspan>
+                 x="0"
+                 style="-inkscape-font-specification:'Liberation Serif Italic';font-family:'Liberation Serif';font-weight:normal;font-style:italic;font-stretch:normal;font-variant:normal">I</tspan>
             </text>
           </g>
           <g
@@ -1904,11 +1706,14 @@
             <text
                id="text5943"
                style="font-style:italic;font-variant:normal;font-weight:bold;font-size:13.19999981px;font-family:'Liberation Serif';-inkscape-font-specification:LiberationSerif-BoldItalic;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-               transform="matrix(1,0,0,-1,516.7,114.9)">
+               transform="scale(1,-1)"
+               x="513.5"
+               y="-114.9">
               <tspan
                  id="tspan5945"
-                 y="0"
-                 x="0">c</tspan>
+                 y="-114.9"
+                 x="513.5"
+                 style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Liberation Serif';-inkscape-font-specification:'Liberation Serif Italic'">P</tspan>
             </text>
           </g>
           <g
@@ -1956,7 +1761,8 @@
               <tspan
                  id="tspan5969"
                  y="0"
-                 x="0">T</tspan>
+                 x="0"
+                 style="-inkscape-font-specification:'Liberation Serif Bold';font-family:'Liberation Serif';font-weight:bold;font-style:normal;font-stretch:normal;font-variant:normal">T</tspan>
             </text>
           </g>
           <g
@@ -1972,17 +1778,7 @@
             </text>
           </g>
           <g
-             id="g5977">
-            <text
-               id="text5979"
-               style="font-variant:normal;font-weight:normal;font-size:22px;font-family:OpenSymbol;-inkscape-font-specification:OpenSymbol;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-               transform="matrix(1,0,0,-1,579.7,119.5)">
-              <tspan
-                 id="tspan5981"
-                 y="0"
-                 x="0">⃗</tspan>
-            </text>
-          </g>
+             id="g5977" />
           <g
              id="g5983">
             <text
@@ -1992,7 +1788,8 @@
               <tspan
                  id="tspan5987"
                  y="0"
-                 x="0">x</tspan>
+                 x="0"
+                 style="-inkscape-font-specification:'Liberation Serif Bold';font-family:'Liberation Serif';font-weight:bold;font-style:normal;font-stretch:normal;font-variant:normal">x</tspan>
             </text>
           </g>
           <g
@@ -2040,7 +1837,8 @@
               <tspan
                  id="tspan6011"
                  y="0"
-                 x="0">I</tspan>
+                 x="0"
+                 style="-inkscape-font-specification:'Liberation Serif Italic';font-family:'Liberation Serif';font-weight:normal;font-style:italic;font-stretch:normal;font-variant:normal">I</tspan>
             </text>
           </g>
           <g
@@ -2048,11 +1846,14 @@
             <text
                id="text6015"
                style="font-style:italic;font-variant:normal;font-weight:bold;font-size:13.19999981px;font-family:'Liberation Serif';-inkscape-font-specification:LiberationSerif-BoldItalic;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-               transform="matrix(1,0,0,-1,639,114.9)">
+               transform="scale(1,-1)"
+               x="635.80005"
+               y="-114.9">
               <tspan
                  id="tspan6017"
-                 y="0"
-                 x="0">p</tspan>
+                 y="-114.9"
+                 x="635.80005"
+                 style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Liberation Serif';-inkscape-font-specification:'Liberation Serif Italic'">C</tspan>
             </text>
           </g>
           <g
@@ -2068,17 +1869,7 @@
             </text>
           </g>
           <g
-             id="g6025">
-            <text
-               id="text6027"
-               style="font-variant:normal;font-weight:normal;font-size:22px;font-family:OpenSymbol;-inkscape-font-specification:OpenSymbol;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
-               transform="matrix(1,0,0,-1,655.5,119.5)">
-              <tspan
-                 id="tspan6029"
-                 y="0"
-                 x="0">⃗</tspan>
-            </text>
-          </g>
+             id="g6025" />
           <g
              id="g6031">
             <text
@@ -2088,7 +1879,8 @@
               <tspan
                  id="tspan6035"
                  y="0"
-                 x="0">x</tspan>
+                 x="0"
+                 style="-inkscape-font-specification:'Liberation Serif Bold';font-family:'Liberation Serif';font-weight:bold;font-style:normal;font-stretch:normal;font-variant:normal">x</tspan>
             </text>
           </g>
           <g
@@ -2117,6 +1909,157 @@
            clip-path="url(#clipPath6085)"
            id="g6091"
            style="opacity:0.5" />
+      </g>
+    </g>
+    <g
+       id="g5371-4"
+       transform="matrix(0.35277778,0,0,-0.35277778,78.251737,207.15463)">
+      <g
+         id="g5373-6"
+         clip-path="url(#clipPath5375-1)">
+        <g
+           id="g5379-2" />
+        <g
+           id="g5385-5" />
+        <g
+           id="g5391-7">
+          <text
+             transform="matrix(1,0,0,-1,90.9,336.2)"
+             style="font-variant:normal;font-weight:normal;font-size:28px;font-family:OpenSymbol;-inkscape-font-specification:OpenSymbol;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+             id="text5393-3">
+            <tspan
+               x="0"
+               y="0"
+               id="tspan5395-3">π</tspan>
+          </text>
+        </g>
+        <g
+           id="g5397-5">
+          <text
+             transform="matrix(1,0,0,-1,105.8,348.2)"
+             style="font-variant:normal;font-weight:normal;font-size:16.79999924px;font-family:OpenSymbol;-inkscape-font-specification:OpenSymbol;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+             id="text5399-5">
+            <tspan
+               x="0"
+               y="0"
+               id="tspan5401-6">−</tspan>
+          </text>
+        </g>
+        <g
+           id="g5403-8">
+          <text
+             transform="matrix(1,0,0,-1,119.3,348.2)"
+             style="font-variant:normal;font-weight:normal;font-size:16.79999924px;font-family:'Liberation Serif';-inkscape-font-specification:LiberationSerif;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+             id="text5405-5">
+            <tspan
+               x="0"
+               y="0"
+               id="tspan5407-4">1</tspan>
+          </text>
+        </g>
+        <g
+           id="g5409-2">
+          <text
+             transform="matrix(1,0,0,-1,129.1,336.2)"
+             style="font-variant:normal;font-weight:normal;font-size:28px;font-family:OpenSymbol;-inkscape-font-specification:OpenSymbol;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+             id="text5411-8">
+            <tspan
+               x="0"
+               y="0"
+               id="tspan5413-6">(</tspan>
+          </text>
+        </g>
+        <g
+           id="g5415-2" />
+        <g
+           id="g5421-1">
+          <text
+             transform="matrix(1,0,0,-1,141.8,336.2)"
+             style="font-style:italic;font-variant:normal;font-size:28px;font-family:'Liberation Serif';-inkscape-font-specification:LiberationSerif-Italic;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+             id="text5423-3">
+            <tspan
+               x="0"
+               y="0"
+               id="tspan5425-0"
+               style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:'Liberation Serif';-inkscape-font-specification:'Liberation Serif Bold'">x</tspan>
+          </text>
+        </g>
+        <g
+           id="g5427-3">
+          <text
+             transform="matrix(1,0,0,-1,158.3,336.2)"
+             style="font-style:italic;font-variant:normal;font-size:28px;font-family:'Liberation Serif';-inkscape-font-specification:LiberationSerif-Italic;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+             id="text5429-0">
+            <tspan
+               x="0"
+               y="0"
+               id="tspan5431-8">,</tspan>
+          </text>
+        </g>
+        <g
+           id="g5433-3">
+          <text
+             transform="matrix(1,0,0,-1,169.6,336.2)"
+             style="font-style:italic;font-variant:normal;font-weight:bold;font-size:28px;font-family:'Liberation Serif';-inkscape-font-specification:LiberationSerif-BoldItalic;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+             id="text5435-0">
+            <tspan
+               x="0"
+               y="0"
+               id="tspan5437-2"
+               style="font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Liberation Serif';-inkscape-font-specification:'Liberation Serif Italic'">D</tspan>
+          </text>
+        </g>
+        <g
+           id="g5439-1">
+          <text
+             transform="matrix(1,0,0,-1,192.8,336.2)"
+             style="font-variant:normal;font-weight:normal;font-size:28px;font-family:OpenSymbol;-inkscape-font-specification:OpenSymbol;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+             id="text5441-6">
+            <tspan
+               x="0"
+               y="0"
+               id="tspan5443-8">(</tspan>
+          </text>
+        </g>
+        <g
+           id="g5445-3" />
+        <g
+           id="g5451-2">
+          <text
+             transform="matrix(1,0,0,-1,204.8,336.2)"
+             style="font-style:italic;font-variant:normal;font-size:28px;font-family:'Liberation Serif';-inkscape-font-specification:LiberationSerif-Italic;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+             id="text5453-5">
+            <tspan
+               x="0"
+               y="0"
+               id="tspan5455-1"
+               style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:'Liberation Serif';-inkscape-font-specification:'Liberation Serif Bold'">x</tspan>
+          </text>
+        </g>
+        <g
+           id="g5457-6">
+          <text
+             transform="matrix(1,0,0,-1,219.9,336.2)"
+             style="font-variant:normal;font-weight:normal;font-size:28px;font-family:OpenSymbol;-inkscape-font-specification:OpenSymbol;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+             id="text5459-2">
+            <tspan
+               x="0"
+               y="0"
+               id="tspan5461-0">)</tspan>
+          </text>
+        </g>
+        <g
+           id="g5463-9">
+          <text
+             transform="matrix(1,0,0,-1,229.6,336.2)"
+             style="font-variant:normal;font-weight:normal;font-size:28px;font-family:OpenSymbol;-inkscape-font-specification:OpenSymbol;writing-mode:lr-tb;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none"
+             id="text5465-5">
+            <tspan
+               x="0"
+               y="0"
+               id="tspan5467-7">)</tspan>
+          </text>
+        </g>
       </g>
     </g>
   </g>

@@ -68,13 +68,13 @@ have the same brightness, regardless of viewing angle.
 This section closely follows \cite{omaridenseodometry}.
 
 Using an back-projection derived from the standard pinhole camera model, a
-point $ \vec{x} $ in the camera image plane is be back-projected into a point $
-\vec{p} \in \mathbb{R}^3 $ (written using homogeneous coordinates) by using the
-pixel's disparity value $D(\vec{x})$:
+point $ \vec{x} = [ x_u  x_v ]^\intercal $ in the camera image plane is be back-projected into a point $
+\vec{p_C} \in \mathbb{R}^3 $ (in the current frame of reference; written using
+homogeneous coordinates) by using the pixel's disparity value $D_C(\vec{x})$:
 
 \begin{equation}
     \label{eq:backprojection}
-    \vec{p} = \pi^{-1}(\vec{x}, D(\vec{x})) := \frac{b}{D(x)}
+    \vec{p_C} = \pi^{-1}(\vec{x}, D_C(\vec{x})) := \frac{b}{D_C(x)}
     \begin{bmatrix}
         x_u - c_u \\
         x_v - c_v \\
@@ -83,26 +83,25 @@ pixel's disparity value $D(\vec{x})$:
     \end{bmatrix}
 \end{equation}
 
-where $b$ is the stereo baseline, $f$ the focal length and $\vec{c}$ the principal point of the camera.
+where $b$ is the stereo baseline, $f$ the focal length and $\vec{c} = [ c_u c_v ]^\intercal$ the principal point of the camera.
 
-This point $\vec{p}$ can now be moved into a new camera frame by translating
-and rotating it, by writing $\vec{T}$ as a $4 \times 4$ homogeneous
+This point $\vec{p_C}$ can now be moved into the previous camera frame by translating
+and rotating it, by writing the transformation from the previous into the
+current camera frame $\vec{T_{PC}}$ as a $4 \times 4$ homogeneous
 transformation matrix:
 
-[TODO: soll ich das explizit als $f(\vec{T})\vec{p}$ schreiben?]
-
 \begin{equation}
-    \vec{p'} = \mat{T} \vec{p}
+    \vec{p_P} = \mat{T_{PC}} \cdot \vec{p_C}
 \end{equation}
 
 A point in 3D space can be projected back onto the (now moved) camera image plane:
 
 \begin{equation}
     \label{eq:projection}
-    \vec{x'} = \pi(\vec{p'}) := \frac{f}{p'_z}
+    \vec{x'} = \pi(\vec{p_P}) := \frac{f}{p_{z}}
     \begin{bmatrix}
-        p'_x \\
-        p'_y \\
+        p_{x} \\
+        p_{y} \\
     \end{bmatrix}
     + \vec{c}
 \end{equation}
@@ -110,7 +109,7 @@ A point in 3D space can be projected back onto the (now moved) camera image plan
 This whole warping operator is summarized in a warping operator $\tau$:
 
 \begin{equation}
-    \vec{x'} = \tau(\vec{x}, D(\vec{x}), \vec{T}) := \pi( \mat{T} \cdot \pi^{-1} (\vec{x}, D(\vec{x})))
+    \vec{x'} = \tau(\vec{x}, \vec{T_{PC}}) := \pi( \mat{T_{PC}} \cdot \pi^{-1} (\vec{x}, D_C(\vec{x})))
 \end{equation}
 
 
@@ -136,7 +135,7 @@ Using $\tau$, the error between the previous frame and the warped current frame 
 
 \begin{equation}
     \label{eq:error}
-    e(\vec{x}, \vec{T}) := I_p(\tau(\vec{x}, \vec{T})) - I_c(\vec{x})
+    e(\vec{x}, \vec{T_{PC}}) := I_P(\tau(\vec{x}, \vec{T_{PC}})) - I_C(\vec{x})
 \end{equation}
 
 
@@ -152,7 +151,7 @@ This equation can be solved for the estimated motion by applying standard
 optimization techniques, for example Gauss-Newton:
 
 \begin{equation}
-    \mat{J}^T \mat{J} \Delta \vec{T} = - \mat{J}^T \vec{e(\vec{T})}
+    \mat{J}^\intercal \mat{J} \Delta \vec{T} = - \mat{J}^\intercal \vec{e(\vec{T})}
 \end{equation}
 
 Here, $\mat{J} \in \mathbb{R}^{N \times 6}$ are the stacked Jacobian matrices
