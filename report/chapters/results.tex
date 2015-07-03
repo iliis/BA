@@ -28,12 +28,35 @@ has been accumulated. On faster trajectories with larger movement between
 frames, the Gauss-Newton optimization can diverge resulting in a completely
 wrong trajectory.
 
-An important finding, which was already noted in [TODO: cannot find a paper
-mentioning this], is that processing the camera images in their full resolution
-is not a necessity. As can be seen in figure~\ref{fig:trajectory}, even using
-only a twice downscaled image still results in precise tracking while
-drastically improving performance.
+An important finding, which was already noted in \cite{comport2007odometry}, is
+that processing the camera images in their full resolution is not a necessity.
+As can be seen in figure~\ref{fig:trajectory}, even using only a twice
+downscaled image still results in precise tracking while drastically improving
+performance.
 
+Downscaling usually implies filtering and doing so alters the 3D structure. For
+this reason, \cite{comport2007odometry} does not downscale the disparity values and
+samples them at the full resolution. Though when matching pose on the camera plane
+instead of in 3D space, downscaling the disparity values works as well.
+
+It might be worth investigating how much of an effect on performance and
+quality downscaling the disparity images has. Disparity values are only read at
+integer coordinates and downscaling them might not be worth the runtime
+penalty.
+
+\subsection{Keeping Pixel Numbers Stable}
+
+The optimizations described in section~\ref{sec:optimizations} can
+substantially reduce the pixel count, so much so that there are not enough for
+stable performance. Especially filtering pixels based on their image gradient
+as explained in section~\ref{sec:gradient_filtering} requires a well-chosen
+threshold, as image gradients depend on the scene. \cite{comport2007odometry}
+computes a histogram to select the $N$ best pixels. An easier approach is to
+simply restart the current iteration with a lower threshold when the number of
+pixels gets too low and increasing it after a step with enough pixels,
+therefore implementing a proportional controller as described in
+\cite{omaridenseodometry}. The same problem also applies to other optimization
+parameters such as the size of the image pyramid.
 
 \section{Timing}
 \label{sec:timing}

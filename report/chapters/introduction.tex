@@ -19,12 +19,19 @@ This approach of photometric odometry does not track a sparse set of features,
 as is usuallty done in visual odometry, but instead warps the full image to
 find a perspective where the warped image matches the previous frame.
 
-This approach is well suited for offloading to an FPGA, as most parts are
-highly parallelizable. Note tough, that this is not the most efficient way to do embedded odometry,
-as a lot more data has to be processed. The main goal was to explore how an
-FPGA and a general purpose processor can be integrated on an embedded device
-and to ascertain the potential for further optimizations by transfering more
-parts to the FPGA.
+Photometric odometry is very robust against various perturbations, such as
+blur, occlusions or changes in lighting \cite{comport2011asymmetric}. It is
+also more accurate than feature-based methods, as it incorporates every pixel
+instead of throwing out most of the data. This also increases computational
+load however. Visual odoemtry in general requires a well structured
+environment, as for example homogenous walls are basically impossible to track.
+
+This "dense" approach is well suited for offloading to an FPGA, as most parts
+are highly parallelizable. Note tough, that this is not the most efficient way
+to do embedded odometry, as a lot more data has to be processed. The main goal
+was to explore how an FPGA and a general purpose processor can be integrated on
+an embedded device and to ascertain the potential for further optimizations by
+transfering more parts to the FPGA.
 
 A visual-inertial sensor developed by the ASL \cite{nikolic2014synchronized} is
 used which features a Xilinx Zynq 7020 SoC consisting of a dual-core ARM Cortex
@@ -41,9 +48,7 @@ it is also power-efficient, consuming around \unit[5]{W}.
 
 Photometric odometry as initially developed by Comport et al. in
 \cite{comport2007odometry} has been implemented in \cite{omaridenseodometry} to
-use data from the SGM core but running on a powerful PC instead. They show that
-photometric odometry is very robust against various perturbations, such as
-blur, occlusions or changes in lighting \cite{comport2011asymmetric}.
+use data from the SGM core but running on a powerful PC instead.
 
 In \cite{marcin2014odometry}, feature-based odometry running on the vi-sensor
 is developed, which uses the FPGA for corner detection. While very similar in
