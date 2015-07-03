@@ -17,16 +17,30 @@ loss of accuracy.}
 \section{Qualitative Assessment}
 \label{sec:results_qualitative}
 
-To assess the quality of photometric approach to visual odometry, a circual
-trajectory of an indoor office scene was processed offline with a high quality
-SGM from OpenCV and run trough both the very accurate ASLAM algorithm
-\cite{leutenegger2013keyframe} and the photometric odometry method described in
-this work.
+To assess the quality of photometric approach to visual odometry, an indoor
+circular trajectory was processed offline with OpenCV's SGM to ensure
+high-quality disparity data.  It was also run trough the very accurate ASLAM
+algorithm \cite{leutenegger2013keyframe} to provide something akin to
+ground-truth.
 
 After a traveled distance of about \unit[12]{m} a drift of about \unit[20]{cm}
-has been accumulated. On faster trajectories with larger movement between
-frames, the Gauss-Newton optimization can diverge resulting in a completely
-wrong trajectory.
+has been accumulated.
+
+The trajectory was recorded in an office environment, using a vi-sensor as
+described in section~\ref{sec:motivation} with a baseline of \unit[11]{cm} and a
+\unit[112]{\degree} diagonal field of view, providing a resolution of $752
+\times 480$ pixels. To ensure photoconsistency, the shutter speed was fixed.
+The image gradient threshold was tuned to use at least \unit[25]{\%} of all
+pixels. The lowest resolution used in the image pyramid was $94 \times 60$
+pixels, downscaling the orignial image three times. No error weighting was
+used, as the trajectory did contain few occlusions. The code was compiled for
+maximum performance, using \texttt{-O3 -mfpu=neon -mfloat-abi=softfp
+-ffast-math -fno-finite-math-only}.
+
+Movement was restricted to a slow walking speed and was recorded with 30 FPS.
+On faster trajectories with larger movement between frames, the Gauss-Newton
+optimization diverges in badly lit or sparse parts with few image gradients,
+resulting in a completely wrong trajectory.
 
 An important finding, which was already noted in \cite{comport2007odometry}, is
 that processing the camera images in their full resolution is not a necessity.
@@ -69,10 +83,10 @@ parameters such as the size of the image pyramid.
 \end{figure}
 
 The different parts of the algorithm have been timed by counting CPU cycles
-while running the full photometric odometry on a single ARM core on the
-vi-sensor while moving around slowly. The time for the SGM is not shown in
-figure~\ref{fig:timing}, as this part is running on the FPGA with the full 30
-FPS provided by the cameras.
+while running the full photometric odometry on a single 667 MHz Cortex A9 ARM
+core on the vi-sensor while moving around slowly. The time for the SGM is not
+shown in figure~\ref{fig:timing}, as this part is running on the FPGA with the
+full 30 FPS provided by the cameras.
 
 Using early abort in the image pyramid we can achieve an average run-time
 performance of about 5 Hz.
@@ -87,5 +101,8 @@ IMU.
 Another important point is that at least half the time is spent on building the
 image pyramid, warping pixels and computing the Jacobians. These parts are
 highly parallelizable because every pixel is completely independent of each
-other. This offers great potential for offloading further work onto the FPGA,
-or the second ARM core.
+other. This offers great potential for further optimizations: Moving the
+construction of image pyramids to the FPGA is simple. Warping and the
+calculation of Jacobians less so, because these steps involve a lot of
+floating-point arithmetic, but they would still greatly profit from another CPU
+core or usage of vector instruction (such as the ARM NEON instruction set).
